@@ -1,0 +1,8 @@
+gradio
+presidio-analyzer
+presidio-anonymizer
+spacy
+pandas
+PyMuPDF
+python-docx
+python-dotenv
