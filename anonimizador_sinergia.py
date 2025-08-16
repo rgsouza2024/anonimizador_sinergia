@@ -1,5 +1,5 @@
-# Nome do arquivo: anonimizador_trf1.py
-# Versão 1.5 - Ajustes finos no layout do cabeçalho com Logo Sinergia
+# Nome do arquivo: anonimizador_sinergia.py
+# Versão 1.6 - Renomeação do arquivo principal
 
 import gradio as gr
 import spacy
