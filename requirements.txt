@@ -7,4 +7,4 @@ presidio-analyzer
 presidio-anonymizer
 spacy>=3.7.0
 # Linha especial para baixar o modelo de português do spaCy
-https://github.com/explosion/spacy-models/releases/download/pt_core_news_lg-3.7.5/pt_core_news_lg-3.7.5-py3-none-any.whl
+https://github.com/explosion/spacy-models/releases/download/pt_core_news_lg-3.7.0/pt_core_news_lg-3.7.0-py3-none-any.whl
