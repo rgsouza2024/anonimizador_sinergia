@@ -189,8 +189,6 @@ Substabelecimento
 Certidão de Nascimento
 Certidão de Casamento
 Certidão de Óbito
-Carteira de Identidade
-Carteira Nacional de Habilitação
 Comprovante de Residência
 Declaração de Hipossuficiência
 Atestado Médico
@@ -965,7 +963,6 @@ Permissão
 Concessão
 Alvará
 Registro
-Matrícula
 Cadastro
 Sistema Único de Benefícios
 Cadastro Único
@@ -1726,7 +1723,6 @@ Polícia Militar
 Corpo de Bombeiros Militar
 Guarda Municipal
 Secretaria de Segurança Pública
-SSP
 Departamento Estadual de Trânsito
 DETRAN
 Companhia Nacional de Abastecimento
@@ -2069,7 +2065,6 @@ Programa Nacional de Apoio à Cultura
 PROCONVE
 Programa de Controle da Poluição do Ar por Veículos Automotores
 RENACH
-Registro Nacional de Carteiras de Habilitação
 RENAVAM
 Registro Nacional de Veículos Automotores
 SIMPLES Nacional
