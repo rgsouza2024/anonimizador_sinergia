@@ -1,5 +1,5 @@
 # Nome do arquivo: anonimizador_sinergia.py
-# Versão 1.6 - Renomeação do arquivo principal
+# Versão 0.93 - Beta 
 
 import gradio as gr
 import spacy
@@ -72,11 +72,34 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CI", name="CIRecognizer", patterns=[Pattern(name="ci_formatado", regex=r"\bCI\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(name="ci_padrao", regex=r"\b\d{1,2}\.?\d{3}\.?\d{3}-?\d\b", score=0.90)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CIN", name="CINRecognizer", patterns=[Pattern(name="cin_formatado", regex=r"\bCIN\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(name="cin_padrao", regex=r"\b\d{1,2}\.?\d{3}\.?\d{3}-?\d\b", score=0.90)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="MATRICULA_SIAPE", name="MatriculaSiapeRecognizer", patterns=[Pattern(name="matricula_siape", regex=r"(?i)\b(matr[íi]cula|siape)\b", score=0.95)], supported_language="pt"))
+    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="TERMO_IDENTIDADE", name="TermoIdentidadeRecognizer", patterns=[Pattern(name="termo_rg_id", regex=r"(?i)\b(RG|carteira|identidade|ssp)\b", score=0.95)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ID_DOCUMENTO", name="IdDocumentoRecognizer", patterns=[Pattern(name="numero_beneficio_nb_formatado", regex=r"\bNB\s*\d{1,3}(\.?\d{3}){2}-[\dX]\b", score=0.98), Pattern(name="id_numerico_longo_pje", regex=r"\b\d{10,25}\b", score=0.97), Pattern(name="id_prefixo_numerico", regex=r"\bID\s*\d{8,12}\b", score=0.97), Pattern(name="numero_rg_completo", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+(?:-\dª\s*VIA)?\s*-\s*[A-Z]{2,3}\/[A-Z]{2}\b", score=0.98), Pattern(name="numero_rg_simples", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+\b", score=0.97), Pattern(name="numero_processo_cnj", regex=r"\b\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}\b", score=0.95), Pattern(name="numero_rnm", regex=r"\bRNM\s*(?:nº|n\.)?\s*[A-Z0-9]{7,15}\b", score=0.98), Pattern(name="numero_crm", regex=r"\bCRM\s*[A-Z]{2}\s*-\s*\d{1,6}\b", score=0.98)], supported_language="pt"))
     return analyzer
 
 def obter_operadores_anonimizacao():
-    return {"DEFAULT": OperatorConfig("keep"),"PERSON": OperatorConfig("replace", {"new_value": "<NOME>"}),"LOCATION": OperatorConfig("replace", {"new_value": "<ENDERECO>"}),"EMAIL_ADDRESS": OperatorConfig("replace", {"new_value": "<EMAIL>"}),"PHONE_NUMBER": OperatorConfig("mask", {"type": "mask", "masking_char": "*", "chars_to_mask": 4, "from_end": True}),"CPF": OperatorConfig("replace", {"new_value": "<CPF>"}),"DATE_TIME": OperatorConfig("keep"),"OAB_NUMBER": OperatorConfig("replace", {"new_value": "<OAB>"}),"CEP_NUMBER": OperatorConfig("replace", {"new_value": "<CEP>"}),"ESTADO_CIVIL": OperatorConfig("keep"),"ORGANIZACAO_CONHECIDA": OperatorConfig("keep"),"ID_DOCUMENTO": OperatorConfig("keep"),"LEGAL_OR_COMMON_TERM": OperatorConfig("keep"),"CNH": OperatorConfig("replace", {"new_value": "***"}),"SIAPE": OperatorConfig("replace", {"new_value": "***"}),"CI": OperatorConfig("replace", {"new_value": "***"}),"CIN": OperatorConfig("replace", {"new_value": "***"}),"RG": OperatorConfig("replace", {"new_value": "***"}),"MATRICULA_SIAPE": OperatorConfig("replace", {"new_value": "***"}),"TERMO_COMUM": OperatorConfig("keep")}
+    return {
+        "DEFAULT": OperatorConfig("keep"),
+        "PERSON": OperatorConfig("replace", {"new_value": "<NOME>"}),
+        "LOCATION": OperatorConfig("replace", {"new_value": "<ENDERECO>"}),
+        "EMAIL_ADDRESS": OperatorConfig("replace", {"new_value": "<EMAIL>"}),
+        "PHONE_NUMBER": OperatorConfig("mask", {"type": "mask", "masking_char": "*", "chars_to_mask": 4, "from_end": True}),
+        "CPF": OperatorConfig("replace", {"new_value": "<CPF>"}),
+        "DATE_TIME": OperatorConfig("keep"),
+        "OAB_NUMBER": OperatorConfig("replace", {"new_value": "<OAB>"}),
+        "CEP_NUMBER": OperatorConfig("replace", {"new_value": "<CEP>"}),
+        "ESTADO_CIVIL": OperatorConfig("keep"),
+        "ORGANIZACAO_CONHECIDA": OperatorConfig("keep"),
+        "ID_DOCUMENTO": OperatorConfig("keep"),
+        "LEGAL_OR_COMMON_TERM": OperatorConfig("keep"),
+        "CNH": OperatorConfig("replace", {"new_value": "***"}),
+        "SIAPE": OperatorConfig("replace", {"new_value": "***"}),
+        "CI": OperatorConfig("replace", {"new_value": "***"}),
+        "CIN": OperatorConfig("replace", {"new_value": "***"}),
+        "RG": OperatorConfig("replace", {"new_value": "***"}),
+        "MATRICULA_SIAPE": OperatorConfig("replace", {"new_value": "***"}),
+        "TERMO_IDENTIDADE": OperatorConfig("replace", {"new_value": "***"}),
+        "TERMO_COMUM": OperatorConfig("keep")
+    }
 
 def carregar_anonymizer_engine(): return AnonymizerEngine()
 

@@ -1,5 +1,5 @@
 # Nome do arquivo: anonimizador_trf1.py
-# Versão 1.2 - Interface de Download Corrigida 
+# Versão 0.90 - Interface de Download Corrigida 
 
 import gradio as gr
 import spacy
