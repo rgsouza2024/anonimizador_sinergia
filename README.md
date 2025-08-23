@@ -5,7 +5,7 @@ colorFrom: indigo
 colorTo: green
 sdk: gradio
 sdk_version: 5.42.0
-app_file: app.py
+app_file: anonimizador_sinergia.py
 pinned: false
 license: mit
 short_description: Anonimizador de dados do Projeto Sinergia
