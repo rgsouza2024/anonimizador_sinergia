@@ -66,43 +66,66 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
         nlp_engine=spacy_engine_obj, supported_languages=["pt"], default_score_threshold=0.4)
     if termos_safe_location:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="SAFE_LOCATION", name="SafeLocationRecognizer",
-                                           deny_list=termos_safe_location, supported_language="pt", deny_list_score=0.99))
+                                                            deny_list=termos_safe_location, supported_language="pt", deny_list_score=0.99))
     if termos_legal_header:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="LEGAL_HEADER", name="LegalHeaderRecognizer",
-                                           deny_list=termos_legal_header, supported_language="pt", deny_list_score=0.99))
+                                                            deny_list=termos_legal_header, supported_language="pt", deny_list_score=0.99))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CPF", name="CustomCpfRecognizer", patterns=[
-                                     Pattern(name="CpfRegexPattern", regex=r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", score=0.85)], supported_language="pt"))
+        Pattern(name="CpfRegexPattern", regex=r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", score=0.85)
+    ], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="OAB_NUMBER", name="CustomOabRecognizer", patterns=[
-                                     Pattern(name="OabRegexPattern", regex=r"\b(?:OAB\s+)?\d{1,6}(?:\.\d{3})?\s*\/\s*[A-Z]{2}\b", score=0.85)], supported_language="pt"))
+                                      Pattern(name="OabRegexPattern", regex=r"\b(?:OAB\s+)?\d{1,6}(?:\.\d{3})?\s*\/\s*[A-Z]{2}\b", score=0.85)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CEP_NUMBER", name="CustomCepRecognizer", patterns=[
-                                     Pattern(name="CepPattern", regex=r"\b(\d{5}-?\d{3}|\d{2}\.\d{3}-?\d{3})\b", score=0.80)], supported_language="pt"))
+                                      Pattern(name="CepPattern", regex=r"\b(\d{5}-?\d{3}|\d{2}\.\d{3}-?\d{3})\b", score=0.80)], supported_language="pt"))
     if termos_estado_civil:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ESTADO_CIVIL", name="EstadoCivilRecognizer", patterns=[
-                                     Pattern(name=f"estado_civil_{t.lower()}", regex=rf"(?i)\b{re.escape(t)}\b", score=0.99) for t in termos_estado_civil], supported_language="pt"))
+                                      Pattern(name=f"estado_civil_{t.lower()}", regex=rf"(?i)\b{re.escape(t)}\b", score=0.99) for t in termos_estado_civil], supported_language="pt"))
     if termos_organizacoes_conhecidas:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ORGANIZACAO_CONHECIDA", name="OrganizacaoConhecidaRecognizer", patterns=[
-                                     Pattern(name=f"org_{t.lower()}", regex=rf"(?i)\b{re.escape(t)}\b", score=0.99) for t in termos_organizacoes_conhecidas], supported_language="pt"))
+                                      Pattern(name=f"org_{t.lower()}", regex=rf"(?i)\b{re.escape(t)}\b", score=0.99) for t in termos_organizacoes_conhecidas], supported_language="pt"))
     if termos_comuns_a_manter:
         recognizer_common_terms = PatternRecognizer(
             supported_entity="TERMO_COMUM", name="CommonTermsRecognizer", deny_list=termos_comuns_a_manter, supported_language="pt", deny_list_score=1.0)
         analyzer.registry.add_recognizer(recognizer_common_terms)
     if lista_sobrenomes:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="PERSON", name="BrazilianCommonSurnamesRecognizer", patterns=[
-                                     Pattern(name=f"surname_{s.lower().replace(' ', '_')}", regex=rf"(?i)\b{re.escape(s)}\b", score=0.97) for s in lista_sobrenomes], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CNH", name="CNHRecognizer", patterns=[Pattern(
-        name="cnh_formatado", regex=r"\bCNH\s*(?:nº|n\.)?\s*\d{11}\b", score=0.98), Pattern(name="cnh_apenas_numeros", regex=r"\b(?<![\w])\d{11}(?![\w])\b", score=0.85)], supported_language="pt"))
+                                      Pattern(name=f"surname_{s.lower().replace(' ', '_')}", regex=rf"(?i)\b{re.escape(s)}\b", score=0.97) for s in lista_sobrenomes], supported_language="pt"))
+    
+    # ---> INÍCIO DA MODIFICAÇÃO <---
+    # SCORE AUMENTADO PARA 0.98 PARA VENCER O CONFLITO COM ID_DOCUMENTO
+    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CNH", name="CNHRecognizer", patterns=[
+        Pattern(name="cnh_formatado", regex=r"\bCNH\s*(?:nº|n\.)?\s*\d{11}\b", score=0.99), 
+        Pattern(name="cnh_apenas_numeros", regex=r"\b(?<![\w])\d{11}(?![\w])\b", score=0.98)
+    ], supported_language="pt"))
+    # ---> FIM DA MODIFICAÇÃO <---
+
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="SIAPE", name="SIAPERecognizer", patterns=[Pattern(
         name="siape_formatado", regex=r"\bSIAPE\s*(?:nº|n\.)?\s*\d{7}\b", score=0.98), Pattern(name="siape_apenas_numeros", regex=r"\b(?<![\w])\d{7}(?![\w])\b", score=0.85)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CI", name="CIRecognizer", patterns=[Pattern(name="ci_formatado", regex=r"\bCI\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(
         name="ci_padrao", regex=r"\b\d{1,2}\.?\d{3}\.?\d{3}-?\d\b", score=0.90)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CIN", name="CINRecognizer", patterns=[Pattern(name="cin_formatado", regex=r"\bCIN\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(
         name="cin_padrao", regex=r"\b\d{1,2}\.?\d{3}\.?\d{3}-?\d\b", score=0.90)], supported_language="pt"))
+    analyzer.registry.add_recognizer(PatternRecognizer(
+        supported_entity="RG_NUMBER",
+        name="CustomRgRecognizer",
+        patterns=[
+            Pattern(name="numero_rg_completo", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+(?:-\dª\s*VIA)?\s*-\s*[A-Z]{2,3}\/[A-Z]{2}\b", score=0.99),
+            Pattern(name="numero_rg_simples", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+\b", score=0.98)
+        ],
+        supported_language="pt"
+    ))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="MATRICULA_SIAPE", name="MatriculaSiapeRecognizer", patterns=[
-                                     Pattern(name="matricula_siape", regex=r"(?i)\b(matr[íi]cula|siape)\b", score=0.95)], supported_language="pt"))
+                                      Pattern(name="matricula_siape", regex=r"(?i)\b(matr[íi]cula|siape)\b", score=0.95)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="TERMO_IDENTIDADE", name="TermoIdentidadeRecognizer", patterns=[
-                                     Pattern(name="termo_rg_id", regex=r"(?i)\b(RG|carteira|identidade|ssp)\b", score=0.95)], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ID_DOCUMENTO", name="IdDocumentoRecognizer", patterns=[Pattern(name="numero_beneficio_nb_formatado", regex=r"\bNB\s*\d{1,3}(\.?\d{3}){2}-[\dX]\b", score=0.98), Pattern(name="id_numerico_longo_pje", regex=r"\b\d{10,25}\b", score=0.97), Pattern(name="id_prefixo_numerico", regex=r"\bID\s*\d{8,12}\b", score=0.97), Pattern(
-        name="numero_rg_completo", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+(?:-\dª\s*VIA)?\s*-\s*[A-Z]{2,3}\/[A-Z]{2}\b", score=0.98), Pattern(name="numero_rg_simples", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+\b", score=0.97), Pattern(name="numero_processo_cnj", regex=r"\b\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}\b", score=0.95), Pattern(name="numero_rnm", regex=r"\bRNM\s*(?:nº|n\.)?\s*[A-Z0-9]{7,15}\b", score=0.98), Pattern(name="numero_crm", regex=r"\bCRM\s*[A-Z]{2}\s*-\s*\d{1,6}\b", score=0.98)], supported_language="pt"))
+                                      Pattern(name="termo_rg_id", regex=r"(?i)\b(RG|carteira|identidade|ssp)\b", score=0.95)], supported_language="pt"))
+    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ID_DOCUMENTO", name="IdDocumentoRecognizer", patterns=[
+        Pattern(name="numero_beneficio_nb_formatado", regex=r"\bNB\s*\d{1,3}(\.?\d{3}){2}-[\dX]\b", score=0.98),
+        Pattern(name="id_numerico_longo_pje", regex=r"\b\d{10,25}\b", score=0.97),
+        Pattern(name="id_prefixo_numerico", regex=r"\bID\s*\d{8,12}\b", score=0.97),
+        Pattern(name="numero_processo_cnj", regex=r"\b\d{7}-\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}\b", score=0.95),
+        Pattern(name="numero_rnm", regex=r"\bRNM\s*(?:nº|n\.)?\s*[A-Z0-9]{7,15}\b", score=0.98),
+        Pattern(name="numero_crm", regex=r"\bCRM\s*[A-Z]{2}\s*-\s*\d{1,6}\b", score=0.98)
+    ], supported_language="pt"))
     return analyzer
 
 
@@ -121,10 +144,16 @@ def obter_operadores_anonimizacao():
         "ORGANIZACAO_CONHECIDA": OperatorConfig("keep"),
         "ID_DOCUMENTO": OperatorConfig("keep"),
         "LEGAL_OR_COMMON_TERM": OperatorConfig("keep"),
-        "CNH": OperatorConfig("replace", {"new_value": "***"}),
+        
+        # ---> INÍCIO DA MODIFICAÇÃO <---
+        # ESTA REGRA AGORA ANONIMIZA QUALQUER SEQUÊNCIA DE 11 DÍGITOS
+        "CNH": OperatorConfig("replace", {"new_value": "***********"}),
+        # ---> FIM DA MODIFICAÇÃO <---
+
         "SIAPE": OperatorConfig("replace", {"new_value": "***"}),
         "CI": OperatorConfig("replace", {"new_value": "***"}),
         "CIN": OperatorConfig("replace", {"new_value": "***"}),
+        "RG_NUMBER": OperatorConfig("replace", {"new_value": "<NUMERO RG>"}),
         "RG": OperatorConfig("replace", {"new_value": "***"}),
         "MATRICULA_SIAPE": OperatorConfig("replace", {"new_value": "***"}),
         "TERMO_IDENTIDADE": OperatorConfig("replace", {"new_value": "***"}),
