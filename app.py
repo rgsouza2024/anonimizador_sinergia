@@ -1,5 +1,5 @@
 # Nome do arquivo: app.py (anonimizador_sinergia)
-# Versão 0.95 - Beta (botão de cópia aumentado)
+# Versão 0.95 - Beta
 
 import gradio as gr
 import spacy
