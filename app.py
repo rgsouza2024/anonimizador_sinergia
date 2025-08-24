@@ -1,5 +1,5 @@
 # Nome do arquivo: app.py (anonimizador_sinergia)
-# Versão 0.95 - Beta
+# Versão 0.96 - Versão Beta
 
 import gradio as gr
 import spacy
@@ -22,6 +22,7 @@ load_dotenv()
 # --- Constantes ---
 NOME_ARQUIVO_SOBRENOMES = "sobrenomes_comuns.txt"
 NOME_ARQUIVO_TERMOS_COMUNS = "termos_comuns.txt"
+NOME_ARQUIVO_TITULOS = "titulos_legais.txt"
 LOGO_FILE_PATH = "Logo Projeto Sinergia TRF1 - Fundo Transparente.png"
 
 # --- Funções e Listas para o Motor de Anonimização ---
@@ -44,6 +45,7 @@ def carregar_lista_de_arquivo(nome_arquivo):
 
 LISTA_SOBRENOMES_FREQUENTES_BR = carregar_lista_de_arquivo(NOME_ARQUIVO_SOBRENOMES)
 LISTA_TERMOS_COMUNS = carregar_lista_de_arquivo(NOME_ARQUIVO_TERMOS_COMUNS)
+LISTA_TITULOS_LEGAIS = carregar_lista_de_arquivo(NOME_ARQUIVO_TITULOS)
 LISTA_ESTADOS_CAPITAIS_BR = ["Acre", "AC", "Alagoas", "AL", "Amapá", "AP", "Amazonas", "AM", "Bahia", "BA", "Ceará", "CE", "Distrito Federal", "DF", "Espírito Santo", "ES", "Goiás", "GO", "Maranhão", "MA", "Mato Grosso", "MT", "Mato Grosso do Sul", "MS", "Minas Gerais", "MG", "Pará", "PA", "Paraíba", "PB", "Paraná", "PR", "Pernambuco", "PE", "Piauí", "PI", "Rio de Janeiro", "RJ", "Rio Grande do Norte", "RN", "Rio Grande do Sul", "RS", "Rondônia", "RO", "Roraima", "RR", "Santa Catarina", "SC", "São Paulo", "SP", "Sergipe", "SE", "Tocantins", "TO",
                              "Aracaju", "Belém", "Belo Horizonte", "Boa Vista", "Brasília", "Campo Grande", "Cuiabá", "Curitiba", "Florianópolis", "Fortaleza", "Goiânia", "João Pessoa", "Macapá", "Maceió", "Manaus", "Natal", "Palmas", "Porto Alegre", "Porto Velho", "Recife", "Rio Branco", "Salvador", "São Luís", "Teresina", "Vitória"]
 TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR = ["EXMO. SR. DR. JUIZ FEDERAL", "EXMO SR DR JUIZ FEDERAL", "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ FEDERAL", "JUIZ FEDERAL", "EXMO. SR. DR. JUIZ DE DIREITO", "EXMO SR DR JUIZ DE DIREITO", "EXCELENTÍSSIMO SENHOR DOUTOR JUIZ DE DIREITO", "JUIZ DE DIREITO", "JUIZADO ESPECIAL FEDERAL", "VARA DA SEÇÃO JUDICIÁRIA", "SEÇÃO JUDICIÁRIA", "EXMO.", "EXMO", "SR.", "DR.", "Dra.", "DRA.", "EXCELENTÍSSIMO(A) SENHOR(A) DOUTOR(A) JUIZ(A) FEDERAL",
@@ -54,7 +56,7 @@ LISTA_ORGANIZACOES_CONHECIDAS = ["FUNASA", "INSS", "IBAMA", "CNPQ", "IBGE", "FIO
                                 "Turma Recursal", "PJE", "SJGO", "SJDF", "SJMA", "SJAC", "SJAL", "SJAP", "SJAM", "SJBA", "SJCE", "SJDF", "SJES", "SJGO", "SJMA", "SJMG", "SJMS", "SJMT", "SJPA", "SJPB", "SJPE", "SJPI", "SJPR", "SJPE", "SJRN", "SJRO", "SJRR", "SJRS", "SJSC", "SJSE", "SJSP", "SJTO", "Justiça Federal da 1ª Região", "PJe - Processo Judicial Eletrônico"]
 
 # --- Configuração e Inicialização do Presidio (Motor Principal) ---
-def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_sobrenomes, termos_estado_civil, termos_organizacoes_conhecidas, termos_comuns_a_manter):
+def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_sobrenomes, termos_estado_civil, termos_organizacoes_conhecidas, termos_comuns_a_manter, titulos_legais):
     try:
         spacy.load('pt_core_news_lg')
     except OSError:
@@ -70,6 +72,22 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
     if termos_legal_header:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="LEGAL_HEADER", name="LegalHeaderRecognizer",
                                                             deny_list=termos_legal_header, supported_language="pt", deny_list_score=0.99))
+
+    if titulos_legais:
+        palavras_para_regex = '|'.join(titulos_legais)
+        legal_titles_pattern = Pattern(
+            name="legal_title_pattern",
+            regex=rf"(?i)\b({palavras_para_regex})(?:\([A-Z]\))?\b",
+            score=1.0
+        )
+        legal_title_recognizer = PatternRecognizer(
+            supported_entity="LEGAL_TITLE",
+            name="LegalTitleRecognizer",
+            patterns=[legal_titles_pattern],
+            supported_language="pt"
+        )
+        analyzer.registry.add_recognizer(legal_title_recognizer)
+
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CPF", name="CustomCpfRecognizer", patterns=[
         Pattern(name="CpfRegexPattern", regex=r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", score=0.85)
     ], supported_language="pt"))
@@ -90,15 +108,10 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
     if lista_sobrenomes:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="PERSON", name="BrazilianCommonSurnamesRecognizer", patterns=[
                                       Pattern(name=f"surname_{s.lower().replace(' ', '_')}", regex=rf"(?i)\b{re.escape(s)}\b", score=0.97) for s in lista_sobrenomes], supported_language="pt"))
-    
-    # ---> INÍCIO DA MODIFICAÇÃO <---
-    # SCORE AUMENTADO PARA 0.98 PARA VENCER O CONFLITO COM ID_DOCUMENTO
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CNH", name="CNHRecognizer", patterns=[
-        Pattern(name="cnh_formatado", regex=r"\bCNH\s*(?:nº|n\.)?\s*\d{11}\b", score=0.99), 
+        Pattern(name="cnh_formatado", regex=r"\bCNH\s*(?:nº|n\.)?\s*\d{11}\b", score=0.99),
         Pattern(name="cnh_apenas_numeros", regex=r"\b(?<![\w])\d{11}(?![\w])\b", score=0.98)
     ], supported_language="pt"))
-    # ---> FIM DA MODIFICAÇÃO <---
-
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="SIAPE", name="SIAPERecognizer", patterns=[Pattern(
         name="siape_formatado", regex=r"\bSIAPE\s*(?:nº|n\.)?\s*\d{7}\b", score=0.98), Pattern(name="siape_apenas_numeros", regex=r"\b(?<![\w])\d{7}(?![\w])\b", score=0.85)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CI", name="CIRecognizer", patterns=[Pattern(name="ci_formatado", regex=r"\bCI\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(
@@ -143,13 +156,9 @@ def obter_operadores_anonimizacao():
         "ESTADO_CIVIL": OperatorConfig("keep"),
         "ORGANIZACAO_CONHECIDA": OperatorConfig("keep"),
         "ID_DOCUMENTO": OperatorConfig("keep"),
+        "LEGAL_TITLE": OperatorConfig("keep"), # <-- CORREÇÃO 2: REGRA ADICIONADA
         "LEGAL_OR_COMMON_TERM": OperatorConfig("keep"),
-        
-        # ---> INÍCIO DA MODIFICAÇÃO <---
-        # ESTA REGRA AGORA ANONIMIZA QUALQUER SEQUÊNCIA DE 11 DÍGITOS
         "CNH": OperatorConfig("replace", {"new_value": "***********"}),
-        # ---> FIM DA MODIFICAÇÃO <---
-
         "SIAPE": OperatorConfig("replace", {"new_value": "***"}),
         "CI": OperatorConfig("replace", {"new_value": "***"}),
         "CIN": OperatorConfig("replace", {"new_value": "***"}),
@@ -160,13 +169,20 @@ def obter_operadores_anonimizacao():
         "TERMO_COMUM": OperatorConfig("keep")
     }
 
-
 def carregar_anonymizer_engine(): return AnonymizerEngine()
 
 
-analyzer_engine = carregar_analyzer_engine(LISTA_ESTADOS_CAPITAIS_BR, TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR,
-                                           LISTA_SOBRENOMES_FREQUENTES_BR, LISTA_ESTADO_CIVIL, LISTA_ORGANIZACOES_CONHECIDAS, LISTA_TERMOS_COMUNS)
-anonymizer_engine = carregar_anonymizer_engine()
+# ---> CORREÇÃO 1: INICIALIZAÇÃO CORRIGIDA <---
+analyzer_engine = carregar_analyzer_engine(
+    LISTA_ESTADOS_CAPITAIS_BR,
+    TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR,
+    LISTA_SOBRENOMES_FREQUENTES_BR,
+    LISTA_ESTADO_CIVIL,
+    LISTA_ORGANIZACOES_CONHECIDAS,
+    LISTA_TERMOS_COMUNS,
+    LISTA_TITULOS_LEGAIS
+)
+anonymizer_engine = carregar_anonymizer_engine() # Corrigido de 'carregar_analyzer_engine'
 operadores = obter_operadores_anonimizacao()
 
 def extrair_texto_de_pdf(caminho_arquivo_pdf):
