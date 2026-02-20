@@ -14,6 +14,7 @@ import fitz  # PyMuPDF
 from docx import Document
 import re
 import os
+import time
 from dotenv import load_dotenv
 
 # Carrega as variáveis de ambiente do arquivo .env (opcional, mas bom manter)
@@ -24,6 +25,12 @@ NOME_ARQUIVO_SOBRENOMES = "sobrenomes_comuns.txt"
 NOME_ARQUIVO_TERMOS_COMUNS = "termos_comuns.txt"
 NOME_ARQUIVO_TITULOS = "titulos_legais.txt"
 LOGO_FILE_PATH = "Logo Projeto Sinergia TRF1 - Fundo Transparente.png"
+ESTADO_VAZIO_TEXTO_ANONIMIZADO = "O texto anonimizado aparecera aqui apos clicar em 'Anonimizar texto'."
+ESTADO_VAZIO_PDF_ORIGINAL = "O texto extraido do PDF sera exibido aqui apos o processamento."
+ESTADO_VAZIO_PDF_ANONIMIZADO = "O resultado anonimizado do PDF sera exibido aqui apos o processamento."
+COLUNAS_ENTIDADES_DETECTADAS = ["Entidade", "Texto Detectado", "Inicio", "Fim", "Score"]
+RESUMO_VAZIO_TEXTO = "**Resumo:** aguardando processamento do texto."
+RESUMO_VAZIO_PDF = "**Resumo:** aguardando processamento do PDF."
 
 # --- Funções e Listas para o Motor de Anonimização ---
 def carregar_lista_de_arquivo(nome_arquivo):
@@ -185,6 +192,25 @@ analyzer_engine = carregar_analyzer_engine(
 anonymizer_engine = carregar_anonymizer_engine() # Corrigido de 'carregar_analyzer_engine'
 operadores = obter_operadores_anonimizacao()
 
+def dataframe_entidades_vazio():
+    return pd.DataFrame(columns=COLUNAS_ENTIDADES_DETECTADAS)
+
+
+def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None):
+    sufixo_tempo = ""
+    if tempo_segundos is not None:
+        sufixo_tempo = f" Tempo total: {tempo_segundos:.2f}s."
+    if df_resultados is None or df_resultados.empty:
+        return f"**Resumo ({origem}):** nenhuma entidade detectada.{sufixo_tempo}"
+    total_entidades = len(df_resultados)
+    tipos_unicos = df_resultados["Entidade"].nunique()
+    top_tipos = df_resultados["Entidade"].value_counts().head(3)
+    top_formatado = ", ".join([f"{entidade} ({qtde})" for entidade, qtde in top_tipos.items()])
+    return (
+        f"**Resumo ({origem}):** {total_entidades} entidades detectadas em "
+        f"{tipos_unicos} tipos. Principais ocorrencias: {top_formatado}.{sufixo_tempo}"
+    )
+
 def extrair_texto_de_pdf(caminho_arquivo_pdf):
     texto_completo = ""
     try:
@@ -227,50 +253,164 @@ def _anonimizar_logica(texto_original):
     return resultado_anonimizado_obj.text, pd.DataFrame(dados_resultados)
 
 
+def atualizar_estado_botao_texto(texto_original):
+    texto_valido = bool(texto_original and texto_original.strip())
+    return gr.update(interactive=texto_valido)
+
+
+def atualizar_estado_botao_pdf(arquivo_temp):
+    return gr.update(interactive=arquivo_temp is not None)
+
+
+def desativar_botao():
+    return gr.update(interactive=False)
+
+
 def processar_texto_area(texto_original):
     if not texto_original or not texto_original.strip():
-        gr.Warning("Por favor, insira um texto na área para anonimizar.")
-        return "O resultado da anonimização aparecerá aqui...", pd.DataFrame(None)
+        gr.Warning("Cole ou digite um texto antes de iniciar a anonimização.")
+        return ESTADO_VAZIO_TEXTO_ANONIMIZADO, dataframe_entidades_vazio(), RESUMO_VAZIO_TEXTO
+    inicio_processamento = time.perf_counter()
     try:
         texto_anonimizado, df_resultados = _anonimizar_logica(texto_original)
+        tempo_total = time.perf_counter() - inicio_processamento
+        resumo_processamento = gerar_resumo_processamento(df_resultados, "Texto", tempo_total)
         gr.Info("Texto da área anonimizado com sucesso!")
-        return texto_anonimizado, df_resultados
+        return texto_anonimizado, df_resultados, resumo_processamento
     except Exception as e:
         gr.Error(f"Ocorreu um erro durante a anonimização: {e}")
-        return "Erro ao processar o texto.", pd.DataFrame(None)
+        tempo_total = time.perf_counter() - inicio_processamento
+        return "Não foi possível processar o texto.", dataframe_entidades_vazio(), f"**Resumo:** erro no processamento. Tempo total: {tempo_total:.2f}s."
+
+
+def limpar_texto_area():
+    return "", ESTADO_VAZIO_TEXTO_ANONIMIZADO, dataframe_entidades_vazio(), RESUMO_VAZIO_TEXTO, gr.update(interactive=False)
 
 
 def processar_arquivo_pdf(arquivo_temp, progress=gr.Progress()):
     if arquivo_temp is None:
-        gr.Warning("Por favor, carregue um arquivo PDF.")
-        return None, None
+        gr.Warning("Selecione um arquivo PDF antes de iniciar a anonimização.")
+        return ESTADO_VAZIO_PDF_ORIGINAL, ESTADO_VAZIO_PDF_ANONIMIZADO, RESUMO_VAZIO_PDF
+    inicio_processamento = time.perf_counter()
     progress(0, desc="Iniciando...")
     try:
         progress(0.2, desc="Extraindo texto do PDF...")
         texto_extraido, erro = extrair_texto_de_pdf(arquivo_temp.name)
         if erro:
             gr.Error(erro)
-            return None, None
+            tempo_total = time.perf_counter() - inicio_processamento
+            return ESTADO_VAZIO_PDF_ORIGINAL, ESTADO_VAZIO_PDF_ANONIMIZADO, f"**Resumo:** erro na extração. Tempo total: {tempo_total:.2f}s."
         progress(0.6, desc="Anonimizando o conteúdo...")
-        texto_anonimizado, _ = _anonimizar_logica(texto_extraido)
+        texto_anonimizado, df_resultados = _anonimizar_logica(texto_extraido)
+        tempo_total = time.perf_counter() - inicio_processamento
+        resumo_processamento = gerar_resumo_processamento(df_resultados, "PDF", tempo_total)
         progress(1, desc="Concluído!")
         gr.Info("Arquivo PDF anonimizado com sucesso!")
-        return texto_extraido, texto_anonimizado
+        return texto_extraido, texto_anonimizado, resumo_processamento
     except Exception as e:
         gr.Error(f"Ocorreu um erro ao processar o PDF: {e}")
-        return None, None
+        tempo_total = time.perf_counter() - inicio_processamento
+        return ESTADO_VAZIO_PDF_ORIGINAL, ESTADO_VAZIO_PDF_ANONIMIZADO, f"**Resumo:** erro no processamento. Tempo total: {tempo_total:.2f}s."
 
 # --- CSS Customizado para aumentar o botão de cópia ---
 custom_css = """
-/* Aumenta a área clicável e o tamanho geral do botão de copiar */
+:root {
+    --font-base: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    --color-primary: #0b5cab;
+    --color-primary-hover: #084987;
+    --color-bg-subtle: #f5f8fc;
+    --color-border: #d8e0eb;
+    --space-1: 8px;
+    --space-2: 16px;
+    --space-3: 24px;
+    --radius-1: 10px;
+}
+
+.gradio-container {
+    font-family: var(--font-base);
+    padding: var(--space-3) !important;
+}
+
+#header {
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+#header h1 {
+    margin-bottom: var(--space-1) !important;
+}
+
+.gradio-container .tabs {
+    margin-top: var(--space-2);
+}
+
+.gradio-container .tabitem {
+    padding-top: var(--space-2);
+}
+
+.gradio-container .gr-accordion {
+    margin-top: var(--space-2);
+}
+
+.gradio-container textarea,
+.gradio-container input[type="text"],
+.gradio-container input[type="file"],
+.gradio-container table {
+    border-radius: var(--radius-1) !important;
+    border-color: var(--color-border) !important;
+}
+
+.gradio-container .gr-button {
+    border-radius: var(--radius-1) !important;
+    padding: var(--space-1) var(--space-2) !important;
+}
+
+.gradio-container .gr-button.primary {
+    background: var(--color-primary) !important;
+    border-color: var(--color-primary) !important;
+}
+
+.gradio-container .gr-button.primary:hover {
+    background: var(--color-primary-hover) !important;
+    border-color: var(--color-primary-hover) !important;
+}
+
+.gradio-container .gr-button:not(.primary) {
+    background: #f2f4f7 !important;
+    color: #1f2937 !important;
+    border-color: #cfd8e3 !important;
+}
+
+.gradio-container .gr-button:not(.primary):hover {
+    background: #e7edf4 !important;
+    border-color: #b8c4d1 !important;
+}
+
+.gradio-container .cta-row {
+    gap: var(--space-1);
+    margin-bottom: var(--space-1);
+}
+
+.gradio-container .gr-markdown {
+    margin-bottom: var(--space-2);
+}
+
+.gradio-container > .gr-markdown:nth-of-type(2) {
+    background: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-1);
+    padding: var(--space-2);
+}
+
 button.copy-button {
     padding: 6px !important;
     min-width: 36px !important;
     min-height: 36px !important;
 }
-/* Aumenta o tamanho do ícone SVG (o desenho) dentro do botão */
+
 button.copy-button > svg {
-    transform: scale(1.1); /* Deixa o ícone 10% maior */
+    transform: scale(1.1);
 }
 """
 
@@ -285,50 +425,107 @@ with gr.Blocks(theme=gr.themes.Soft(), title="Anonimizador TRF1", css=custom_css
             gr.Markdown(
                 """
                 # Anonimizador SINERGIA
-                **Ferramenta para anonimização de documentos.** **Desenvolvido pelo Projeto Sinergia - TRF1.**
+                **Anonimize textos jurídicos com apoio de NLP e regras customizadas.**
+                Desenvolvido pelo Projeto Sinergia - TRF1.
                 """
             )
 
+    gr.Markdown(
+        """
+        ### Limites e privacidade
+        - Esta ferramenta processa o texto enviado para detectar e anonimizar entidades.
+        - PDFs digitalizados como imagem podem não conter texto extraível (OCR não incluso nesta versão).
+        - Revise o resultado antes de compartilhar o documento, pois nenhum modelo acerta 100% dos casos.
+        - Siga as políticas internas de privacidade e LGPD ao usar dados pessoais.
+        """
+    )
+
     with gr.Tabs():
-        with gr.TabItem("⌨️ Anonimizar Texto Colado"):
+        with gr.TabItem("Anonimizar texto"):
+            gr.Markdown("### Passo 1: cole o texto original e clique em **Anonimizar texto**.")
             with gr.Row():
                 with gr.Column(scale=1):
                     texto_original_area = gr.Textbox(
-                        lines=15, label="Texto Original", placeholder="Cole ou digite o texto aqui...")
+                        lines=15,
+                        label="Texto original",
+                        placeholder="Cole ou digite o conteúdo que deseja anonimizar.")
 
                 with gr.Column(scale=1):
                     texto_anonimizado_area = gr.Textbox(
-                        lines=15, label="Texto Anonimizado", interactive=False, show_copy_button=True)
+                        lines=15,
+                        value=ESTADO_VAZIO_TEXTO_ANONIMIZADO,
+                        label="Texto anonimizado",
+                        interactive=False,
+                        show_copy_button=True)
 
-            btn_limpar_area = gr.Button("🗑️ Limpar")
-            btn_anonimizar_area = gr.Button(
-                "🔍 Anonimizar Texto", variant="primary", size="lg")
+            with gr.Row(elem_classes=["cta-row"]):
+                btn_anonimizar_area = gr.Button("Anonimizar texto", variant="primary", size="lg", interactive=False)
+                btn_limpar_area = gr.Button("Limpar campos", variant="secondary")
+            resumo_texto_area = gr.Markdown(value=RESUMO_VAZIO_TEXTO)
 
-            with gr.Accordion("📊 Ver Entidades Detectadas", open=False):
-                resultados_df_area = gr.DataFrame(label="Entidades Encontradas")
+            with gr.Accordion("Ver entidades detectadas", open=False):
+                resultados_df_area = gr.DataFrame(
+                    label="Entidades encontradas",
+                    value=dataframe_entidades_vazio(),
+                    interactive=False)
 
-        with gr.TabItem("🗂️ Anonimizar Arquivo PDF"):
-            gr.Markdown("### Passo 1: Carregue seu documento PDF")
-            upload_pdf = gr.File(
-                label="Selecione o arquivo PDF", file_types=['.pdf'])
-            btn_anonimizar_pdf = gr.Button(
-                "🔍 Anonimizar PDF Carregado", variant="primary")
-            gr.Markdown("### Passo 2: Confira os resultados")
+        with gr.TabItem("Anonimizar arquivo PDF"):
+            gr.Markdown("### Passo 1: envie um PDF com texto pesquisável e clique em **Anonimizar PDF**.")
+            upload_pdf = gr.File(label="Selecione o arquivo PDF", file_types=['.pdf'])
+            with gr.Row(elem_classes=["cta-row"]):
+                btn_anonimizar_pdf = gr.Button("Anonimizar PDF", variant="primary", size="lg", interactive=False)
+            resumo_pdf = gr.Markdown(value=RESUMO_VAZIO_PDF)
+            gr.Markdown("### Passo 2: revise o texto original extraído e a versão anonimizada.")
             with gr.Row():
-                with gr.Accordion("📄 Ver Texto Extraído do PDF (Original)", open=False):
+                with gr.Accordion("Ver texto original extraído do PDF", open=False):
                     texto_original_pdf = gr.Textbox(
-                        lines=15, label="Texto Original Extraído", interactive=False)
+                        lines=15,
+                        value=ESTADO_VAZIO_PDF_ORIGINAL,
+                        label="Texto original extraído",
+                        interactive=False)
                 with gr.Column():
                     texto_anonimizado_pdf = gr.Textbox(
-                        lines=14, label="Texto Anonimizado", interactive=False, show_copy_button=True)
+                        lines=14,
+                        value=ESTADO_VAZIO_PDF_ANONIMIZADO,
+                        label="Texto anonimizado",
+                        interactive=False,
+                        show_copy_button=True)
 
     # --- Lógica de Conexão dos Componentes (Event Listeners) ---
-    btn_anonimizar_area.click(fn=processar_texto_area, inputs=[texto_original_area], outputs=[
-                              texto_anonimizado_area, resultados_df_area])
-    btn_limpar_area.click(lambda: ("", "", pd.DataFrame(None)), outputs=[
-                          texto_original_area, texto_anonimizado_area, resultados_df_area])
-    btn_anonimizar_pdf.click(fn=processar_arquivo_pdf, inputs=[upload_pdf], outputs=[
-                             texto_original_pdf, texto_anonimizado_pdf])
+    texto_original_area.change(fn=atualizar_estado_botao_texto, inputs=[texto_original_area], outputs=[btn_anonimizar_area])
+    upload_pdf.change(fn=atualizar_estado_botao_pdf, inputs=[upload_pdf], outputs=[btn_anonimizar_pdf])
+    evento_anonimizar_texto = btn_anonimizar_area.click(
+        fn=desativar_botao,
+        outputs=[btn_anonimizar_area],
+        queue=False,
+    ).then(
+        fn=processar_texto_area,
+        inputs=[texto_original_area],
+        outputs=[texto_anonimizado_area, resultados_df_area, resumo_texto_area],
+    )
+    evento_anonimizar_texto.then(
+        fn=atualizar_estado_botao_texto,
+        inputs=[texto_original_area],
+        outputs=[btn_anonimizar_area],
+        queue=False,
+    )
+    btn_limpar_area.click(fn=limpar_texto_area, outputs=[
+                          texto_original_area, texto_anonimizado_area, resultados_df_area, resumo_texto_area, btn_anonimizar_area])
+    evento_anonimizar_pdf = btn_anonimizar_pdf.click(
+        fn=desativar_botao,
+        outputs=[btn_anonimizar_pdf],
+        queue=False,
+    ).then(
+        fn=processar_arquivo_pdf,
+        inputs=[upload_pdf],
+        outputs=[texto_original_pdf, texto_anonimizado_pdf, resumo_pdf],
+    )
+    evento_anonimizar_pdf.then(
+        fn=atualizar_estado_botao_pdf,
+        inputs=[upload_pdf],
+        outputs=[btn_anonimizar_pdf],
+        queue=False,
+    )
 
 # --- Ponto de Entrada para Iniciar o App ---
 if __name__ == "__main__":
