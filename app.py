@@ -15,6 +15,7 @@ from docx import Document
 import re
 import os
 import time
+import unicodedata
 from dotenv import load_dotenv
 
 # Carrega as variáveis de ambiente do arquivo .env (opcional, mas bom manter)
@@ -31,6 +32,59 @@ ESTADO_VAZIO_PDF_ANONIMIZADO = "O resultado anonimizado do PDF sera exibido aqui
 COLUNAS_ENTIDADES_DETECTADAS = ["Entidade", "Texto Detectado", "Inicio", "Fim", "Score"]
 RESUMO_VAZIO_TEXTO = "**Resumo:** aguardando processamento do texto."
 RESUMO_VAZIO_PDF = "**Resumo:** aguardando processamento do PDF."
+PLACEHOLDER_NOME_PARTE_EXTERNO = "<NOME_PARTE_AUTORA>"
+PLACEHOLDER_NOME_PARTE_INTERNO = "__NOME_PARTE_AUTORA__"
+PAPEIS_ALVO_NOME_PARTE = [
+    "AUTOR",
+    "AUTORA",
+    "PARTE AUTORA",
+    "RECORRENTE",
+    "REQUERENTE",
+    "RECORRIDO",
+    "RECORRIDA",
+]
+TERMOS_EXCLUSAO_NOME_PARTE = [
+    "ADVOGADO",
+    "ADVOGADA",
+    "OAB",
+    "JUIZ",
+    "JUIZA",
+    "RELATOR",
+    "PROCURADOR",
+    "PROCURADORIA",
+    "DESEMBARGADOR",
+    "MINISTRO",
+    "DEFENSOR",
+    "PATRONO",
+    "PATRONA",
+    "TERCEIRO INTERESSADO",
+]
+TERMOS_INDICADORES_PJ = [
+    "LTDA",
+    "S/A",
+    "EIRELI",
+    "ME",
+    "MEI",
+    "CNPJ",
+    "INSTITUTO",
+    "ASSOCIACAO",
+    "SOCIEDADE",
+    "EMPRESA",
+    "FUNDACAO",
+    "AUTARQUIA",
+    "UNIAO",
+    "MUNICIPIO",
+    "ESTADO",
+    "MINISTERIO",
+    "SECRETARIA",
+]
+PALAVRAS_NAO_NOME_GENERICAS = [
+    "PODER", "JUDICIARIO", "JUSTICA", "FEDERAL", "SECAO", "VARA", "PROCESSO",
+    "BENEFICIO", "ASSISTENCIAL", "PRESTACAO", "CONTINUADA", "SENTENCA", "CONTESTACAO",
+    "TURMA", "RECURSAL", "TRIBUNAL", "REGIAO", "DOCUMENTO", "ASSINADO", "ELETRONICAMENTE",
+    "ADVOCACIA", "PROCURADORIA", "INSS", "MINISTERIO", "PUBLICO", "DEFENSORIA", "UNIAO",
+]
+REGEX_UF_BR = r"(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)"
 
 # --- Funções e Listas para o Motor de Anonimização ---
 def carregar_lista_de_arquivo(nome_arquivo):
@@ -95,13 +149,124 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
         )
         analyzer.registry.add_recognizer(legal_title_recognizer)
 
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CPF", name="CustomCpfRecognizer", patterns=[
-        Pattern(name="CpfRegexPattern", regex=r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", score=0.85)
-    ], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="OAB_NUMBER", name="CustomOabRecognizer", patterns=[
-                                      Pattern(name="OabRegexPattern", regex=r"\b(?:OAB\s+)?\d{1,6}(?:\.\d{3})?\s*\/\s*[A-Z]{2}\b", score=0.85)], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CEP_NUMBER", name="CustomCepRecognizer", patterns=[
-                                      Pattern(name="CepPattern", regex=r"\b(\d{5}-?\d{3}|\d{2}\.\d{3}-?\d{3})\b", score=0.80)], supported_language="pt"))
+    analyzer.registry.add_recognizer(PatternRecognizer(
+        supported_entity="CPF",
+        name="CustomCpfRecognizer",
+        patterns=[
+            Pattern(
+                name="cpf_formatado",
+                regex=r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b",
+                score=1.0
+            ),
+            Pattern(
+                name="cpf_com_separadores",
+                regex=r"\b\d{3}[.\s]\d{3}[.\s]\d{3}[-\s]\d{2}\b",
+                score=0.99
+            ),
+            Pattern(
+                name="cpf_com_rotulo",
+                regex=r"(?i)\bCPF\s*(?:n[ºo°.]?\s*)?:?\s*\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b",
+                score=1.0
+            ),
+            Pattern(
+                name="cin_com_rotulo",
+                regex=r"(?i)\bCIN\s*(?:n[ºo°.]?\s*)?:?\s*\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b",
+                score=1.0
+            ),
+            Pattern(
+                name="carteira_identidade_nacional_com_numero",
+                regex=r"(?i)\bCarteira\s+de\s+Identidade\s+Nacional\b[\s:\-nºo°\.]{0,20}\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b",
+                score=0.99
+            ),
+            Pattern(
+                name="cpf_apenas_numeros",
+                regex=r"(?<!\d)\d{11}(?!\d)",
+                score=0.995
+            ),
+        ],
+        supported_language="pt"
+    ))
+    analyzer.registry.add_recognizer(PatternRecognizer(
+        supported_entity="OAB_NUMBER",
+        name="CustomOabRecognizer",
+        patterns=[
+            Pattern(
+                name="oab_uf_numero",
+                regex=rf"(?i)\bOAB\s*(?:n[º°.]?\s*)?(?:/|-)?\s*{REGEX_UF_BR}\s*(?:[Nn][º°o.\?]?\s*)?[-.]?\s*\d{{1,6}}(?:\.\d{{3}})?\b",
+                score=0.90
+            ),
+            Pattern(
+                name="oab_numero_uf",
+                regex=rf"(?i)\bOAB\s*(?:n[º°.]?\s*)?\d{{1,6}}(?:\.\d{{3}})?\s*\/\s*{REGEX_UF_BR}\b",
+                score=0.88
+            ),
+            Pattern(
+                name="oab_uf_numero_compacto",
+                regex=rf"(?i)\bOAB\s*(?:/|-)?\s*{REGEX_UF_BR}\s*[-.]?\s*\d{{4,6}}(?:\.\d{{3}})?\b",
+                score=0.80
+            ),
+            Pattern(
+                name="oab_uf_numero_sem_prefixo",
+                regex=rf"(?i)(?<!/)\b{REGEX_UF_BR}\s*[-.]?\s*\d{{4,6}}(?:\.\d{{3}})?\b",
+                score=0.70
+            ),
+        ],
+        supported_language="pt"
+    ))
+    analyzer.registry.add_recognizer(PatternRecognizer(
+        supported_entity="CEP_NUMBER",
+        name="CustomCepRecognizer",
+        patterns=[
+            Pattern(
+                name="cep_com_rotulo",
+                regex=r"(?i)\bCEP\s*[:\-]?\s*\d{5}-?\d{3}\b",
+                score=0.99
+            ),
+            Pattern(
+                name="cep_hifen",
+                regex=r"\b\d{5}-\d{3}\b",
+                score=0.93
+            ),
+            Pattern(
+                name="cep_pontuado",
+                regex=r"\b\d{2}\.\d{3}-\d{3}\b",
+                score=0.93
+            ),
+        ],
+        supported_language="pt"
+    ))
+    analyzer.registry.add_recognizer(PatternRecognizer(
+        supported_entity="ENDERECO_LOGRADOURO",
+        name="EnderecoLogradouroRecognizer",
+        patterns=[
+            Pattern(
+                name="logradouro_com_numero_e_complemento",
+                regex=r"(?i)\b(?:rua|ra|avenida|av\.?|travessa|trav\.?|alameda|pra[cç]a|rodovia|estrada)\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+){0,8}\s*,\s*(?:n[ºo°.]?\s*)?\d+[A-Za-z0-9/\-]*\s*,\s*[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]{2,}){0,5}",
+                score=0.97
+            ),
+            Pattern(
+                name="logradouro_prefixado",
+                regex=r"(?i)\b(?:rua|ra|avenida|av\.?|travessa|trav\.?|alameda|pra[cç]a|rodovia|estrada|vicinal)\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+){0,8}(?:\s*,?\s*(?:n[ºo°.]?\s*)?\d+[A-Za-z0-9/\-]*)?(?:\s*,\s*[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]{2,}){0,5})?",
+                score=0.90
+            ),
+            Pattern(
+                name="vicinal_composta",
+                regex=r"(?i)\bVicinal\s+\d{1,3}\s+com\s+Vicinal\s+\d{1,3}\b",
+                score=0.95
+            ),
+            Pattern(
+                name="quadra_lote",
+                regex=r"(?i)\b(?:quadra|qd\.?)\s*[A-Za-z0-9\-]+(?:\s*,?\s*(?:lote|lt\.?)\s*[A-Za-z0-9\-]+)?\b",
+                score=0.88
+            ),
+            Pattern(
+                name="setor_condominio_residencial",
+                regex=r"(?i)\b(?:setor|condom[ií]nio|residencial)\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+){0,5}\b",
+                score=0.82
+            ),
+        ],
+        supported_language="pt"
+    ))
     if termos_estado_civil:
         analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ESTADO_CIVIL", name="EstadoCivilRecognizer", patterns=[
                                       Pattern(name=f"estado_civil_{t.lower()}", regex=rf"(?i)\b{re.escape(t)}\b", score=0.99) for t in termos_estado_civil], supported_language="pt"))
@@ -112,32 +277,35 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
         recognizer_common_terms = PatternRecognizer(
             supported_entity="TERMO_COMUM", name="CommonTermsRecognizer", deny_list=termos_comuns_a_manter, supported_language="pt", deny_list_score=1.0)
         analyzer.registry.add_recognizer(recognizer_common_terms)
-    if lista_sobrenomes:
-        analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="PERSON", name="BrazilianCommonSurnamesRecognizer", patterns=[
-                                      Pattern(name=f"surname_{s.lower().replace(' ', '_')}", regex=rf"(?i)\b{re.escape(s)}\b", score=0.97) for s in lista_sobrenomes], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CNH", name="CNHRecognizer", patterns=[
         Pattern(name="cnh_formatado", regex=r"\bCNH\s*(?:nº|n\.)?\s*\d{11}\b", score=0.99),
-        Pattern(name="cnh_apenas_numeros", regex=r"\b(?<![\w])\d{11}(?![\w])\b", score=0.98)
     ], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="SIAPE", name="SIAPERecognizer", patterns=[Pattern(
         name="siape_formatado", regex=r"\bSIAPE\s*(?:nº|n\.)?\s*\d{7}\b", score=0.98), Pattern(name="siape_apenas_numeros", regex=r"\b(?<![\w])\d{7}(?![\w])\b", score=0.85)], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CI", name="CIRecognizer", patterns=[Pattern(name="ci_formatado", regex=r"\bCI\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(
-        name="ci_padrao", regex=r"\b\d{1,2}\.?\d{3}\.?\d{3}-?\d\b", score=0.90)], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="CIN", name="CINRecognizer", patterns=[Pattern(name="cin_formatado", regex=r"\bCIN\s*(?:nº|n\.)?\s*[\d.]{7,11}-?\d\b", score=0.98), Pattern(
-        name="cin_padrao", regex=r"\b\d{1,2}\.?\d{3}\.?\d{3}-?\d\b", score=0.90)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(
         supported_entity="RG_NUMBER",
         name="CustomRgRecognizer",
         patterns=[
-            Pattern(name="numero_rg_completo", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+(?:-\dª\s*VIA)?\s*-\s*[A-Z]{2,3}\/[A-Z]{2}\b", score=0.99),
-            Pattern(name="numero_rg_simples", regex=r"\bRG\s*(?:nº|n\.)?\s*[\d.X-]+\b", score=0.98)
+            Pattern(
+                name="rg_com_rotulo",
+                regex=r"(?i)\bRG\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*-\s*\dª\s*VIA)?(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
+                score=0.99
+            ),
+            Pattern(
+                name="registro_geral_com_numero",
+                regex=r"(?i)\bRegistro\s+Geral\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
+                score=0.98
+            ),
+            Pattern(
+                name="cedula_ou_carteira_identidade_com_numero",
+                regex=r"(?i)\b(?:C[ÉE]DULA\s+DE\s+IDENTIDADE|CARTEIRA\s+DE\s+IDENTIDADE(?!\s+NACIONAL))\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
+                score=0.95
+            )
         ],
         supported_language="pt"
     ))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="MATRICULA_SIAPE", name="MatriculaSiapeRecognizer", patterns=[
                                       Pattern(name="matricula_siape", regex=r"(?i)\b(matr[íi]cula|siape)\b", score=0.95)], supported_language="pt"))
-    analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="TERMO_IDENTIDADE", name="TermoIdentidadeRecognizer", patterns=[
-                                      Pattern(name="termo_rg_id", regex=r"(?i)\b(RG|carteira|identidade|ssp)\b", score=0.95)], supported_language="pt"))
     analyzer.registry.add_recognizer(PatternRecognizer(supported_entity="ID_DOCUMENTO", name="IdDocumentoRecognizer", patterns=[
         Pattern(name="numero_beneficio_nb_formatado", regex=r"\bNB\s*\d{1,3}(\.?\d{3}){2}-[\dX]\b", score=0.98),
         Pattern(name="id_numerico_longo_pje", regex=r"\b\d{10,25}\b", score=0.97),
@@ -152,11 +320,12 @@ def carregar_analyzer_engine(termos_safe_location, termos_legal_header, lista_so
 def obter_operadores_anonimizacao():
     return {
         "DEFAULT": OperatorConfig("keep"),
-        "PERSON": OperatorConfig("replace", {"new_value": "<NOME>"}),
-        "LOCATION": OperatorConfig("replace", {"new_value": "<ENDERECO>"}),
+        "PERSON": OperatorConfig("keep"),
+        "LOCATION": OperatorConfig("keep"),
+        "ENDERECO_LOGRADOURO": OperatorConfig("replace", {"new_value": "<ENDERECO>"}),
         "EMAIL_ADDRESS": OperatorConfig("replace", {"new_value": "<EMAIL>"}),
         "PHONE_NUMBER": OperatorConfig("mask", {"type": "mask", "masking_char": "*", "chars_to_mask": 4, "from_end": True}),
-        "CPF": OperatorConfig("replace", {"new_value": "<CPF>"}),
+        "CPF": OperatorConfig("replace", {"new_value": "<CPF/CIN>"}),
         "DATE_TIME": OperatorConfig("keep"),
         "OAB_NUMBER": OperatorConfig("replace", {"new_value": "<OAB>"}),
         "CEP_NUMBER": OperatorConfig("replace", {"new_value": "<CEP>"}),
@@ -167,12 +336,8 @@ def obter_operadores_anonimizacao():
         "LEGAL_OR_COMMON_TERM": OperatorConfig("keep"),
         "CNH": OperatorConfig("replace", {"new_value": "***********"}),
         "SIAPE": OperatorConfig("replace", {"new_value": "***"}),
-        "CI": OperatorConfig("replace", {"new_value": "***"}),
-        "CIN": OperatorConfig("replace", {"new_value": "***"}),
         "RG_NUMBER": OperatorConfig("replace", {"new_value": "<NUMERO RG>"}),
-        "RG": OperatorConfig("replace", {"new_value": "***"}),
         "MATRICULA_SIAPE": OperatorConfig("replace", {"new_value": "***"}),
-        "TERMO_IDENTIDADE": OperatorConfig("replace", {"new_value": "***"}),
         "TERMO_COMUM": OperatorConfig("keep")
     }
 
@@ -225,6 +390,214 @@ def extrair_texto_de_pdf(caminho_arquivo_pdf):
     return texto_completo, None
 
 
+def _limpar_nome_extraido(candidato_nome):
+    if not candidato_nome:
+        return ""
+    nome_limpo = re.sub(r"\s+", " ", candidato_nome).strip()
+    nome_limpo = re.sub(r"\s+e\s+outros?\b.*$", "", nome_limpo, flags=re.IGNORECASE)
+    nome_limpo = re.sub(r"\s*[-,:;]\s*$", "", nome_limpo).strip()
+    return nome_limpo
+
+
+def _normalizar_texto_para_filtro(texto):
+    texto_normalizado = unicodedata.normalize("NFKD", texto)
+    texto_sem_acentos = "".join(
+        c for c in texto_normalizado if not unicodedata.combining(c)
+    )
+    return re.sub(r"\s+", " ", texto_sem_acentos).upper().strip()
+
+
+def _contem_termo_normalizado(texto_normalizado, termo_normalizado):
+    padrao = re.compile(
+        rf"(?<![A-Z0-9]){re.escape(termo_normalizado)}(?![A-Z0-9])"
+    )
+    return bool(padrao.search(texto_normalizado))
+
+
+def _nome_parte_passa_filtros(nome_candidato):
+    if not nome_candidato:
+        return False
+    if "<" in nome_candidato or ">" in nome_candidato:
+        return False
+
+    tokens_alfabeticos = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", nome_candidato)
+    if len(tokens_alfabeticos) < 2:
+        return False
+
+    nome_normalizado = _normalizar_texto_para_filtro(nome_candidato)
+
+    for termo in TERMOS_EXCLUSAO_NOME_PARTE:
+        if _contem_termo_normalizado(nome_normalizado, termo):
+            return False
+
+    for termo in TERMOS_INDICADORES_PJ:
+        if _contem_termo_normalizado(nome_normalizado, termo):
+            return False
+
+    return True
+
+
+def extrair_nomes_parte_alvo(texto_original):
+    nomes_encontrados = set()
+    if not texto_original or not texto_original.strip():
+        return nomes_encontrados
+
+    papeis_regex = "|".join(re.escape(papel) for papel in PAPEIS_ALVO_NOME_PARTE)
+
+    padrao_linha_rotulo = re.compile(
+        rf"(?im)^\s*({papeis_regex})\s*:\s*(.+?)\s*$"
+    )
+    for match in padrao_linha_rotulo.finditer(texto_original):
+        nome_limpo = _limpar_nome_extraido(match.group(2))
+        if _nome_parte_passa_filtros(nome_limpo):
+            nomes_encontrados.add(nome_limpo)
+
+    padrao_linha_partes = re.compile(
+        rf"(?im)^\s*(.+?)\s*\(\s*({papeis_regex})\s*\)\s*$"
+    )
+    for match in padrao_linha_partes.finditer(texto_original):
+        nome_limpo = _limpar_nome_extraido(match.group(1))
+        if _nome_parte_passa_filtros(nome_limpo):
+            nomes_encontrados.add(nome_limpo)
+
+    return nomes_encontrados
+
+
+def _nome_generico_passa_filtros(nome_candidato):
+    if not nome_candidato:
+        return False
+    if "<" in nome_candidato or ">" in nome_candidato:
+        return False
+
+    tokens_alfabeticos = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", nome_candidato)
+    if len(tokens_alfabeticos) < 2:
+        return False
+
+    nome_normalizado = _normalizar_texto_para_filtro(nome_candidato)
+
+    for termo in TERMOS_INDICADORES_PJ + PALAVRAS_NAO_NOME_GENERICAS:
+        if _contem_termo_normalizado(nome_normalizado, termo):
+            return False
+
+    return True
+
+
+def extrair_nomes_pessoais_contextuais(texto_original):
+    nomes_encontrados = set()
+    if not texto_original or not texto_original.strip():
+        return nomes_encontrados
+
+    conectores_nome = r"(?:DE|DA|DO|DAS|DOS|E|de|da|do|das|dos|e)"
+    bloco_nome = rf"[A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÖØ-öø-ÿ]+(?:\s+{conectores_nome})?(?:\s+[A-ZÀ-ÖØ-Ý][A-Za-zÀ-ÖØ-öø-ÿ]+){{1,7}}"
+
+    padroes = [
+        re.compile(
+            rf"(?im)^\s*(?P<nome>{bloco_nome})\s*,\s*(?:brasileir[oa]|solteir[oa]|casad[oa]|desempregad[oa]|portador[oa])\b"
+        ),
+        re.compile(
+            rf"(?im)\b(?:AUTOR(?:A)?|REQUERENTE|RECORRENTE|RECORRIDO(?:A)?|PERIT[AO]|ADVOGAD[OA]|FILIA[ÇC][ÃA]O|ASSINADO\s+ELETRONICAMENTE\s+POR)\s*[:\-]?\s*(?P<nome>{bloco_nome})"
+        ),
+        re.compile(
+            rf"(?im)\(\s*[IVXLC]+\s*\)\s*(?P<nome>{bloco_nome})"
+        ),
+    ]
+
+    for padrao in padroes:
+        for match in padrao.finditer(texto_original):
+            nome_limpo = _limpar_nome_extraido(match.group("nome"))
+            if _nome_generico_passa_filtros(nome_limpo):
+                nomes_encontrados.add(nome_limpo)
+
+    return nomes_encontrados
+
+
+def anonimizar_nomes_extraidos(texto, nomes_extraidos, placeholder):
+    if not texto or not nomes_extraidos:
+        return texto
+    texto_resultado = texto
+    for nome in sorted(nomes_extraidos, key=len, reverse=True):
+        if not nome:
+            continue
+        nome_normalizado = re.sub(r"\s+", " ", nome).strip()
+        tokens_nome = [token for token in nome_normalizado.split(" ") if token]
+        if not tokens_nome:
+            continue
+        padrao_nome_flexivel = r"\s+".join(re.escape(token) for token in tokens_nome)
+        regex_nome = re.compile(rf"(?i)(?<!\w){padrao_nome_flexivel}(?!\w)")
+        texto_resultado = regex_nome.sub(placeholder, texto_resultado)
+    return texto_resultado
+
+
+def normalizar_placeholders_nome_parte(texto):
+    if not texto:
+        return texto
+    return texto.replace(PLACEHOLDER_NOME_PARTE_INTERNO, PLACEHOLDER_NOME_PARTE_EXTERNO)
+
+
+def _extrair_apenas_digitos(texto):
+    return re.sub(r"\D", "", texto or "")
+
+
+def cpf_tem_digitos_validos(texto_cpf):
+    cpf = _extrair_apenas_digitos(texto_cpf)
+    if len(cpf) != 11:
+        return False
+    if cpf == cpf[0] * 11:
+        return False
+
+    soma_dv1 = sum(int(cpf[i]) * (10 - i) for i in range(9))
+    resto_dv1 = soma_dv1 % 11
+    dv1 = 0 if resto_dv1 < 2 else 11 - resto_dv1
+
+    soma_dv2 = sum(int(cpf[i]) * (11 - i) for i in range(10))
+    resto_dv2 = soma_dv2 % 11
+    dv2 = 0 if resto_dv2 < 2 else 11 - resto_dv2
+
+    return cpf[-2:] == f"{dv1}{dv2}"
+
+
+def trecho_tem_contexto_cpf(texto_analise, inicio, fim, alcance=32):
+    inicio_contexto = max(0, inicio - alcance)
+    fim_contexto = min(len(texto_analise), fim + alcance)
+    contexto = texto_analise[inicio_contexto:fim_contexto]
+    return bool(
+        re.search(
+            r"(?i)\b(?:cpf|cin|carteira\s+de\s+identidade\s+nacional)\b",
+            contexto
+        )
+    )
+
+
+def trecho_tem_contexto_oab(texto_analise, inicio, fim, alcance=96):
+    inicio_contexto = max(0, inicio - alcance)
+    fim_contexto = min(len(texto_analise), fim + alcance)
+    contexto = texto_analise[inicio_contexto:fim_contexto]
+    return bool(
+        re.search(
+            r"(?i)\b(?:advogad[oa]|procurador(?:ia)?|representante(?:s)?|polo\s+ativo|polo\s+passivo|oab|assinado\s+eletronicamente|subscr(?:eve|ito)|inscri[çc][aã]o)\b",
+            contexto,
+        )
+    )
+
+
+def filtrar_resultados_analise(resultados_analise, texto_analise):
+    resultados_filtrados = []
+    for resultado in resultados_analise:
+        trecho_detectado = texto_analise[resultado.start:resultado.end]
+        if resultado.entity_type in {"CPF", "CIN"}:
+            cpf_valido = cpf_tem_digitos_validos(trecho_detectado)
+            cpf_em_contexto = trecho_tem_contexto_cpf(texto_analise, resultado.start, resultado.end)
+            if not cpf_valido and not cpf_em_contexto:
+                continue
+        if resultado.entity_type == "OAB_NUMBER":
+            trecho_tem_oab = bool(re.search(r"(?i)\bOAB\b", trecho_detectado))
+            if not trecho_tem_oab:
+                if not trecho_tem_contexto_oab(texto_analise, resultado.start, resultado.end):
+                    continue
+        resultados_filtrados.append(resultado)
+    return resultados_filtrados
+
+
 def gerar_arquivo_docx(texto):
     if not texto or texto.strip() == "":
         return None
@@ -241,16 +614,38 @@ def gerar_arquivo_docx(texto):
 
 # --- Funções de Lógica da Interface (Event Handlers) ---
 def _anonimizar_logica(texto_original):
+    nomes_parte_alvo = extrair_nomes_parte_alvo(texto_original)
+    texto_para_anonimizar = anonimizar_nomes_extraidos(
+        texto_original,
+        nomes_parte_alvo,
+        PLACEHOLDER_NOME_PARTE_INTERNO,
+    )
+    nomes_contextuais = extrair_nomes_pessoais_contextuais(texto_para_anonimizar)
+    texto_para_anonimizar = anonimizar_nomes_extraidos(
+        texto_para_anonimizar,
+        nomes_contextuais,
+        "<NOME>",
+    )
     entidades_para_analise = list(operadores.keys()) + ["SAFE_LOCATION", "LEGAL_HEADER", "ESTADO_CIVIL",
-                                                        "ORGANIZACAO_CONHECIDA", "ID_DOCUMENTO", "CNH", "SIAPE", "CI", "CIN", "MATRICULA_SIAPE"]
-    entidades_para_analise = list(set(entidades_para_analise) - {"DEFAULT"})
-    resultados_analise = analyzer_engine.analyze(
-        text=texto_original, language='pt', entities=entidades_para_analise, return_decision_process=False)
+                                                        "ORGANIZACAO_CONHECIDA", "ID_DOCUMENTO", "CNH", "SIAPE", "MATRICULA_SIAPE"]
+    entidades_para_analise = list(set(entidades_para_analise) - {"DEFAULT", "PERSON"})
+    resultados_analise_brutos = analyzer_engine.analyze(
+        text=texto_para_anonimizar, language='pt', entities=entidades_para_analise, return_decision_process=False)
+    resultados_analise = filtrar_resultados_analise(resultados_analise_brutos, texto_para_anonimizar)
     resultado_anonimizado_obj = anonymizer_engine.anonymize(
-        text=texto_original, analyzer_results=resultados_analise, operators=operadores)
-    dados_resultados = [{"Entidade": res.entity_type, "Texto Detectado": texto_original[res.start:res.end], "Início": res.start,
-                         "Fim": res.end, "Score": f"{res.score:.2f}"} for res in sorted(resultados_analise, key=lambda x: x.start)]
-    return resultado_anonimizado_obj.text, pd.DataFrame(dados_resultados)
+        text=texto_para_anonimizar, analyzer_results=resultados_analise, operators=operadores)
+    texto_anonimizado = normalizar_placeholders_nome_parte(resultado_anonimizado_obj.text)
+    dados_resultados = [
+        {
+            "Entidade": res.entity_type,
+            "Texto Detectado": normalizar_placeholders_nome_parte(texto_para_anonimizar[res.start:res.end]),
+            "Início": res.start,
+            "Fim": res.end,
+            "Score": f"{res.score:.2f}",
+        }
+        for res in sorted(resultados_analise, key=lambda x: x.start)
+    ]
+    return texto_anonimizado, pd.DataFrame(dados_resultados)
 
 
 def atualizar_estado_botao_texto(texto_original):
