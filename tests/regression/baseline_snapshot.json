@@ -1,0 +1,341 @@
+[
+  {
+    "id": "cpf_cin_rotulo",
+    "input": "CPF: 926.511.422-72; CIN 12345678909",
+    "output": "<CPF/CIN>; <CPF/CIN>",
+    "entities": [
+      {
+        "entity": "CPF",
+        "text": "CPF: 926.511.422-72"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CPF"
+      },
+      {
+        "entity": "CPF",
+        "text": "CIN 12345678909"
+      },
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "12345678909"
+      },
+      {
+        "entity": "PHONE_NUMBER",
+        "text": "12345678909"
+      }
+    ]
+  },
+  {
+    "id": "rg_contexto_forte",
+    "input": "portador da cédula de identidade nº 255353 SESP/RR",
+    "output": "portador da <NUMERO RG>",
+    "entities": [
+      {
+        "entity": "RG_NUMBER",
+        "text": "cédula de identidade nº 255353 SESP/RR"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "RR"
+      }
+    ]
+  },
+  {
+    "id": "oab_com_prefixos",
+    "input": "OAB/GO Nº 49.904; OAB 49904/GO; OAB GO 49904",
+    "output": "<OAB>; <OAB>; <OAB>",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "OAB"
+      },
+      {
+        "entity": "OAB_NUMBER",
+        "text": "OAB/GO Nº 49.904"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "GO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "OAB"
+      },
+      {
+        "entity": "OAB_NUMBER",
+        "text": "OAB 49904/GO"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "GO"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "GO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "OAB"
+      },
+      {
+        "entity": "OAB_NUMBER",
+        "text": "OAB GO 49904"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "GO"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "GO"
+      }
+    ]
+  },
+  {
+    "id": "oab_uf_numero_com_contexto",
+    "input": "REPRESENTANTES POLO ATIVO: FULANO - GO20508 e BELTRANO - GO38362",
+    "output": "REPRESENTANTES POLO ATIVO: FULANO - <OAB> e BELTRANO - <OAB>",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "POLO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "POLO ATIVO"
+      },
+      {
+        "entity": "OAB_NUMBER",
+        "text": "GO20508"
+      },
+      {
+        "entity": "OAB_NUMBER",
+        "text": "GO38362"
+      }
+    ]
+  },
+  {
+    "id": "oab_uf_numero_sem_contexto",
+    "input": "Texto aleatório com GO20508 sem contexto nenhum",
+    "output": "Texto aleatório com GO20508 sem contexto nenhum",
+    "entities": []
+  },
+  {
+    "id": "endereco_ra_cep",
+    "input": "residente no endereço Ra Estrela Celeste, 1397, Professora Araceli, CEP: 69306-685",
+    "output": "residente no endereço <ENDERECO>, <CEP>",
+    "entities": [
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Ra Estrela Celeste, 1397, Professora Araceli"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Ra Estrela Celeste"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Professora"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CEP"
+      },
+      {
+        "entity": "CEP_NUMBER",
+        "text": "CEP: 69306-685"
+      }
+    ]
+  },
+  {
+    "id": "vicinal_composta",
+    "input": "ENDEREÇO: Vicinal 02 com Vicinal 16, Nº s/n, Bairro: Vila Reislândia/ Paredão",
+    "output": "ENDEREÇO: <ENDERECO>, Nº s/n, Bairro: Vila Reislândia/ Paredão",
+    "entities": [
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Vicinal 02 com Vicinal 16"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Vicinal"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Bairro"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Bairro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Vila"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Vila"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Paredão"
+      }
+    ]
+  },
+  {
+    "id": "nit_nb_numero_longo",
+    "input": "NIT 12732444032 NB 7107032446 e processo 1004207-64.2023.4.01.4200",
+    "output": "NIT 12732444032 NB 7107032446 e processo 1004207-64.2023.4.01.4200",
+    "entities": [
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "12732444032"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NB"
+      },
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "7107032446"
+      },
+      {
+        "entity": "PHONE_NUMBER",
+        "text": "7107032446"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "processo"
+      },
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "1004207-64.2023.4.01.4200"
+      },
+      {
+        "entity": "SIAPE",
+        "text": "1004207"
+      },
+      {
+        "entity": "DATE_TIME",
+        "text": "4.01.4200"
+      }
+    ]
+  },
+  {
+    "id": "nome_contextual",
+    "input": "O autor Ejohnson Rodrigues Souza, brasileiro, solteiro, está recorrendo à Justiça.",
+    "output": "O autor <NOME>, brasileiro, solteiro, está recorrendo à Justiça.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autor"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "ESTADO_CIVIL",
+        "text": "solteiro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Justiça"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Justiça"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Justiça"
+      }
+    ]
+  },
+  {
+    "id": "reu_pf_parenteses",
+    "input": "ANTONIO MARCOS MACIEL FERNANDES (REU)\nINSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS (AUTOR)",
+    "output": "<NOME> (REU)\nINSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS (AUTOR)",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "REU"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "INSTITUTO"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AUTOR"
+      }
+    ]
+  },
+  {
+    "id": "nome_pf_variacao_acento",
+    "input": "REQUERIDO: ANTONIO MARCOS MACIEL FERNANDES. O réu ANTÔNIO MARCOS MACIEL FERNANDES apresentou contestação.",
+    "output": "REQUERIDO: <NOME>. O réu <NOME> apresentou contestação.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "REQUERIDO"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "REQUERIDO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "réu"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "contestação"
+      }
+    ]
+  },
+  {
+    "id": "pj_deve_permanecer",
+    "input": "POLO ATIVO: INSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS",
+    "output": "POLO ATIVO: INSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "POLO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "POLO ATIVO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "INSTITUTO"
+      }
+    ]
+  }
+]

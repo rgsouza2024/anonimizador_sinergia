@@ -1,0 +1,50 @@
+﻿[
+  {
+    "id": "cpf_cin_rotulo",
+    "input": "CPF: 926.511.422-72; CIN 12345678909"
+  },
+  {
+    "id": "rg_contexto_forte",
+    "input": "portador da cédula de identidade nº 255353 SESP/RR"
+  },
+  {
+    "id": "oab_com_prefixos",
+    "input": "OAB/GO Nº 49.904; OAB 49904/GO; OAB GO 49904"
+  },
+  {
+    "id": "oab_uf_numero_com_contexto",
+    "input": "REPRESENTANTES POLO ATIVO: FULANO - GO20508 e BELTRANO - GO38362"
+  },
+  {
+    "id": "oab_uf_numero_sem_contexto",
+    "input": "Texto aleatório com GO20508 sem contexto nenhum"
+  },
+  {
+    "id": "endereco_ra_cep",
+    "input": "residente no endereço Ra Estrela Celeste, 1397, Professora Araceli, CEP: 69306-685"
+  },
+  {
+    "id": "vicinal_composta",
+    "input": "ENDEREÇO: Vicinal 02 com Vicinal 16, Nº s/n, Bairro: Vila Reislândia/ Paredão"
+  },
+  {
+    "id": "nit_nb_numero_longo",
+    "input": "NIT 12732444032 NB 7107032446 e processo 1004207-64.2023.4.01.4200"
+  },
+  {
+    "id": "nome_contextual",
+    "input": "O autor Ejohnson Rodrigues Souza, brasileiro, solteiro, está recorrendo à Justiça."
+  },
+  {
+    "id": "reu_pf_parenteses",
+    "input": "ANTONIO MARCOS MACIEL FERNANDES (REU)\nINSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS (AUTOR)"
+  },
+  {
+    "id": "nome_pf_variacao_acento",
+    "input": "REQUERIDO: ANTONIO MARCOS MACIEL FERNANDES. O réu ANTÔNIO MARCOS MACIEL FERNANDES apresentou contestação."
+  },
+  {
+    "id": "pj_deve_permanecer",
+    "input": "POLO ATIVO: INSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS"
+  }
+]
