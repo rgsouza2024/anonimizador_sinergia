@@ -24,13 +24,14 @@ from core.pipeline import executar_pipeline_anonimizacao
 from core.resources import (
     LISTA_ESTADO_CIVIL,
     LISTA_ESTADOS_CAPITAIS_BR,
+    LISTA_NOMES_COMUNS,
     LISTA_ORGANIZACOES_CONHECIDAS,
-    LISTA_SOBRENOMES_FREQUENTES_BR,
     LISTA_TERMOS_COMUNS,
     LISTA_TITULOS_LEGAIS,
     TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR,
 )
 from core.text_filters import (
+    anonimizar_por_lista_nomes_comuns,
     anonimizar_nomes_extraidos,
     extrair_nomes_parte_alvo,
     extrair_nomes_pessoais_contextuais,
@@ -55,7 +56,7 @@ load_dotenv()
 analyzer_engine = carregar_analyzer_engine(
     LISTA_ESTADOS_CAPITAIS_BR,
     TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR,
-    LISTA_SOBRENOMES_FREQUENTES_BR,
+    LISTA_NOMES_COMUNS,
     LISTA_ESTADO_CIVIL,
     LISTA_ORGANIZACOES_CONHECIDAS,
     LISTA_TERMOS_COMUNS,
@@ -84,6 +85,8 @@ def _anonimizar_logica(texto_original):
         extrair_nomes_parte_alvo_fn=extrair_nomes_parte_alvo,
         extrair_nomes_pessoais_contextuais_fn=extrair_nomes_pessoais_contextuais,
         anonimizar_nomes_extraidos_fn=anonimizar_nomes_extraidos,
+        anonimizar_por_lista_nomes_comuns_fn=anonimizar_por_lista_nomes_comuns,
+        lista_nomes_comuns=LISTA_NOMES_COMUNS,
         filtrar_resultados_analise_fn=filtrar_resultados_analise,
         normalizar_placeholders_nome_parte_fn=normalizar_placeholders_nome_parte,
         placeholder_nome_parte_interno=PLACEHOLDER_NOME_PARTE_INTERNO,

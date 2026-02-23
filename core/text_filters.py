@@ -59,6 +59,69 @@ def _token_para_regex_acento_flexivel(token):
     return "".join(partes)
 
 
+def _normalizar_token_nome(token):
+    if not token:
+        return ""
+    token_normalizado = unicodedata.normalize("NFKD", token)
+    token_sem_acentos = "".join(c for c in token_normalizado if not unicodedata.combining(c))
+    return token_sem_acentos.upper().strip()
+
+
+def _intervalo_esta_em_spans(inicio, fim, spans):
+    for inicio_span, fim_span in spans:
+        if inicio >= inicio_span and fim <= fim_span:
+            return True
+    return False
+
+
+def _mesclar_spans(spans):
+    if not spans:
+        return []
+    spans_ordenados = sorted(spans, key=lambda intervalo: intervalo[0])
+    resultado = [spans_ordenados[0]]
+    for inicio, fim in spans_ordenados[1:]:
+        ultimo_inicio, ultimo_fim = resultado[-1]
+        if inicio <= ultimo_fim:
+            resultado[-1] = (ultimo_inicio, max(ultimo_fim, fim))
+            continue
+        resultado.append((inicio, fim))
+    return resultado
+
+
+def _extrair_spans_pessoa_juridica(texto):
+    if not texto:
+        return []
+
+    padroes_pj = [
+        re.compile(
+            r"(?<!\w)[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD0-9.&/\-]*(?:\s+(?:DE|DA|DO|DAS|DOS|E|[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD0-9.&/\-]*)){1,14}(?!\w)"
+        ),
+        re.compile(
+            r"(?<!\w)[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9.&/\-]*(?:\s+(?:de|da|do|das|dos|e|[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9.&/\-]*)){1,14}(?!\w)"
+        ),
+    ]
+    termos_pj_normalizados = [_normalizar_texto_para_filtro(termo) for termo in TERMOS_INDICADORES_PJ if termo]
+    spans = []
+    for padrao in padroes_pj:
+        for match in padrao.finditer(texto):
+            trecho_normalizado = _normalizar_texto_para_filtro(match.group(0))
+            if any(_contem_termo_normalizado(trecho_normalizado, termo_pj) for termo_pj in termos_pj_normalizados):
+                spans.append((match.start(), match.end()))
+    return _mesclar_spans(spans)
+
+
+def _token_esta_em_contexto_endereco(texto, inicio, fim, alcance=40):
+    inicio_contexto = max(0, inicio - alcance)
+    fim_contexto = min(len(texto), fim + alcance)
+    contexto = texto[inicio_contexto:fim_contexto]
+    return bool(
+        re.search(
+            r"(?i)\b(?:endere[cç]o|rua|ra|avenida|av\.?|travessa|trav\.?|alameda|rodovia|estrada|vicinal|bairro|lote|quadra|qd\.?|cep|fazenda|s[ií]tio|ch[aá]cara)\b",
+            contexto,
+        )
+    )
+
+
 def _nome_parece_pessoa_fisica(nome_candidato):
     if not nome_candidato:
         return False
@@ -165,6 +228,60 @@ def anonimizar_nomes_extraidos(texto, nomes_extraidos, placeholder):
         regex_nome = re.compile(rf"(?i)(?<!\w){padrao_nome_flexivel}(?!\w)")
         texto_resultado = regex_nome.sub(placeholder, texto_resultado)
     return texto_resultado
+
+
+def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<NOME>"):
+    if not texto or not lista_nomes_comuns:
+        return texto
+
+    conectores = {"DE", "DA", "DO", "DAS", "DOS", "E"}
+    termos_bloqueados = {
+        _normalizar_token_nome(termo)
+        for termo in PALAVRAS_NAO_NOME_GENERICAS + TERMOS_INDICADORES_PJ
+        if termo and " " not in termo
+    }
+    nomes_normalizados = set()
+    for item in lista_nomes_comuns:
+        for token in re.findall(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", item or ""):
+            token_normalizado = _normalizar_token_nome(token)
+            if len(token_normalizado) < 3:
+                continue
+            if token_normalizado in conectores or token_normalizado in termos_bloqueados:
+                continue
+            nomes_normalizados.add(token_normalizado)
+
+    if not nomes_normalizados:
+        return texto
+
+    spans_pj = _extrair_spans_pessoa_juridica(texto)
+    spans_substituicao = []
+    for match in re.finditer(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", texto):
+        inicio, fim = match.span()
+        if _intervalo_esta_em_spans(inicio, fim, spans_pj):
+            continue
+        if _token_esta_em_contexto_endereco(texto, inicio, fim):
+            continue
+        if inicio > 0 and texto[inicio - 1] == "<":
+            continue
+        if fim < len(texto) and texto[fim] == ">":
+            continue
+        token_normalizado = _normalizar_token_nome(match.group(0))
+        if token_normalizado in nomes_normalizados:
+            spans_substituicao.append((inicio, fim))
+
+    if not spans_substituicao:
+        return texto
+
+    partes = []
+    cursor = 0
+    for inicio, fim in spans_substituicao:
+        if inicio < cursor:
+            continue
+        partes.append(texto[cursor:inicio])
+        partes.append(placeholder)
+        cursor = fim
+    partes.append(texto[cursor:])
+    return "".join(partes)
 
 
 def normalizar_placeholders_nome_parte(texto):

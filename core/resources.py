@@ -24,7 +24,9 @@ def carregar_lista_de_arquivo(nome_arquivo):
         print(f"ERRO: Erro ao ler o arquivo '{nome_arquivo}': {e}")
     return lista_itens
 
-LISTA_SOBRENOMES_FREQUENTES_BR = carregar_lista_de_arquivo(NOME_ARQUIVO_SOBRENOMES)
+LISTA_NOMES_COMUNS = carregar_lista_de_arquivo(NOME_ARQUIVO_SOBRENOMES)
+# Alias de compatibilidade para chamadas existentes do app.
+LISTA_SOBRENOMES_FREQUENTES_BR = LISTA_NOMES_COMUNS
 LISTA_TERMOS_COMUNS = carregar_lista_de_arquivo(NOME_ARQUIVO_TERMOS_COMUNS)
 LISTA_TITULOS_LEGAIS = carregar_lista_de_arquivo(NOME_ARQUIVO_TITULOS)
 LISTA_ESTADOS_CAPITAIS_BR = ["Acre", "AC", "Alagoas", "AL", "Amapá", "AP", "Amazonas", "AM", "Bahia", "BA", "Ceará", "CE", "Distrito Federal", "DF", "Espírito Santo", "ES", "Goiás", "GO", "Maranhão", "MA", "Mato Grosso", "MT", "Mato Grosso do Sul", "MS", "Minas Gerais", "MG", "Pará", "PA", "Paraíba", "PB", "Paraná", "PR", "Pernambuco", "PE", "Piauí", "PI", "Rio de Janeiro", "RJ", "Rio Grande do Norte", "RN", "Rio Grande do Sul", "RS", "Rondônia", "RO", "Roraima", "RR", "Santa Catarina", "SC", "São Paulo", "SP", "Sergipe", "SE", "Tocantins", "TO",
