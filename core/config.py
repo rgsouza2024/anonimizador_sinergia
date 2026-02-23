@@ -1,6 +1,6 @@
 """Shared configuration constants for the anonymization engine."""
 
-NOME_ARQUIVO_SOBRENOMES = "sobrenomes_comuns.txt"
+NOME_ARQUIVO_SOBRENOMES = "nomes_comuns.txt"
 NOME_ARQUIVO_TERMOS_COMUNS = "termos_comuns.txt"
 NOME_ARQUIVO_TITULOS = "titulos_legais.txt"
 LOGO_FILE_PATH = "Logo Projeto Sinergia TRF1 - Fundo Transparente.png"
@@ -68,6 +68,9 @@ TERMOS_INDICADORES_PJ = [
     "MINISTERIO PUBLICO",
     "IBAMA",
     "ICMBIO",
+    "INSS",
+    "TRF",
+    "PJE",
 ]
 PALAVRAS_NAO_NOME_GENERICAS = [
     "PODER", "JUDICIARIO", "JUSTICA", "FEDERAL", "SECAO", "VARA", "PROCESSO",

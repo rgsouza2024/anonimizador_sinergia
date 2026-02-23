@@ -46,5 +46,13 @@
   {
     "id": "pj_deve_permanecer",
     "input": "POLO ATIVO: INSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS"
+  },
+  {
+    "id": "nome_unico_lista_comum",
+    "input": "Sr. SEBASTIÃO compareceu à audiência."
+  },
+  {
+    "id": "pj_com_nome_comum",
+    "input": "SEBASTIAO FILHOS LTDA ajuizou ação."
   }
 ]

@@ -275,11 +275,11 @@
         "text": "INSTITUTO"
       },
       {
-        "entity": "LEGAL_TITLE",
+        "entity": "TERMO_COMUM",
         "text": "AUTOR"
       },
       {
-        "entity": "TERMO_COMUM",
+        "entity": "LEGAL_TITLE",
         "text": "AUTOR"
       }
     ]
@@ -290,11 +290,11 @@
     "output": "REQUERIDO: <NOME>. O réu <NOME> apresentou contestação.",
     "entities": [
       {
-        "entity": "TERMO_COMUM",
+        "entity": "LEGAL_TITLE",
         "text": "REQUERIDO"
       },
       {
-        "entity": "LEGAL_TITLE",
+        "entity": "TERMO_COMUM",
         "text": "REQUERIDO"
       },
       {
@@ -302,11 +302,11 @@
         "text": "NOME"
       },
       {
-        "entity": "TERMO_COMUM",
+        "entity": "LEGAL_TITLE",
         "text": "réu"
       },
       {
-        "entity": "LEGAL_TITLE",
+        "entity": "TERMO_COMUM",
         "text": "réu"
       },
       {
@@ -335,6 +335,40 @@
       {
         "entity": "TERMO_COMUM",
         "text": "INSTITUTO"
+      }
+    ]
+  },
+  {
+    "id": "nome_unico_lista_comum",
+    "input": "Sr. SEBASTIÃO compareceu à audiência.",
+    "output": "Sr. <NOME> compareceu à audiência.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Sr"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "Sr."
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "audiência"
+      }
+    ]
+  },
+  {
+    "id": "pj_com_nome_comum",
+    "input": "SEBASTIAO FILHOS LTDA ajuizou ação.",
+    "output": "SEBASTIAO FILHOS LTDA ajuizou ação.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "ação"
       }
     ]
   }

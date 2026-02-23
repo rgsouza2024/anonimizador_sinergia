@@ -11,6 +11,8 @@ def executar_pipeline_anonimizacao(
     extrair_nomes_parte_alvo_fn,
     extrair_nomes_pessoais_contextuais_fn,
     anonimizar_nomes_extraidos_fn,
+    anonimizar_por_lista_nomes_comuns_fn,
+    lista_nomes_comuns,
     filtrar_resultados_analise_fn,
     normalizar_placeholders_nome_parte_fn,
     placeholder_nome_parte_interno,
@@ -25,6 +27,11 @@ def executar_pipeline_anonimizacao(
     texto_para_anonimizar = anonimizar_nomes_extraidos_fn(
         texto_para_anonimizar,
         nomes_contextuais,
+        "<NOME>",
+    )
+    texto_para_anonimizar = anonimizar_por_lista_nomes_comuns_fn(
+        texto_para_anonimizar,
+        lista_nomes_comuns,
         "<NOME>",
     )
     entidades_para_analise = list(operadores.keys()) + [
@@ -62,4 +69,3 @@ def executar_pipeline_anonimizacao(
         for res in sorted(resultados_analise, key=lambda x: x.start)
     ]
     return texto_anonimizado, pd.DataFrame(dados_resultados)
-
