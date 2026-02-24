@@ -4,6 +4,7 @@ import re
 import unicodedata
 
 from core.config import (
+    BLOQUEIO_SEMANTICO_NOME,
     PALAVRAS_NAO_NOME_GENERICAS,
     PAPEIS_ALVO_NOME_PARTE,
     PLACEHOLDER_NOME_PARTE_EXTERNO,
@@ -13,6 +14,51 @@ from core.config import (
 )
 
 
+def _normalizar_texto_para_filtro(texto):
+    texto_normalizado = unicodedata.normalize("NFKD", texto)
+    texto_sem_acentos = "".join(c for c in texto_normalizado if not unicodedata.combining(c))
+    return re.sub(r"\s+", " ", texto_sem_acentos).upper().strip()
+
+
+_CONECTORES_NOME = {"DE", "DA", "DO", "DAS", "DOS", "E"}
+_BLOQUEIO_SEMANTICO_NOME_NORMALIZADO = {
+    _normalizar_texto_para_filtro(termo)
+    for termo in (BLOQUEIO_SEMANTICO_NOME + PALAVRAS_NAO_NOME_GENERICAS + TERMOS_INDICADORES_PJ)
+    if termo
+}
+
+
+def _trecho_bloqueado_semantico_para_nome(trecho):
+    if not trecho:
+        return False
+
+    tokens = re.findall(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", trecho)
+    if not tokens:
+        return False
+
+    tokens_relevantes = []
+    for token in tokens:
+        token_normalizado = _normalizar_token_nome(token)
+        if not token_normalizado or token_normalizado in _CONECTORES_NOME:
+            continue
+        tokens_relevantes.append(token_normalizado)
+
+    if not tokens_relevantes:
+        return True
+
+    qtd_bloqueados = sum(1 for token in tokens_relevantes if token in _BLOQUEIO_SEMANTICO_NOME_NORMALIZADO)
+    if qtd_bloqueados == 0:
+        return False
+
+    if qtd_bloqueados == len(tokens_relevantes):
+        return True
+
+    if len(tokens_relevantes) >= 3 and (qtd_bloqueados / len(tokens_relevantes)) >= 0.75:
+        return True
+
+    return False
+
+
 def _limpar_nome_extraido(candidato_nome):
     if not candidato_nome:
         return ""
@@ -20,14 +66,6 @@ def _limpar_nome_extraido(candidato_nome):
     nome_limpo = re.sub(r"\s+e\s+outros?\b.*$", "", nome_limpo, flags=re.IGNORECASE)
     nome_limpo = re.sub(r"\s*[-,:;]\s*$", "", nome_limpo).strip()
     return nome_limpo
-
-
-def _normalizar_texto_para_filtro(texto):
-    texto_normalizado = unicodedata.normalize("NFKD", texto)
-    texto_sem_acentos = "".join(c for c in texto_normalizado if not unicodedata.combining(c))
-    return re.sub(r"\s+", " ", texto_sem_acentos).upper().strip()
-
-
 def _contem_termo_normalizado(texto_normalizado, termo_normalizado):
     padrao = re.compile(rf"(?<![A-Z0-9]){re.escape(termo_normalizado)}(?![A-Z0-9])")
     return bool(padrao.search(texto_normalizado))
@@ -136,6 +174,8 @@ def _nome_parece_pessoa_fisica(nome_candidato):
     for termo in TERMOS_INDICADORES_PJ:
         if _contem_termo_normalizado(nome_normalizado, termo):
             return False
+    if _trecho_bloqueado_semantico_para_nome(nome_candidato):
+        return False
     return True
 
 
@@ -403,15 +443,20 @@ def _tokens_nome_para_variantes(nome):
     variantes = set()
 
     nome_completo = " ".join(tokens)
-    variantes.add(nome_completo)
+    if not _trecho_bloqueado_semantico_para_nome(nome_completo):
+        variantes.add(nome_completo)
 
     for tamanho in range(len(tokens), 1, -1):
         prefixo = tokens[:tamanho]
         palavras_reais = [t for t in prefixo if t.lower() not in conectores]
         if len(palavras_reais) < 2:
             continue
-        variantes.add(" ".join(prefixo))
-        variantes.add(" ".join(palavras_reais))
+        variante_prefixo = " ".join(prefixo)
+        variante_sem_conectores = " ".join(palavras_reais)
+        if not _trecho_bloqueado_semantico_para_nome(variante_prefixo):
+            variantes.add(variante_prefixo)
+        if not _trecho_bloqueado_semantico_para_nome(variante_sem_conectores):
+            variantes.add(variante_sem_conectores)
 
     return sorted(variantes, key=lambda x: len(x), reverse=True)
 
@@ -428,6 +473,8 @@ def _extrair_primeiro_nome(nome):
     conectores = {"de", "da", "do", "das", "dos", "e"}
     for token in re.findall(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", nome or ""):
         if token.lower() not in conectores:
+            if _trecho_bloqueado_semantico_para_nome(token):
+                return ""
             return token
     return ""
 
@@ -451,9 +498,12 @@ def _coletar_spans_para_regex(texto, regex, spans_pj, exigir_contexto_processual
 
     for match in regex.finditer(texto):
         inicio, fim = match.span()
+        trecho_encontrado = match.group(0)
         if _intervalo_esta_em_spans(inicio, fim, spans_pj):
             continue
         if _token_esta_em_contexto_endereco(texto, inicio, fim):
+            continue
+        if _trecho_bloqueado_semantico_para_nome(trecho_encontrado):
             continue
         if inicio > 0 and texto[inicio - 1] == "<":
             continue
