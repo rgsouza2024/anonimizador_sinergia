@@ -8,6 +8,8 @@ def executar_pipeline_anonimizacao(
     analyzer_engine,
     anonymizer_engine,
     operadores,
+    anonimizar_nomes_pf_metadados_fn,
+    nomes_pf_metadados,
     extrair_nomes_parte_alvo_fn,
     extrair_nomes_pessoais_contextuais_fn,
     anonimizar_nomes_extraidos_fn,
@@ -16,10 +18,26 @@ def executar_pipeline_anonimizacao(
     filtrar_resultados_analise_fn,
     normalizar_placeholders_nome_parte_fn,
     placeholder_nome_parte_interno,
+    retornar_metricas=False,
 ):
+    metricas_pipeline = {}
+    if retornar_metricas:
+        texto_preprocessado, metricas_metadado = anonimizar_nomes_pf_metadados_fn(
+            texto_original,
+            nomes_pf_metadados,
+            "<NOME>",
+            retornar_metricas=True,
+        )
+        metricas_pipeline["metadado"] = metricas_metadado
+    else:
+        texto_preprocessado = anonimizar_nomes_pf_metadados_fn(
+            texto_original,
+            nomes_pf_metadados,
+            "<NOME>",
+        )
     nomes_parte_alvo = extrair_nomes_parte_alvo_fn(texto_original)
     texto_para_anonimizar = anonimizar_nomes_extraidos_fn(
-        texto_original,
+        texto_preprocessado,
         nomes_parte_alvo,
         placeholder_nome_parte_interno,
     )
@@ -68,4 +86,6 @@ def executar_pipeline_anonimizacao(
         }
         for res in sorted(resultados_analise, key=lambda x: x.start)
     ]
+    if retornar_metricas:
+        return texto_anonimizado, pd.DataFrame(dados_resultados), metricas_pipeline
     return texto_anonimizado, pd.DataFrame(dados_resultados)
