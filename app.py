@@ -31,6 +31,7 @@ from core.resources import (
     TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR,
 )
 from core.text_filters import (
+    anonimizar_nomes_pf_metadados,
     anonimizar_por_lista_nomes_comuns,
     anonimizar_nomes_extraidos,
     extrair_nomes_parte_alvo,
@@ -69,19 +70,21 @@ def dataframe_entidades_vazio():
     return service_dataframe_entidades_vazio(COLUNAS_ENTIDADES_DETECTADAS)
 
 
-def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None):
-    return service_gerar_resumo_processamento(df_resultados, origem, tempo_segundos)
+def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None, info_metadado_pdf=None):
+    return service_gerar_resumo_processamento(df_resultados, origem, tempo_segundos, info_metadado_pdf)
 
 def extrair_texto_de_pdf(caminho_arquivo_pdf):
     return service_extrair_texto_de_pdf(caminho_arquivo_pdf)
 
 # --- Funções de Lógica da Interface (Event Handlers) ---
-def _anonimizar_logica(texto_original):
+def _anonimizar_logica(texto_original, nomes_pf_metadados=None, retornar_metricas=False):
     return executar_pipeline_anonimizacao(
         texto_original=texto_original,
         analyzer_engine=analyzer_engine,
         anonymizer_engine=anonymizer_engine,
         operadores=operadores,
+        anonimizar_nomes_pf_metadados_fn=anonimizar_nomes_pf_metadados,
+        nomes_pf_metadados=nomes_pf_metadados or set(),
         extrair_nomes_parte_alvo_fn=extrair_nomes_parte_alvo,
         extrair_nomes_pessoais_contextuais_fn=extrair_nomes_pessoais_contextuais,
         anonimizar_nomes_extraidos_fn=anonimizar_nomes_extraidos,
@@ -90,6 +93,7 @@ def _anonimizar_logica(texto_original):
         filtrar_resultados_analise_fn=filtrar_resultados_analise,
         normalizar_placeholders_nome_parte_fn=normalizar_placeholders_nome_parte,
         placeholder_nome_parte_interno=PLACEHOLDER_NOME_PARTE_INTERNO,
+        retornar_metricas=retornar_metricas,
     )
 
 def atualizar_estado_botao_texto(texto_original):

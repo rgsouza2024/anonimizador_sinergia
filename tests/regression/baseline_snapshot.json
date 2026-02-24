@@ -275,11 +275,11 @@
         "text": "INSTITUTO"
       },
       {
-        "entity": "TERMO_COMUM",
+        "entity": "LEGAL_TITLE",
         "text": "AUTOR"
       },
       {
-        "entity": "LEGAL_TITLE",
+        "entity": "TERMO_COMUM",
         "text": "AUTOR"
       }
     ]
@@ -302,11 +302,11 @@
         "text": "NOME"
       },
       {
-        "entity": "LEGAL_TITLE",
+        "entity": "TERMO_COMUM",
         "text": "réu"
       },
       {
-        "entity": "TERMO_COMUM",
+        "entity": "LEGAL_TITLE",
         "text": "réu"
       },
       {
@@ -369,6 +369,33 @@
       {
         "entity": "TERMO_COMUM",
         "text": "ação"
+      }
+    ]
+  },
+  {
+    "id": "metadado_nome_pf_flexivel",
+    "input": "No relatório consta ANTÔNIO DE SOUZA SANTOS. Em outro trecho: Antônio de Souza protocolou petição. Por fim, Sr. Antônio compareceu.",
+    "output": "No relatório consta <NOME>. Em outro trecho: <NOME> protocolou petição. Por fim, <NOME> compareceu.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "relatório"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "petição"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
       }
     ]
   }

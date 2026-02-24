@@ -54,5 +54,12 @@
   {
     "id": "pj_com_nome_comum",
     "input": "SEBASTIAO FILHOS LTDA ajuizou ação."
+  },
+  {
+    "id": "metadado_nome_pf_flexivel",
+    "metadata_pf_names": [
+      "Antônio de Souza Santos"
+    ],
+    "input": "No relatório consta ANTÔNIO DE SOUZA SANTOS. Em outro trecho: Antônio de Souza protocolou petição. Por fim, Sr. Antônio compareceu."
   }
 ]
