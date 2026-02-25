@@ -11,6 +11,7 @@ def obter_operadores_anonimizacao():
         "ENDERECO_LOGRADOURO": OperatorConfig("replace", {"new_value": "<ENDERECO>"}),
         "EMAIL_ADDRESS": OperatorConfig("replace", {"new_value": "<EMAIL>"}),
         "PHONE_NUMBER": OperatorConfig("mask", {"type": "mask", "masking_char": "*", "chars_to_mask": 4, "from_end": True}),
+        "PHONE_NUMBER_BR": OperatorConfig("mask", {"type": "mask", "masking_char": "*", "chars_to_mask": 4, "from_end": True}),
         "CPF": OperatorConfig("replace", {"new_value": "<CPF/CIN>"}),
         "DATE_TIME": OperatorConfig("keep"),
         "OAB_NUMBER": OperatorConfig("replace", {"new_value": "<OAB>"}),

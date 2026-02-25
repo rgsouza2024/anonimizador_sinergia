@@ -115,6 +115,25 @@ def carregar_analyzer_engine(
     )
     analyzer.registry.add_recognizer(
         PatternRecognizer(
+            supported_entity="PHONE_NUMBER_BR",
+            name="CustomPhoneBrRecognizer",
+            patterns=[
+                Pattern(
+                    name="telefone_com_ddd",
+                    regex=r"(?<!\d)(?:\(?\d{2}\)?\s*)(?:9\d{4}|\d{4})[-\s]\d{4}(?!\d)",
+                    score=0.93,
+                ),
+                Pattern(
+                    name="telefone_sem_ddd",
+                    regex=r"(?<!\d)(?:9\d{4}|\d{4})-\d{4}(?!\d)",
+                    score=0.92,
+                ),
+            ],
+            supported_language="pt",
+        )
+    )
+    analyzer.registry.add_recognizer(
+        PatternRecognizer(
             supported_entity="CEP_NUMBER",
             name="CustomCepRecognizer",
             patterns=[
@@ -139,6 +158,11 @@ def carregar_analyzer_engine(
                     name="logradouro_prefixado",
                     regex=r"(?i)\b(?:rua|ra|avenida|av\.?|travessa|trav\.?|alameda|pra[cç]a|rodovia|estrada|vicinal)\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]+){0,8}(?:\s*,?\s*(?:n[ºo°.]?\s*)?\d+[A-Za-z0-9/\-]*)?(?:\s*,\s*[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]{2,}(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´.\-]{2,}){0,5})?",
                     score=0.90,
+                ),
+                Pattern(
+                    name="beco_viela_ramal_com_numero",
+                    regex=r"(?i)\b(?:beco|viela|ramal|ladeira|passagem)\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´\-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´\-]+){0,6}\s*,\s*(?:casa\s*)?\d+[A-Za-z0-9/\-]*(?:\s*,?\s*(?:bairro\s*:?\s*)?[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´\-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ0-9'`´\-]+){0,4})?",
+                    score=0.98,
                 ),
                 Pattern(name="vicinal_composta", regex=r"(?i)\bVicinal\s+\d{1,3}\s+com\s+Vicinal\s+\d{1,3}\b", score=0.95),
                 Pattern(
