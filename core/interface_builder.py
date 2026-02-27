@@ -176,11 +176,21 @@ def criar_interface_gradio(
                     )
 
             with gr.TabItem("Anonimizar arquivo PDF"):
-                gr.Markdown("### Passo 1: envie um PDF com texto pesquisável e clique em **Anonimizar PDF**.")
-                upload_pdf = gr.File(label="Selecione o arquivo PDF", file_types=[".pdf"])
+                gr.Markdown("### Passo 1: envie um PDF com texto pesquisável para anonimizar automaticamente.")
+                upload_pdf = gr.File(
+                    label="Selecione o arquivo PDF",
+                    file_types=[".pdf"],
+                    height=120,
+                )
                 with gr.Row(elem_classes=["cta-row"]):
-                    btn_anonimizar_pdf = gr.Button("Anonimizar PDF", variant="primary", size="lg", interactive=False)
-                resumo_pdf = gr.Markdown(value=resumo_vazio_pdf)
+                    btn_anonimizar_pdf = gr.Button(
+                        "Reprocessar PDF",
+                        variant="primary",
+                        size="lg",
+                        interactive=False,
+                        visible=False,
+                    )
+                resumo_pdf = gr.Markdown(value=resumo_vazio_pdf, min_height=88)
                 gr.Markdown("### Passo 2: revise o texto original extraído e a versão anonimizada.")
                 with gr.Row():
                     with gr.Accordion("Ver texto original extraído do PDF", open=False):
@@ -200,7 +210,15 @@ def criar_interface_gradio(
                         )
 
         texto_original_area.change(fn=atualizar_estado_botao_texto_fn, inputs=[texto_original_area], outputs=[btn_anonimizar_area])
-        upload_pdf.change(fn=atualizar_estado_botao_pdf_fn, inputs=[upload_pdf], outputs=[btn_anonimizar_pdf])
+        evento_upload_pdf = upload_pdf.upload(
+            fn=lambda: gr.update(visible=False, interactive=False),
+            outputs=[btn_anonimizar_pdf],
+            queue=False,
+        ).then(
+            fn=processar_arquivo_pdf_fn,
+            inputs=[upload_pdf],
+            outputs=[texto_original_pdf, texto_anonimizado_pdf, resumo_pdf, btn_anonimizar_pdf],
+        )
         evento_anonimizar_texto = btn_anonimizar_area.click(
             fn=desativar_botao_fn,
             outputs=[btn_anonimizar_area],
@@ -227,13 +245,7 @@ def criar_interface_gradio(
         ).then(
             fn=processar_arquivo_pdf_fn,
             inputs=[upload_pdf],
-            outputs=[texto_original_pdf, texto_anonimizado_pdf, resumo_pdf],
-        )
-        evento_anonimizar_pdf.then(
-            fn=atualizar_estado_botao_pdf_fn,
-            inputs=[upload_pdf],
-            outputs=[btn_anonimizar_pdf],
-            queue=False,
+            outputs=[texto_original_pdf, texto_anonimizado_pdf, resumo_pdf, btn_anonimizar_pdf],
         )
 
     return demo
