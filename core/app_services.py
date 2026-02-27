@@ -1,8 +1,11 @@
 """Application service helpers (non-UI)."""
 
+import os
+
 import fitz  # PyMuPDF
 import pandas as pd
 
+from core.config import LIMITE_PDF_MB, LIMITE_PDF_PAGINAS
 from core.text_filters import extrair_nomes_pf_metadados_pdf
 
 
@@ -46,7 +49,22 @@ def extrair_texto_de_pdf(caminho_arquivo_pdf):
     texto_completo = ""
     nomes_pf_metadados = set()
     try:
+        tamanho_arquivo_bytes = os.path.getsize(caminho_arquivo_pdf)
+        limite_tamanho_bytes = LIMITE_PDF_MB * 1024 * 1024
+        if tamanho_arquivo_bytes > limite_tamanho_bytes:
+            return (
+                None,
+                f"O PDF excede o limite de {LIMITE_PDF_MB} MB.",
+                set(),
+            )
+
         with fitz.open(caminho_arquivo_pdf) as documento_pdf:
+            if documento_pdf.page_count > LIMITE_PDF_PAGINAS:
+                return (
+                    None,
+                    f"O PDF excede o limite de {LIMITE_PDF_PAGINAS} paginas.",
+                    set(),
+                )
             nomes_pf_metadados = extrair_nomes_pf_metadados_pdf(documento_pdf.metadata or {})
             for pagina in documento_pdf:
                 texto_completo += pagina.get_text()
