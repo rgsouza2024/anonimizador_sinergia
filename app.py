@@ -1,5 +1,5 @@
 # Nome do arquivo: app.py (anonimizador_sinergia)
-# Versão 0.96 - Versão Beta
+# Versão 0.97 - Versão Beta
 
 import gradio as gr
 from dotenv import load_dotenv
