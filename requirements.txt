@@ -7,3 +7,5 @@ presidio-anonymizer==2.2.359
 spacy==3.8.7
 # Modelo pt do spaCy compativel com a serie 3.8.x
 https://github.com/explosion/spacy-models/releases/download/pt_core_news_lg-3.8.0/pt_core_news_lg-3.8.0-py3-none-any.whl
+fastapi
+uvicorn[standard]
