@@ -1,8 +1,12 @@
 # Nome do arquivo: app.py (anonimizador_sinergia)
 # Versão 0.97 - Versão Beta
 
+import time
 import gradio as gr
 from dotenv import load_dotenv
+from fastapi import FastAPI
+from pydantic import BaseModel
+import uvicorn
 from core.config import (
     COLUNAS_ENTIDADES_DETECTADAS,
     ESTADO_VAZIO_PDF_ANONIMIZADO,
@@ -139,6 +143,28 @@ def processar_arquivo_pdf(arquivo_temp, progress=gr.Progress()):
         progress=progress,
     )
 
+# ── REST API ──────────────────────────────────────────────────────────────────
+fastapi_app = FastAPI(title="Anonimizador Sinergia API")
+
+class AnonimizarRequest(BaseModel):
+    texto: str
+    nomes_metadados: list[str] = []
+
+@fastapi_app.post("/anonimizar")
+async def anonimizar_endpoint(req: AnonimizarRequest):
+    inicio = time.time()
+    texto_anon, df_entidades = _anonimizar_logica(
+        req.texto,
+        nomes_pf_metadados=set(req.nomes_metadados)
+    )
+    entidades = df_entidades.to_dict(orient="records") if not df_entidades.empty else []
+    return {
+        "texto_anonimizado": texto_anon,
+        "entidades_detectadas": entidades,
+        "tempo_processamento": round(time.time() - inicio, 3)
+    }
+# ── fim REST API ──────────────────────────────────────────────────────────────
+
 demo = criar_interface_gradio(
     logo_file_path=LOGO_FILE_PATH,
     estado_vazio_texto_anonimizado=ESTADO_VAZIO_TEXTO_ANONIMIZADO,
@@ -156,9 +182,12 @@ demo = criar_interface_gradio(
 )
 
 # --- Ponto de Entrada para Iniciar o App ---
+# Monta a UI Gradio no FastAPI (padrão oficial HF para Gradio + REST API)
+app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+
 if __name__ == "__main__":
     if analyzer_engine and anonymizer_engine:
-        print("Motores de anonimização carregados com sucesso. Iniciando a interface Gradio...")
-        demo.launch()
+        print("Motores de anonimização carregados com sucesso. Iniciando servidor (Gradio + REST API)...")
+        uvicorn.run(app, host="0.0.0.0", port=7860)
     else:
         print("ERRO CRÍTICO: Não foi possível iniciar a aplicação pois os motores de anonimização falharam ao carregar.")
