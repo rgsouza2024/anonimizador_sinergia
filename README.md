@@ -54,7 +54,7 @@ Anonimizar conteúdo jurídico (texto livre e PDF com texto pesquisável), prese
 ### Fora de escopo (estado atual)
 
 - OCR de PDF escaneado (imagem)
-- API HTTP dedicada (uso principal é via Gradio)
+- **API HTTP dedicada**: endpoint `/api/v1/anonimizar` (JSON POST) para integração com outros sistemas.
 - Garantia de 100% de cobertura sem revisão humana
 
 ## 2. Arquitetura
