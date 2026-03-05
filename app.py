@@ -4,6 +4,7 @@
 import time
 import gradio as gr
 from dotenv import load_dotenv
+from fastapi import FastAPI
 from typing import List, Optional
 from pydantic import BaseModel
 import uvicorn
