@@ -4,7 +4,8 @@
 import time
 import gradio as gr
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from typing import List, Optional
 from pydantic import BaseModel
 import uvicorn
@@ -183,8 +184,13 @@ demo = criar_interface_gradio(
 )
 
 # --- Ponto de Entrada para Iniciar o App ---
-# Monta a UI Gradio no FastAPI (padrão oficial HF para Gradio + REST API)
-app = gr.mount_gradio_app(fastapi_app, demo, path="/")
+# Página de redirecionamento para o Gradio
+@fastapi_app.get("/")
+async def root_redirect():
+    return RedirectResponse(url="/ui")
+
+# Monta a UI Gradio no caminho /ui para evitar conflitos de assets estáticos no HF
+app = gr.mount_gradio_app(fastapi_app, demo, path="/ui")
 
 if __name__ == "__main__":
     if analyzer_engine and anonymizer_engine:
