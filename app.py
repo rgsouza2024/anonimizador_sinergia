@@ -4,7 +4,7 @@
 import time
 import gradio as gr
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from typing import List, Optional
 from pydantic import BaseModel
 import uvicorn
 from core.config import (
@@ -148,9 +148,9 @@ fastapi_app = FastAPI(title="Anonimizador Sinergia API")
 
 class AnonimizarRequest(BaseModel):
     texto: str
-    nomes_metadados: list[str] = []
+    nomes_metadados: List[str] = []
 
-@fastapi_app.post("/anonimizar")
+@fastapi_app.post("/api/v1/anonimizar")
 async def anonimizar_endpoint(req: AnonimizarRequest):
     inicio = time.time()
     texto_anon, df_entidades = _anonimizar_logica(
