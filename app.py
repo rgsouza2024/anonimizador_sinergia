@@ -194,8 +194,17 @@ demo = criar_interface_gradio(
 async def root_redirect():
     return RedirectResponse(url="/ui/")
 
+from core.interface_builder import criar_interface_gradio, CUSTOM_CSS
+...
 # Monta a UI Gradio no caminho /ui para evitar conflitos de assets estáticos no HF
-app = gr.mount_gradio_app(fastapi_app, demo, path="/ui")
+app = gr.mount_gradio_app(
+    fastapi_app, 
+    demo, 
+    path="/ui",
+    theme=gr.themes.Soft(),
+    title="Anonimizador TRF1",
+    css=CUSTOM_CSS
+)
 
 if __name__ == "__main__":
     if analyzer_engine and anonymizer_engine:

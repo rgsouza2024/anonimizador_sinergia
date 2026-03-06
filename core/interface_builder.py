@@ -120,10 +120,10 @@ def criar_interface_gradio(
     limpar_texto_area_fn,
     processar_arquivo_pdf_fn,
 ):
-    with gr.Blocks(theme=gr.themes.Soft(), title="Anonimizador TRF1", css=CUSTOM_CSS) as demo:
+    with gr.Blocks() as demo:
         with gr.Row(elem_id="header"):
             with gr.Column(scale=0, min_width=120):
-                gr.Image(value=logo_file_path, interactive=False, show_download_button=False, show_label=False, width=100)
+                gr.Image(value=logo_file_path, interactive=False, buttons=[], show_label=False, width=100)
             with gr.Column(scale=4):
                 gr.Markdown(
                     """
@@ -160,7 +160,7 @@ def criar_interface_gradio(
                             value=estado_vazio_texto_anonimizado,
                             label="Texto anonimizado",
                             interactive=False,
-                            show_copy_button=True,
+                            buttons=["copy"],
                         )
 
                 with gr.Row(elem_classes=["cta-row"]):
@@ -206,7 +206,7 @@ def criar_interface_gradio(
                             value=estado_vazio_pdf_anonimizado,
                             label="Texto anonimizado",
                             interactive=False,
-                            show_copy_button=True,
+                            buttons=["copy"],
                         )
 
         texto_original_area.change(fn=atualizar_estado_botao_texto_fn, inputs=[texto_original_area], outputs=[btn_anonimizar_area])
