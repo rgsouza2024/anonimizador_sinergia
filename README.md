@@ -46,15 +46,9 @@ Anonimizar conteúdo jurídico (texto livre e PDF com texto pesquisável), prese
 
 - Entrada de **texto** (colar na interface)
 - Entrada de **PDF textual** (extração por PyMuPDF)
+- **Interface Web**: acessível em `/ui/` (redirecionamento automático da raiz `/`)
+- **API HTTP dedicada**: endpoint principal em `/api/v1/anonimizar` (JSON POST), com suporte legado em `/anonimizar`.
 - Saída com:
-  - Texto anonimizado
-  - Tabela de entidades detectadas
-  - Resumo de processamento
-
-### Fora de escopo (estado atual)
-
-- OCR de PDF escaneado (imagem)
-- **API HTTP dedicada**: endpoint `/api/v1/anonimizar` (JSON POST) para integração com outros sistemas.
 - Garantia de 100% de cobertura sem revisão humana
 
 ## 2. Arquitetura
@@ -66,7 +60,8 @@ A aplicação está modularizada em camadas.
 - `app.py`
   - Inicializa engines e recursos
   - Injeta dependências nas funções de pipeline/UI
-  - Sobe a interface Gradio
+  - Sobe a interface Gradio (isolada em `/ui`)
+  - Configura o espelhamento de rotas e redirecionamentos
 
 ### 2.2 Núcleo (`core/`)
 
@@ -270,6 +265,12 @@ python app.py
 
 Se os motores carregarem corretamente, a aplicação abrirá a interface Gradio.
 
+### 8.1 Endpoints no Hugging Face Spaces
+
+- **Web UI**: `https://[seu-space].hf.space/ui/`
+- **API (Versão Atual)**: `POST https://[seu-space].hf.space/api/v1/anonimizar`
+- **API (Legada)**: `POST https://[seu-space].hf.space/anonimizar`
+
 ## 9. Testes de Regressão
 
 A suíte atual é baseada em snapshot.
@@ -340,6 +341,14 @@ Revisar:
 - `nomes_comuns.txt` (remover entradas excessivamente genéricas)
 - `TERMOS_INDICADORES_PJ` em `core/config.py`
 - `PALAVRAS_NAO_NOME_GENERICAS` em `core/config.py`
+
+### Layout quebrado ou ícones gigantes (Hugging Face)
+
+Isso costuma ocorrer por conflito de assets estáticos no Gradio 5/6. A solução adotada foi isolar o Gradio no caminho `/ui/` e garantir que o `sdk_version` no `README.md` esteja como `6.0.0` ou superior.
+
+### Erro `TypeError: BlockContext.__init__() got an unexpected keyword argument 'theme'`
+
+O Gradio 6 removeu parâmetros globais do construtor de `gr.Blocks`. A aplicação foi ajustada para definir `theme`, `title` e `css` como **atributos do objeto** `demo` após sua criação no `core/interface_builder.py`.
 
 ---
 
