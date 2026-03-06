@@ -120,7 +120,7 @@ def criar_interface_gradio(
     limpar_texto_area_fn,
     processar_arquivo_pdf_fn,
 ):
-    with gr.Blocks(theme=gr.themes.Soft(), title="Anonimizador TRF1", css=CUSTOM_CSS, ssr=False) as demo:
+    with gr.Blocks(theme=gr.themes.Soft(), title="Anonimizador TRF1", css=CUSTOM_CSS) as demo:
         with gr.Row(elem_id="header"):
             with gr.Column(scale=0, min_width=120):
                 gr.Image(value=logo_file_path, interactive=False, show_download_button=False, show_label=False, width=100)
