@@ -165,6 +165,11 @@ async def anonimizar_endpoint(req: AnonimizarRequest):
         "entidades_detectadas": entidades,
         "tempo_processamento": round(time.time() - inicio, 3)
     }
+# Rota de compatibilidade para clientes legados
+@fastapi_app.post("/anonimizar")
+async def handle_compatibility_request(req: AnonimizarRequest):
+    return await anonimizar_endpoint(req)
+
 # ── fim REST API ──────────────────────────────────────────────────────────────
 
 demo = criar_interface_gradio(
@@ -184,10 +189,10 @@ demo = criar_interface_gradio(
 )
 
 # --- Ponto de Entrada para Iniciar o App ---
-# Página de redirecionamento para o Gradio
+# Página de redirecionamento para o Gradio (com barra final para evitar hops extras)
 @fastapi_app.get("/")
 async def root_redirect():
-    return RedirectResponse(url="/ui")
+    return RedirectResponse(url="/ui/")
 
 # Monta a UI Gradio no caminho /ui para evitar conflitos de assets estáticos no HF
 app = gr.mount_gradio_app(fastapi_app, demo, path="/ui")
