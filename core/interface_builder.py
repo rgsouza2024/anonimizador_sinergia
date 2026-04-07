@@ -82,6 +82,10 @@ CUSTOM_CSS = """
     margin-bottom: var(--space-1);
 }
 
+.gradio-container .copy-action-row {
+    margin-top: var(--space-1);
+}
+
 .gradio-container .gr-markdown {
     margin-bottom: var(--space-2);
 }
@@ -101,6 +105,37 @@ button.copy-button {
 
 button.copy-button > svg {
     transform: scale(1.1);
+}
+"""
+
+COPY_TEXT_JS = """
+(texto) => {
+    const valor = typeof texto === "string" ? texto : "";
+    if (!valor.trim()) {
+        return [];
+    }
+
+    const copiarComFallback = () => {
+        const areaTemporaria = document.createElement("textarea");
+        areaTemporaria.value = valor;
+        areaTemporaria.setAttribute("readonly", "");
+        areaTemporaria.style.position = "fixed";
+        areaTemporaria.style.opacity = "0";
+        areaTemporaria.style.pointerEvents = "none";
+        document.body.appendChild(areaTemporaria);
+        areaTemporaria.focus();
+        areaTemporaria.select();
+        document.execCommand("copy");
+        document.body.removeChild(areaTemporaria);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(valor).catch(() => copiarComFallback());
+    } else {
+        copiarComFallback();
+    }
+
+    return [];
 }
 """
 
@@ -160,8 +195,12 @@ def criar_interface_gradio(
                             value=estado_vazio_texto_anonimizado,
                             label="Texto anonimizado",
                             interactive=False,
-                            buttons=["copy"],
                         )
+                        with gr.Row(elem_classes=["copy-action-row"]):
+                            btn_copiar_texto_area = gr.Button(
+                                "Copiar texto anonimizado",
+                                variant="secondary",
+                            )
 
                 with gr.Row(elem_classes=["cta-row"]):
                     btn_anonimizar_area = gr.Button("Anonimizar texto", variant="primary", size="lg", interactive=False)
@@ -206,8 +245,12 @@ def criar_interface_gradio(
                             value=estado_vazio_pdf_anonimizado,
                             label="Texto anonimizado",
                             interactive=False,
-                            buttons=["copy"],
                         )
+                        with gr.Row(elem_classes=["copy-action-row"]):
+                            btn_copiar_texto_pdf = gr.Button(
+                                "Copiar texto anonimizado",
+                                variant="secondary",
+                            )
 
         texto_original_area.change(fn=atualizar_estado_botao_texto_fn, inputs=[texto_original_area], outputs=[btn_anonimizar_area])
         evento_upload_pdf = upload_pdf.upload(
@@ -234,6 +277,13 @@ def criar_interface_gradio(
             outputs=[btn_anonimizar_area],
             queue=False,
         )
+        btn_copiar_texto_area.click(
+            fn=None,
+            inputs=[texto_anonimizado_area],
+            outputs=[],
+            js=COPY_TEXT_JS,
+            queue=False,
+        )
         btn_limpar_area.click(
             fn=limpar_texto_area_fn,
             outputs=[texto_original_area, texto_anonimizado_area, resultados_df_area, resumo_texto_area, btn_anonimizar_area],
@@ -246,6 +296,13 @@ def criar_interface_gradio(
             fn=processar_arquivo_pdf_fn,
             inputs=[upload_pdf],
             outputs=[texto_original_pdf, texto_anonimizado_pdf, resumo_pdf, btn_anonimizar_pdf],
+        )
+        btn_copiar_texto_pdf.click(
+            fn=None,
+            inputs=[texto_anonimizado_pdf],
+            outputs=[],
+            js=COPY_TEXT_JS,
+            queue=False,
         )
 
     demo.theme = gr.themes.Soft()
