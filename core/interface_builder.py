@@ -160,7 +160,7 @@ def criar_interface_gradio(
                             value=estado_vazio_texto_anonimizado,
                             label="Texto anonimizado",
                             interactive=False,
-                            buttons=["copy"],
+                            show_copy_button=True,
                         )
 
                 with gr.Row(elem_classes=["cta-row"]):
@@ -206,7 +206,7 @@ def criar_interface_gradio(
                             value=estado_vazio_pdf_anonimizado,
                             label="Texto anonimizado",
                             interactive=False,
-                            buttons=["copy"],
+                            show_copy_button=True,
                         )
 
         texto_original_area.change(fn=atualizar_estado_botao_texto_fn, inputs=[texto_original_area], outputs=[btn_anonimizar_area])
