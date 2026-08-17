@@ -285,7 +285,11 @@
 
     } catch (err) {
       console.error(err);
-      mostrarToast(err.message, 'error');
+      let msg = err.message || 'Erro inesperado.';
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
+        msg = 'Não foi possível conectar ao servidor backend (http://127.0.0.1:7860). Certifique-se de que o backend Python está em execução.';
+      }
+      mostrarToast(msg, 'error', 4500);
     } finally {
       dom.btnAnonimizar.disabled = false;
       dom.btnAnonimizar.innerHTML = btnOriginalHtml;
