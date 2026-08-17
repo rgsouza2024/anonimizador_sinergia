@@ -202,6 +202,11 @@
     dom.btnAnonimizar.disabled = dom.inputTexto.value.trim().length === 0;
   }
 
+  // Determina URL base da API (suporta porta 7860 mesmo se aberto por Live Server 5501 ou file://)
+  const API_BASE = (window.location.port !== '7860' && (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' || window.location.protocol === 'file:'))
+    ? 'http://127.0.0.1:7860'
+    : '';
+
   // ── 5. PROCESSAMENTO UNIVERSAL (TEXTO, PDF E DOCX) COM AUTO-COPY ───────────
   async function processarUniversal() {
     const texto = dom.inputTexto.value.trim();
@@ -224,14 +229,20 @@
         const formData = new FormData();
         formData.append('file', arquivo);
 
-        const response = await fetch('/api/v1/anonimizar-arquivo', {
+        const response = await fetch(`${API_BASE}/api/v1/anonimizar-arquivo`, {
           method: 'POST',
           body: formData
         });
 
-        data = await response.json();
+        try {
+          const text = await response.text();
+          data = text ? JSON.parse(text) : {};
+        } catch (parseErr) {
+          throw new Error(`Falha de comunicação com o backend (Código ${response.status}). Certifique-se de que o servidor Python app.py está em execução na porta 7860.`);
+        }
+
         if (!response.ok || !data.sucesso) {
-          throw new Error(data.erro || 'Falha ao processar arquivo.');
+          throw new Error(data.erro || data.detail || `Erro no processamento (${response.status})`);
         }
 
         // Se o textarea estava vazio, preenche com o texto extraído
@@ -242,17 +253,23 @@
 
       } else {
         // Envio via endpoint de texto puro
-        const response = await fetch('/api/v1/anonimizar', {
+        const response = await fetch(`${API_BASE}/api/v1/anonimizar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ texto, nomes_metadados: [] })
         });
 
-        if (!response.ok) {
-          throw new Error(`Erro no servidor: ${response.status}`);
+        try {
+          const text = await response.text();
+          data = text ? JSON.parse(text) : {};
+        } catch (parseErr) {
+          throw new Error(`Falha de comunicação com o backend (Código ${response.status}). Certifique-se de que o servidor Python app.py está em execução na porta 7860.`);
         }
 
-        data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.detail || `Erro no servidor: ${response.status}`);
+        }
+
         data.texto_original = texto;
         data.sucesso = true;
       }

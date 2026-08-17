@@ -170,7 +170,18 @@ def extrair_texto_de_docx(arquivo_bytes: bytes):
         return "", f"Erro ao processar arquivo Word (.docx): {str(e)}"
 
 # ── REST API ──────────────────────────────────────────────────────────────────
+from fastapi.middleware.cors import CORSMiddleware
+
 fastapi_app = FastAPI(title="Anonimizador Sinergia API")
+
+# Habilita CORS para testes locais em qualquer porta (incluindo Live Server 5501)
+fastapi_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 class AnonimizarRequest(BaseModel):
     texto: str
