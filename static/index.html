@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Anonimizador SINERGIA</title>
   <link rel="icon" type="image/png" href="/static/img/logo.png">
-  <meta name="description" content="Anonimização de textos e documentos jurídicos com apoio de inteligência artificial generativa e regras contextuais. Projeto Sinergia - TRF1.">
+  <meta name="description" content="Anonimização universal de textos e documentos jurídicos (PDF e DOCX). Projeto Sinergia - TRF1.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -71,291 +71,151 @@
       </div>
       <div class="privacy-body">
         <ul>
-          <li><strong>Privacidade Absoluta:</strong> Os textos são processados localmente sem persistência de dados em disco ou compartilhamento externo com terceiros.</li>
-          <li><strong>Documentos em PDF:</strong> Suporte para arquivos PDF que possuam camada de texto pesquisável (OCR nativo).</li>
+          <li><strong>Privacidade Absoluta:</strong> Os textos são processados localmente sem persistência de dados em disco ou compartilhamento com terceiros.</li>
+          <li><strong>Suporte Universal:</strong> Aceita colagem direta de texto, documentos PDF pesquisáveis e arquivos do Microsoft Word (.docx).</li>
           <li><strong>Revisão Funcional:</strong> Em respeito às diretrizes de governança de IA do Poder Judiciário, revise as peças antes de sua destinação definitiva.</li>
         </ul>
       </div>
     </section>
 
-    <!-- ── 3. BARRA DE CONTROLE: ABAS + MODOS DE VISÃO (OPÇÃO C) ─────────── -->
-    <div class="controls-bar">
+    <!-- ── 3. WORKSPACE UNIVERSAL OMNIMODAL (TEXTO, PDF E DOCX) ──────────── -->
+    <main class="workspace-grid" id="workspace-grid">
       
-      <!-- Abas de Tipo de Entrada -->
-      <nav class="nav-tabs-wrapper" role="tablist">
-        <button class="nav-tab active" data-tab="tab-texto" role="tab" aria-selected="true">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="16" y1="13" x2="8" y2="13"></line>
-            <line x1="16" y1="17" x2="8" y2="17"></line>
-          </svg>
-          Anonimizar Texto
-        </button>
-        <button class="nav-tab" data-tab="tab-pdf" role="tab" aria-selected="false">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-            <polyline points="14 2 14 8 20 8"></polyline>
-            <line x1="12" y1="18" x2="12" y2="12"></line>
-            <line x1="9" y1="15" x2="15" y2="15"></line>
-          </svg>
-          Anonimizar Arquivo PDF
-        </button>
-      </nav>
-
-      <!-- 
-        ========================================================================
-        [RECURSO EXPERIMENTAL / FUTURO]: SELETOR DE MODOS DE EXIBIÇÃO
-        Opções: Lado a Lado (Split View), Documento Focado (Single Canvas) e Comparação Diff.
-        Desativado temporariamente a pedido do usuário, mantendo o padrão exclusivo
-        e definitivo "Lado a Lado" com rolagem sincronizada.
-        Para reativar este seletor no futuro, basta remover os delimitadores de comentário abaixo.
-        ========================================================================
-      <div class="view-modes-wrapper" id="view-modes-container">
-        <span class="view-mode-label">Exibição:</span>
-        <button class="view-mode-btn active" data-mode="split" id="btn-mode-split" title="Visualização lado a lado em duas colunas">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="12" y1="3" x2="12" y2="21"></line>
-          </svg>
-          Lado a Lado
-        </button>
-        <button class="view-mode-btn" data-mode="focus" id="btn-mode-focus" title="Documento amplo com foco na leitura (estilo Word/Decisão)">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <rect x="4" y="3" width="16" height="18" rx="2" ry="2"></rect>
-            <line x1="8" y1="8" x2="16" y2="8"></line>
-            <line x1="8" y1="12" x2="16" y2="12"></line>
-            <line x1="8" y1="16" x2="12" y2="16"></line>
-          </svg>
-          Documento Focado
-        </button>
-        <button class="view-mode-btn" data-mode="diff" id="btn-mode-diff" title="Comparação no próprio texto com o dado original tachado">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <polyline points="16 3 21 3 21 8"></polyline>
-            <line x1="4" y1="20" x2="21" y2="3"></line>
-            <polyline points="21 16 21 21 16 21"></polyline>
-            <line x1="15" y1="15" x2="21" y2="21"></line>
-            <line x1="4" y1="4" x2="9" y2="9"></line>
-          </svg>
-          Comparação Diff
-        </button>
-      </div>
-      -->
-
-    </div>
-
-    <!-- ── 4. CONTEÚDO: ABA TEXTO ────────────────────────────────────────── -->
-    <main id="tab-texto" class="tab-content active">
-      <div class="workspace-grid" id="workspace-grid-texto">
-        
-        <!-- Coluna Entrada (Texto Original) -->
-        <div class="panel-card panel-card-input" id="panel-input-texto">
-          <div class="panel-header">
-            <span class="panel-title">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+      <!-- Coluna Entrada Universal (Texto / PDF / DOCX) -->
+      <div class="panel-card panel-card-input" id="panel-input">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+            Documento Original
+          </span>
+          <div class="panel-header-actions">
+            <button id="btn-anexar-arquivo" class="btn-attach" title="Anexar arquivo PDF ou Word (.docx)">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
               </svg>
-              Texto Original
-            </span>
+              <span>Anexar PDF / Word</span>
+            </button>
+            <input type="file" id="file-input-universal" accept=".pdf,.docx" style="display: none;">
             <span id="char-counter" class="badge-counter">0 caracteres</span>
           </div>
-          <div class="panel-body">
-            <textarea id="input-texto" class="text-input-area" placeholder="Cole ou digite aqui a petição, decisão, sentença, despacho ou acórdão a ser anonimizado (Atalho: Ctrl + Enter)..."></textarea>
+        </div>
+
+        <div class="panel-body panel-body-universal" id="dropzone-universal">
+          <!-- Selo de Arquivo Carregado (PDF / DOCX) -->
+          <div id="file-badge" class="file-loaded-badge" style="display: none;">
+            <div class="file-badge-icon">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+              </svg>
+            </div>
+            <div class="file-badge-info">
+              <strong id="file-badge-name">documento.docx</strong>
+              <span id="file-badge-size">0 KB</span>
+            </div>
+            <button id="btn-remover-arquivo" class="btn-ghost" style="padding: 2px 8px; font-size: 0.80rem;" title="Remover arquivo">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+              Remover
+            </button>
           </div>
-          <div class="panel-footer">
-            <button id="btn-anonimizar-texto" class="btn-primary" disabled>
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-              </svg>
-              <span>Anonimizar Texto (Ctrl+Enter)</span>
-            </button>
-            <button id="btn-limpar-texto" class="btn-ghost" title="Limpar campo de texto">
-              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <polyline points="3 6 5 6 21 6"></polyline>
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-              </svg>
-              Limpar
-            </button>
+
+          <!-- Área de Digitação e Colagem -->
+          <textarea id="input-texto" class="text-input-area" placeholder="Cole o texto da peça jurídica aqui, ou arraste e solte arquivos PDF e Word (.docx)..."></textarea>
+
+          <!-- Overlay visual ao arrastar arquivo -->
+          <div class="drag-overlay" id="drag-overlay">
+            <svg width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="17 8 12 3 7 8"></polyline>
+              <line x1="12" y1="3" x2="12" y2="15"></line>
+            </svg>
+            <p>Solte o arquivo PDF ou Word (.docx) aqui para carregar</p>
           </div>
         </div>
 
-        <!-- Coluna Saída (Texto Anonimizado / Diff / Focus Canvas) -->
-        <div class="panel-card panel-card-output" id="panel-output-texto">
-          <div class="panel-header">
-            <span class="panel-title" id="output-panel-title">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-              </svg>
-              Texto Anonimizado
-            </span>
-            <div class="panel-header-actions">
-              <!-- Botão para voltar à edição no modo foco -->
-              <button id="btn-switch-focus-edit" class="btn-secondary" style="display: none;" title="Voltar para editar o texto">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Editar Texto
-              </button>
-
-              <button id="btn-toggle-highlight-texto" class="btn-secondary" title="Alternar Destaques Coloridos" style="display: none;">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-                Destaques
-              </button>
-            </div>
-          </div>
-          <div class="panel-body">
-            <div id="viewer-texto" class="viewer-container">
-              <div class="viewer-empty-state">
-                <div class="empty-art-wrapper">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    <circle cx="12" cy="11" r="2.5"></circle>
-                    <line x1="12" y1="8.5" x2="12" y2="5"></line>
-                    <line x1="12" y1="13.5" x2="12" y2="17"></line>
-                    <line x1="9.5" y1="11" x2="6.5" y2="11"></line>
-                    <line x1="14.5" y1="11" x2="17.5" y2="11"></line>
-                  </svg>
-                </div>
-                <div class="empty-state-title">Proteção Inteligente de Dados</div>
-                <div class="empty-state-desc">Cole uma peça jurídica e clique em <strong>Anonimizar Texto</strong> para identificar e mascarar dados sensíveis.</div>
-              </div>
-            </div>
-          </div>
-          <div class="panel-footer" style="justify-content: flex-end;">
-            <button id="btn-copiar-texto" class="btn-secondary" title="Copiar para área de transferência" disabled>
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copiar
-            </button>
-            <button id="btn-download-texto" class="btn-secondary" title="Baixar arquivo .txt" disabled>
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              Baixar (.txt)
-            </button>
-          </div>
+        <div class="panel-footer">
+          <button id="btn-anonimizar" class="btn-primary" disabled>
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            <span>Anonimizar e Copiar (Ctrl+Enter)</span>
+          </button>
+          <button id="btn-limpar" class="btn-ghost" title="Limpar documento">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+            </svg>
+            Limpar
+          </button>
         </div>
-
       </div>
+
+      <!-- Coluna Saída (Documento Anonimizado) -->
+      <div class="panel-card panel-card-output" id="panel-output">
+        <div class="panel-header">
+          <span class="panel-title">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Documento Anonimizado
+          </span>
+          <button id="btn-toggle-highlight" class="btn-secondary" title="Alternar Destaques Coloridos" style="display: none;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 20h9"></path>
+              <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+            </svg>
+            Destaques
+          </button>
+        </div>
+        <div class="panel-body">
+          <div id="viewer-texto" class="viewer-container">
+            <div class="viewer-empty-state">
+              <div class="empty-art-wrapper">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                  <circle cx="12" cy="11" r="2.5"></circle>
+                  <line x1="12" y1="8.5" x2="12" y2="5"></line>
+                  <line x1="12" y1="13.5" x2="12" y2="17"></line>
+                  <line x1="9.5" y1="11" x2="6.5" y2="11"></line>
+                  <line x1="14.5" y1="11" x2="17.5" y2="11"></line>
+                </svg>
+              </div>
+              <div class="empty-state-title">Proteção Inteligente de Dados</div>
+              <div class="empty-state-desc">Cole um texto ou envie um arquivo PDF/Word para mascarar dados sensíveis e copiar o resultado com 1 clique.</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer" style="justify-content: flex-end;">
+          <button id="btn-copiar" class="btn-secondary" title="Copiar para área de transferência" disabled>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copiar Novamente
+          </button>
+          <button id="btn-download" class="btn-secondary" title="Baixar arquivo de texto" disabled>
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Baixar (.txt)
+          </button>
+        </div>
+      </div>
+
     </main>
 
-    <!-- ── 5. CONTEÚDO: ABA PDF ──────────────────────────────────────────── -->
-    <main id="tab-pdf" class="tab-content" style="display: none;">
-      
-      <!-- Dropzone de Upload Compacto -->
-      <div id="dropzone" class="dropzone-container">
-        <div class="dropzone-icon-circle">
-          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-        </div>
-        <div class="dropzone-text">
-          <h3>Arraste o arquivo PDF aqui ou clique para selecionar</h3>
-          <p>Suporte a até 40 MB e 500 páginas com camada de texto pesquisável</p>
-        </div>
-        <button type="button" class="btn-secondary dropzone-btn-action" title="Selecionar arquivo PDF">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Selecionar PDF
-        </button>
-        <input type="file" id="file-input-pdf" accept=".pdf" style="display: none;">
-      </div>
-
-      <div id="pdf-file-badge" class="file-info-badge">
-        <svg width="20" height="20" fill="none" stroke="var(--jf-azul)" stroke-width="2" viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-        </svg>
-        <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
-          <strong id="pdf-file-name" style="font-size: 0.88rem; color: var(--color-text-main);">documento.pdf</strong>
-          <span id="pdf-file-size" style="font-size: 0.78rem; color: var(--color-text-muted);">0 KB</span>
-        </div>
-        <button id="btn-remover-pdf" class="btn-ghost" style="padding: 4px 10px; font-size: 0.82rem;" title="Remover arquivo">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-          Remover
-        </button>
-      </div>
-
-      <!-- Comparação Lado a Lado do PDF -->
-      <div class="workspace-grid" id="workspace-grid-pdf">
-        <div class="panel-card panel-card-input" id="panel-input-pdf">
-          <div class="panel-header">
-            <span class="panel-title">Texto Original Extraído do PDF</span>
-          </div>
-          <div class="panel-body">
-            <div id="viewer-pdf-original" class="viewer-container">
-              <div class="viewer-empty-state">
-                <div class="empty-art-wrapper">
-                  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                    <polyline points="14 2 14 8 20 8"></polyline>
-                  </svg>
-                </div>
-                <div class="empty-state-title">Aguardando PDF</div>
-                <div class="empty-state-desc">Envie um arquivo PDF pesquisável para visualizar o conteúdo extraído.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="panel-card panel-card-output" id="panel-output-pdf">
-          <div class="panel-header">
-            <span class="panel-title">Texto Anonimizado do PDF</span>
-          </div>
-          <div class="panel-body">
-            <div id="viewer-pdf-anonimizado" class="viewer-container">
-              <div class="viewer-empty-state">
-                <div class="empty-art-wrapper">
-                  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                    <circle cx="12" cy="11" r="2.5"></circle>
-                  </svg>
-                </div>
-                <div class="empty-state-title">Resultado da Anonimização</div>
-                <div class="empty-state-desc">O texto anonimizado do PDF aparecerá aqui após o processamento.</div>
-              </div>
-            </div>
-          </div>
-          <div class="panel-footer" style="justify-content: flex-end;">
-            <button id="btn-copiar-pdf" class="btn-secondary" disabled>
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-              </svg>
-              Copiar
-            </button>
-            <button id="btn-download-pdf" class="btn-secondary" disabled>
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="7 10 12 15 17 10"></polyline>
-                <line x1="12" y1="15" x2="12" y2="3"></line>
-              </svg>
-              Baixar (.txt)
-            </button>
-          </div>
-        </div>
-      </div>
-    </main>
-
-    <!-- ── 6. STAT CARDS / BARRA DE RESUMO ───────────────────────────────── -->
+    <!-- ── 4. STAT CARDS / BARRA DE RESUMO (SEM EMOJIS) ───────────────────── -->
     <section class="stats-container" id="stats-section" style="display: none;">
       <div class="stat-card">
         <div class="stat-content">
@@ -377,7 +237,7 @@
       </div>
     </section>
 
-    <!-- ── 7. PAINEL DE AUDITORIA E TABELA DE ENTIDADES ──────────────────── -->
+    <!-- ── 5. PAINEL DE AUDITORIA E TABELA DE ENTIDADES ──────────────────── -->
     <section class="audit-panel" id="audit-section" style="display: none;">
       <div class="audit-header">
         <div class="panel-title">
@@ -413,7 +273,7 @@
 
   </div>
 
-  <!-- Container de Toasts Flutuantes -->
+  <!-- Container de Notificações Institucionais (Toasts sem emojis) -->
   <div id="toast-container" class="toast-container"></div>
 
   <script src="/static/js/app.js"></script>

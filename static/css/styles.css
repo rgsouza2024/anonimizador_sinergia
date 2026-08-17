@@ -1,6 +1,6 @@
 /* ==========================================================================
    ANONIMIZADOR SINERGIA - DESIGN SYSTEM INSTITUCIONAL & ARTÍSTICO (TRF1)
-   Opção C: Layout Híbrido Flexível (Split View • Single Canvas • Inline Diff)
+   Entrada Universal Omnimodal (Texto • PDF • DOCX) com Fluxo de Alta Velocidade
    ========================================================================== */
 
 /* ── 1. TOKENS DE DESIGN & VARIÁVEIS DE AMBIENTE ─────────────────────────── */
@@ -18,19 +18,19 @@
   --space-6: 24px;
   --space-8: 32px;
 
-  /* Cores Oficiais da Justiça Federal (Manual Seção 4) */
+  /* Cores Oficiais da Justiça Federal (Manual Seção 4 - Resolução CF-RES-2012/00193) */
   --jf-azul: #002F6C;          /* Pantone 294 C */
   --jf-azul-hover: #083e87;
   --jf-azul-active: #042452;
   --jf-azul-light: #eaf2fb;
   --jf-azul-border: #bfcee0;
-  --jf-azul-glow: rgba(0, 47, 108, 0.22);
+  --jf-azul-glow: rgba(0, 47, 108, 0.20);
 
   --jf-verde: #007A33;         /* Pantone 356 C */
   --jf-verde-hover: #006329;
   --jf-verde-light: #e6f7ed;
   --jf-verde-border: #a3e0b9;
-  --jf-verde-glow: rgba(0, 122, 51, 0.20);
+  --jf-verde-glow: rgba(0, 122, 51, 0.18);
 
   --jf-cinza: #97999F;         /* Cool Gray 7 */
 
@@ -41,7 +41,7 @@
   --color-bg-muted: #e2e8f0;
 
   --color-border: rgba(203, 213, 225, 0.85);
-  --color-border-subtle: rgba(226, 232, 240, 0.8);
+  --color-border-subtle: rgba(226, 232, 240, 0.80);
   --color-border-focus: var(--jf-azul);
 
   --color-text-main: #0f172a;
@@ -56,11 +56,6 @@
   --color-error: #dc2626;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
-
-  /* Diff Styling */
-  --diff-del-bg: #fee2e2;
-  --diff-del-text: #991b1b;
-  --diff-del-border: #fca5a5;
 
   /* Destaques de Entidades (Highlights com Alto Contraste) */
   --hl-nome-bg: #dbeafe;
@@ -107,17 +102,13 @@
   --color-bg-muted: #1f293d;
 
   --color-border: rgba(35, 49, 77, 0.85);
-  --color-border-subtle: rgba(25, 35, 56, 0.7);
+  --color-border-subtle: rgba(25, 35, 56, 0.70);
   --color-border-focus: #38bdf8;
 
   --color-text-main: #f8fafc;
   --color-text-body: #cbd5e1;
   --color-text-muted: #94a3b8;
   --color-text-inverse: #080c14;
-
-  --diff-del-bg: #450a0a;
-  --diff-del-text: #fca5a5;
-  --diff-del-border: #7f1d1d;
 
   --jf-azul-light: #0c2547;
   --jf-azul-border: #1e3a8a;
@@ -214,7 +205,6 @@ body::after {
   gap: var(--space-5);
   position: relative;
   z-index: 1;
-  transition: max-width var(--transition-normal);
 }
 
 /* ── 4. HEADER INSTITUCIONAL ─────────────────────────────────────────────── */
@@ -413,145 +403,12 @@ body::after {
   margin-bottom: 4px;
 }
 
-/* ── 6. BARRA SUPERIOR DE CONTROLE (NAV + MODO DE VISÃO + MÁSCARA) ────────── */
-.controls-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-3);
-}
-
-.nav-tabs-wrapper {
-  display: flex;
-  align-items: center;
-  background: var(--color-bg-muted);
-  padding: 4px;
-  border-radius: var(--radius-md);
-  gap: 4px;
-  border: 1px solid var(--color-border-subtle);
-}
-
-.nav-tab {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  padding: 8px 18px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
-  border-radius: var(--radius-sm);
-  border: none;
-  cursor: pointer;
-  background: transparent;
-  transition: all var(--transition-fast);
-}
-
-.nav-tab:hover {
-  color: var(--color-text-main);
-}
-
-.nav-tab.active {
-  color: var(--jf-azul);
-  background: var(--color-bg-surface);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  font-weight: 700;
-}
-
-[data-theme="dark"] .nav-tab.active {
-  color: #38bdf8;
-  background: var(--color-bg-surface-subtle);
-}
-
-/* Seletor de Modo de Exibição (Opção C) */
-.view-modes-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background: var(--color-bg-surface);
-  padding: 3px 6px;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  box-shadow: var(--shadow-xs);
-}
-
-.view-mode-label {
-  font-size: 0.76rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
-  margin-right: 4px;
-  letter-spacing: 0.03em;
-}
-
-.view-mode-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  font-size: 0.84rem;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  border: none;
-  background: transparent;
-  color: var(--color-text-muted);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.view-mode-btn:hover {
-  color: var(--color-text-main);
-  background: var(--color-bg-surface-subtle);
-}
-
-.view-mode-btn.active {
-  background: var(--jf-azul-light);
-  color: var(--jf-azul);
-  font-weight: 700;
-}
-
-[data-theme="dark"] .view-mode-btn.active {
-  background: #0c2547;
-  color: #38bdf8;
-}
-
-/* ── 7. PAINÉIS DE TRABALHO & MODOS DE LAYOUT ────────────────────────────── */
+/* ── 6. WORKSPACE GRID UNIVERSAL ─────────────────────────────────────────── */
 .workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-5);
   align-items: stretch;
-  transition: all var(--transition-normal);
-}
-
-/* MODO: DOCUMENTO FOCADO (SINGLE CANVAS) */
-.layout-focus .workspace-grid {
-  grid-template-columns: 1fr;
-  max-width: 920px;
-  margin: 0 auto;
-}
-
-.layout-focus .panel-card-input {
-  display: none; /* Em modo foco com resultado, exibe apenas a decisão */
-}
-
-.layout-focus .panel-card-input.show-input {
-  display: flex;
-}
-
-.layout-focus .panel-card-output.hide-output {
-  display: none;
-}
-
-/* MODO: COMPARAÇÃO DIFF */
-.layout-diff .panel-card-input {
-  display: none;
-}
-
-.layout-diff .workspace-grid {
-  grid-template-columns: 1fr;
-  max-width: 1040px;
-  margin: 0 auto;
 }
 
 @media (max-width: 960px) {
@@ -572,6 +429,7 @@ body::after {
   height: 100%;
   overflow: hidden;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  position: relative;
 }
 
 .panel-card:focus-within {
@@ -610,7 +468,33 @@ body::after {
 .panel-header-actions {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.btn-attach {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-body);
+  font-size: 0.80rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-attach:hover {
+  background: var(--jf-azul-light);
+  border-color: var(--jf-azul);
+  color: var(--jf-azul);
+}
+
+[data-theme="dark"] .btn-attach:hover {
+  color: #38bdf8;
+  border-color: #38bdf8;
 }
 
 .panel-body {
@@ -618,6 +502,7 @@ body::after {
   display: flex;
   flex-direction: column;
   flex: 1;
+  position: relative;
 }
 
 .panel-footer {
@@ -633,7 +518,89 @@ body::after {
   box-sizing: border-box;
 }
 
-/* ── 8. ÁREA DE TEXTO E VISUALIZADORES (ALTURA 100% PADRONIZADA) ─────────── */
+/* ── 7. ENTRADA UNIVERSAL & DRAG & DROP ──────────────────────────────────── */
+.panel-body-universal {
+  position: relative;
+}
+
+.file-loaded-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--jf-azul-light);
+  border: 1px solid var(--jf-azul-border);
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  animation: fadeIn 0.2s ease;
+}
+
+[data-theme="dark"] .file-loaded-badge {
+  background: #0c2547;
+  border-color: #1e3a8a;
+}
+
+.file-badge-icon {
+  color: var(--jf-azul);
+  display: flex;
+}
+
+[data-theme="dark"] .file-badge-icon {
+  color: #38bdf8;
+}
+
+.file-badge-info {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.file-badge-info strong {
+  font-size: 0.88rem;
+  color: var(--color-text-main);
+}
+
+.file-badge-info span {
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+}
+
+.drag-overlay {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  right: 18px;
+  bottom: 16px;
+  border: 2px dashed var(--jf-azul);
+  border-radius: var(--radius-md);
+  background: rgba(234, 242, 251, 0.92);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--jf-azul);
+  font-weight: 700;
+  font-size: 0.95rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-fast);
+  z-index: 10;
+}
+
+[data-theme="dark"] .drag-overlay {
+  background: rgba(12, 37, 71, 0.94);
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.panel-card-input.dragover .drag-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── 8. ÁREA DE TEXTO E VISUALIZADORES (ALTURA 100% PADRONIZADA: 420px) ───── */
 .text-input-area {
   width: 100%;
   height: 420px;
@@ -716,7 +683,7 @@ body::after {
   background: rgba(56, 189, 248, 0.40);
 }
 
-/* Empty State Artístico (sem qualquer overflow) */
+/* Empty State Artístico (sem qualquer overflow e sem emojis) */
 .viewer-empty-state {
   display: flex;
   flex-direction: column;
@@ -740,8 +707,8 @@ body::after {
 }
 
 .empty-art-wrapper {
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--jf-azul-light) 0%, var(--jf-verde-light) 100%);
   display: flex;
@@ -760,35 +727,19 @@ body::after {
 }
 
 .empty-state-title {
-  font-size: 1.0rem;
+  font-size: 0.98rem;
   font-weight: 800;
   color: var(--color-text-main);
 }
 
 .empty-state-desc {
-  font-size: 0.86rem;
+  font-size: 0.84rem;
   color: var(--color-text-muted);
-  max-width: 330px;
+  max-width: 320px;
   line-height: 1.55;
 }
 
-/* ── 9. INLINE DIFF STYLING ──────────────────────────────────────────────── */
-.diff-del {
-  text-decoration: line-through;
-  background: var(--diff-del-bg);
-  color: var(--diff-del-text);
-  padding: 1px 5px;
-  border-radius: 3px;
-  font-weight: 500;
-  margin-right: 3px;
-  border: 1px solid var(--diff-del-border);
-}
-
-.diff-ins {
-  margin-left: 2px;
-}
-
-/* ── 10. HIGHLIGHT BADGES ─────────────────────────────────────────────────── */
+/* ── 9. HIGHLIGHT BADGES ─────────────────────────────────────────────────── */
 .entity-tag {
   display: inline-flex;
   align-items: center;
@@ -836,7 +787,7 @@ body::after {
   border-color: var(--hl-contato-border);
 }
 
-/* ── 11. BOTÕES E CONTROLES DE AÇÃO ──────────────────────────────────────── */
+/* ── 10. BOTÕES E CONTROLES DE AÇÃO ──────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -926,7 +877,7 @@ body::after {
   color: var(--color-text-muted);
 }
 
-/* ── 12. STAT CARDS / MÉTRICAS ───────────────────────────────────────────── */
+/* ── 11. STAT CARDS / MÉTRICAS (SEM EMOJIS) ──────────────────────────────── */
 .stats-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -978,7 +929,7 @@ body::after {
   color: #38bdf8;
 }
 
-/* ── 13. TABELA DE AUDITORIA ─────────────────────────────────────────────── */
+/* ── 12. TABELA DE AUDITORIA ─────────────────────────────────────────────── */
 .audit-panel {
   background: var(--color-bg-surface);
   backdrop-filter: blur(20px);
@@ -1077,85 +1028,7 @@ body::after {
   background: var(--jf-azul-light);
 }
 
-/* ── 14. DRAG & DROP DE PDF (COMPACTO & HORIZONTAL) ──────────────────────── */
-.dropzone-container {
-  border: 1.5px dashed var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 14px 20px;
-  background: var(--color-bg-surface);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
-  box-shadow: var(--shadow-xs);
-}
-
-.dropzone-container:hover, .dropzone-container.dragover {
-  border-color: var(--jf-azul);
-  background: var(--jf-azul-light);
-  transform: translateY(-1px);
-}
-
-.dropzone-icon-circle {
-  width: 42px;
-  height: 42px;
-  border-radius: var(--radius-md);
-  background: var(--jf-azul-light);
-  color: var(--jf-azul);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-[data-theme="dark"] .dropzone-icon-circle {
-  color: #38bdf8;
-  background: #0c2547;
-}
-
-.dropzone-text {
-  flex: 1;
-  text-align: left;
-}
-
-.dropzone-text h3 {
-  font-size: 0.94rem;
-  font-weight: 700;
-  color: var(--color-text-main);
-}
-
-.dropzone-text p {
-  font-size: 0.80rem;
-  color: var(--color-text-muted);
-  margin-top: 1px;
-}
-
-.dropzone-btn-action {
-  flex-shrink: 0;
-  pointer-events: none; /* Deixa o clique passar para o dropzone */
-}
-
-.file-info-badge {
-  display: none;
-  align-items: center;
-  gap: var(--space-3);
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  padding: 8px 16px;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-4);
-  box-shadow: var(--shadow-xs);
-}
-
-.file-info-badge.active {
-  display: flex;
-}
-
-/* ── 15. TOASTS & SPINNER ────────────────────────────────────────────────── */
+/* ── 13. NOTIFICAÇÕES TOAST (SEM EMOJIS, APENAS ÍCONES VETORIAIS) ────────── */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -1189,9 +1062,29 @@ body::after {
   border-left: 4px solid var(--color-error);
 }
 
+.toast-icon-svg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.toast-success .toast-icon-svg {
+  color: var(--jf-verde);
+}
+
+.toast-error .toast-icon-svg {
+  color: var(--color-error);
+}
+
 @keyframes slideIn {
   from { transform: translateY(16px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .spinner {

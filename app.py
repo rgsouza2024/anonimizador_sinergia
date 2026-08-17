@@ -149,6 +149,26 @@ def processar_arquivo_pdf(arquivo_temp, progress=gr.Progress()):
         progress=progress,
     )
 
+import docx
+import io
+
+def extrair_texto_de_docx(arquivo_bytes: bytes):
+    """Extrai texto e tabelas de um arquivo Word (.docx). Retorna (texto, erro)."""
+    try:
+        doc = docx.Document(io.BytesIO(arquivo_bytes))
+        paragrafos = [p.text.strip() for p in doc.paragraphs if p.text and p.text.strip()]
+        for table in doc.tables:
+            for row in table.rows:
+                linha = " | ".join(cell.text.strip() for cell in row.cells if cell.text.strip())
+                if linha:
+                    paragrafos.append(linha)
+        texto = "\n\n".join(paragrafos)
+        if not texto.strip():
+            return "", "O documento DOCX está vazio ou não contém texto legível."
+        return texto, None
+    except Exception as e:
+        return "", f"Erro ao processar arquivo Word (.docx): {str(e)}"
+
 # ── REST API ──────────────────────────────────────────────────────────────────
 fastapi_app = FastAPI(title="Anonimizador Sinergia API")
 
@@ -170,50 +190,68 @@ async def anonimizar_endpoint(req: AnonimizarRequest):
         "tempo_processamento": round(time.time() - inicio, 3)
     }
 
-@fastapi_app.post("/api/v1/anonimizar-pdf")
-async def anonimizar_pdf_endpoint(file: UploadFile = File(...)):
+@fastapi_app.post("/api/v1/anonimizar-arquivo")
+async def anonimizar_arquivo_endpoint(file: UploadFile = File(...)):
+    """Endpoint Universal para processamento de arquivos PDF e Word (.docx)."""
     inicio = time.time()
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="O arquivo enviado deve ser um PDF (.pdf).")
-    
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-        conteudo = await file.read()
-        tmp.write(conteudo)
-        tmp_path = tmp.name
+    nome_lower = file.filename.lower()
+    conteudo = await file.read()
 
-    try:
-        texto_extraido, erro, nomes_pf_metadados = extrair_texto_de_pdf(tmp_path)
-        if erro:
-            return {
-                "sucesso": False,
-                "erro": erro,
-                "texto_extraido": "",
-                "texto_anonimizado": "",
-                "entidades_detectadas": [],
-                "metadados_pdf": {},
-                "tempo_processamento": round(time.time() - inicio, 3)
-            }
-        
-        texto_anon, df_entidades, metricas = _anonimizar_logica(
-            texto_extraido,
-            nomes_pf_metadados=nomes_pf_metadados,
-            retornar_metricas=True
+    if nome_lower.endswith(".docx"):
+        texto_extraido, erro = extrair_texto_de_docx(conteudo)
+        nomes_pf_metadados = set()
+        info_metadado = {}
+    elif nome_lower.endswith(".pdf"):
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(conteudo)
+            tmp_path = tmp.name
+        try:
+            texto_extraido, erro, nomes_pf_metadados = extrair_texto_de_pdf(tmp_path)
+            info_metadado = {}
+        finally:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+    else:
+        raise HTTPException(
+            status_code=400, 
+            detail="Formato não suportado. Por favor, envie um arquivo PDF (.pdf) ou Word (.docx)."
         )
-        entidades = df_entidades.to_dict(orient="records") if not df_entidades.empty else []
-        info_metadado = metricas.get("metadado", {}) if isinstance(metricas, dict) else {}
-        
+
+    if erro:
         return {
-            "sucesso": True,
-            "erro": None,
-            "texto_extraido": texto_extraido,
-            "texto_anonimizado": texto_anon,
-            "entidades_detectadas": entidades,
-            "metadados_pdf": info_metadado,
+            "sucesso": False,
+            "erro": erro,
+            "nome_arquivo": file.filename,
+            "texto_extraido": "",
+            "texto_anonimizado": "",
+            "entidades_detectadas": [],
             "tempo_processamento": round(time.time() - inicio, 3)
         }
-    finally:
-        if os.path.exists(tmp_path):
-            os.remove(tmp_path)
+
+    texto_anon, df_entidades, metricas = _anonimizar_logica(
+        texto_extraido,
+        nomes_pf_metadados=nomes_pf_metadados,
+        retornar_metricas=True
+    )
+    entidades = df_entidades.to_dict(orient="records") if not df_entidades.empty else []
+    if isinstance(metricas, dict) and "metadado" in metricas:
+        info_metadado = metricas["metadado"]
+
+    return {
+        "sucesso": True,
+        "erro": None,
+        "nome_arquivo": file.filename,
+        "tipo_arquivo": "docx" if nome_lower.endswith(".docx") else "pdf",
+        "texto_extraido": texto_extraido,
+        "texto_anonimizado": texto_anon,
+        "entidades_detectadas": entidades,
+        "metadados_pdf": info_metadado,
+        "tempo_processamento": round(time.time() - inicio, 3)
+    }
+
+@fastapi_app.post("/api/v1/anonimizar-pdf")
+async def anonimizar_pdf_endpoint(file: UploadFile = File(...)):
+    return await anonimizar_arquivo_endpoint(file)
 
 # Rota de compatibilidade para clientes legados
 @fastapi_app.post("/anonimizar")
