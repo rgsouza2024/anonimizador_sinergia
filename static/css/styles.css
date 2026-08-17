@@ -1,0 +1,852 @@
+/* ==========================================================================
+   ANONIMIZADOR SINERGIA - DESIGN SYSTEM OFICIAL (JUSTIÇA FEDERAL / TRF1)
+   Base Normativa: Manual de Identidade Visual da Justiça Federal (CF-RES-2012/00193)
+   ========================================================================== */
+
+/* ── 1. CORES OFICIAIS & DESIGN TOKENS ───────────────────────────────────── */
+:root {
+  /* Tipografia Institucional (Seção 2 do Manual: Calibri / Arial) */
+  --font-family: 'Calibri', 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
+
+  /* Cores Institucionais Oficiais da Justiça Federal (Seção 4 do Manual) */
+  --jf-azul: #002F6C;          /* Pantone 294 C (CMYK 100/69/7/30) */
+  --jf-azul-80: #1a4980;       /* Extensão 80% */
+  --jf-azul-60: #406a99;       /* Extensão 60% */
+  --jf-azul-40: #809cb9;       /* Extensão 40% */
+  --jf-azul-20: #bfcee0;       /* Extensão 20% */
+  --jf-azul-light: #e6edf4;    /* Fundo suave / 10% */
+  --jf-azul-ring: rgba(0, 47, 108, 0.25);
+
+  --jf-verde: #007A33;         /* Pantone 356 C (CMYK 91/4/100/25) */
+  --jf-verde-80: #1a8848;      /* Extensão 80% */
+  --jf-verde-60: #409e66;      /* Extensão 60% */
+  --jf-verde-40: #80bc99;      /* Extensão 40% */
+  --jf-verde-20: #bfdecc;      /* Extensão 20% */
+  --jf-verde-light: #e6f2eb;   /* Fundo suave / 10% */
+
+  --jf-cinza: #97999F;         /* Cool Gray 7 (CMYK 0/0/0/45) */
+  --jf-cinza-80: #a4a6ab;      /* Extensão 80% */
+  --jf-cinza-60: #b8b9be;      /* Extensão 60% */
+  --jf-cinza-border: #d0d1d4;  /* Extensão 40% */
+  --jf-cinza-20: #e8e8ea;      /* Extensão 20% */
+  --jf-cinza-light: #f4f4f5;   /* Fundo suave / 10% */
+
+  /* Mapeamento Semântico para Modo Claro */
+  --color-primary: var(--jf-azul);
+  --color-primary-hover: var(--jf-azul-80);
+  --color-primary-active: #001f47;
+  --color-primary-light: var(--jf-azul-light);
+  --color-primary-ring: var(--jf-azul-ring);
+
+  --color-bg-page: #f8fafc;
+  --color-bg-surface: #ffffff;
+  --color-bg-surface-elevated: #ffffff;
+  --color-bg-subtle: #f1f5f9;
+  --color-bg-muted: var(--jf-cinza-light);
+
+  --color-border: var(--jf-cinza-border);
+  --color-border-subtle: #e2e8f0;
+  --color-border-focus: var(--jf-azul);
+
+  --color-text-main: #0f172a;
+  --color-text-body: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #ffffff;
+
+  /* Cores de Feedback */
+  --color-success: var(--jf-verde);
+  --color-success-hover: var(--jf-verde-80);
+  --color-success-bg: var(--jf-verde-light);
+  --color-success-border: var(--jf-verde-20);
+
+  --color-warning: #d97706;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+
+  --color-error: #dc2626;
+  --color-error-bg: #fef2f2;
+  --color-error-border: #fecaca;
+
+  /* Cores de Highlight de Entidades (Em harmonia com a paleta oficial) */
+  --hl-nome-bg: var(--jf-azul-light);
+  --hl-nome-text: var(--jf-azul);
+  --hl-nome-border: var(--jf-azul-20);
+
+  --hl-doc-bg: #fef3c7;
+  --hl-doc-text: #92400e;
+  --hl-doc-border: #fde68a;
+
+  --hl-oab-bg: #f3e8ff;
+  --hl-oab-text: #6b21a8;
+  --hl-oab-border: #e9d5ff;
+
+  --hl-loc-bg: var(--jf-verde-light);
+  --hl-loc-text: var(--jf-verde);
+  --hl-loc-border: var(--jf-verde-20);
+
+  --hl-contato-bg: #ffe4e6;
+  --hl-contato-text: #9f1239;
+  --hl-contato-border: #fecdd3;
+
+  /* Geometria e Sombras */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 47, 108, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 47, 108, 0.07), 0 2px 4px -2px rgba(0, 47, 108, 0.04);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 47, 108, 0.08), 0 4px 6px -4px rgba(0, 47, 108, 0.04);
+
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+/* ── 2. PALETA MODO ESCURO (PRESERVANDO CONTRASTE REGULAMENTAR) ───────────── */
+[data-theme="dark"] {
+  --color-primary: #38bdf8;
+  --color-primary-hover: #0ea5e9;
+  --color-primary-active: #0284c7;
+  --color-primary-light: #082f49;
+  --color-primary-ring: rgba(56, 189, 248, 0.3);
+
+  --color-bg-page: #0b1120;
+  --color-bg-surface: #151e32;
+  --color-bg-surface-elevated: #1e293b;
+  --color-bg-subtle: #1e293b;
+  --color-bg-muted: #24324d;
+
+  --color-border: #2c3b59;
+  --color-border-subtle: #1b263e;
+  --color-border-focus: #38bdf8;
+
+  --color-text-main: #f8fafc;
+  --color-text-body: #cbd5e1;
+  --color-text-muted: #94a3b8;
+  --color-text-inverse: #0b1120;
+
+  --color-success: #4ade80;
+  --color-success-hover: #22c55e;
+  --color-success-bg: #052e16;
+  --color-success-border: #166534;
+
+  --hl-nome-bg: #1e3a8a;
+  --hl-nome-text: #bfdbfe;
+  --hl-nome-border: #2563eb;
+
+  --hl-doc-bg: #78350f;
+  --hl-doc-text: #fde68a;
+  --hl-doc-border: #b45309;
+
+  --hl-oab-bg: #581c87;
+  --hl-oab-text: #e9d5ff;
+  --hl-oab-border: #7e22ce;
+
+  --hl-loc-bg: #064e3b;
+  --hl-loc-text: #a7f3d0;
+  --hl-loc-border: #059669;
+
+  --hl-contato-bg: #881337;
+  --hl-contato-text: #fecdd3;
+  --hl-contato-border: #be123c;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+}
+
+/* ── 3. RESET & BASE TIPOGRÁFICA ─────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  min-height: 100%;
+  font-family: var(--font-family);
+  background-color: var(--color-bg-page);
+  color: var(--color-text-body);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+textarea, input {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* ── 4. ESTRUTURA DO CONTAINER ───────────────────────────────────────────── */
+.app-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── 5. HEADER INSTITUCIONAL (RESERVA DE INTEGRIDADE DE 0,5 H) ───────────── */
+.app-header {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--jf-azul);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 24px; /* Reserva livre entre a marca e o texto */
+}
+
+/* Reserva de Integridade de 0,5 H no entorno da marca */
+.header-logo-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  background: var(--color-bg-surface);
+  border-radius: var(--radius-md);
+}
+
+.header-logo {
+  height: 56px; /* Limite digital oficial >= 95px */
+  width: auto;
+  min-width: 100px;
+  object-fit: contain;
+}
+
+.header-titles h1 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  letter-spacing: -0.01em;
+}
+
+.header-titles p {
+  font-size: 0.90rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.badge-pill {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  background: var(--jf-azul-light);
+  color: var(--jf-azul);
+  border: 1px solid var(--jf-azul-20);
+  letter-spacing: 0.02em;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-surface);
+  color: var(--color-text-muted);
+  transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-main);
+  border-color: var(--color-primary);
+}
+
+/* ── 6. BANNER DE PRIVACIDADE E CONFORMIDADE ─────────────────────────────── */
+.privacy-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--jf-azul);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.privacy-header {
+  padding: 12px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  transition: background var(--transition-fast);
+}
+
+.privacy-header:hover {
+  background: var(--color-bg-subtle);
+}
+
+.privacy-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.privacy-body {
+  padding: 0 18px 14px;
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border-subtle);
+  display: none;
+}
+
+.privacy-card.open .privacy-body {
+  display: block;
+}
+
+.privacy-card.open .privacy-toggle-icon {
+  transform: rotate(180deg);
+}
+
+.privacy-toggle-icon {
+  transition: transform var(--transition-fast);
+}
+
+.privacy-body ul {
+  margin-top: 8px;
+  padding-left: 20px;
+}
+
+.privacy-body li {
+  margin-bottom: 4px;
+}
+
+/* ── 7. NAVEGAÇÃO POR ABAS ───────────────────────────────────────────────── */
+.nav-tabs-wrapper {
+  display: flex;
+  border-bottom: 2px solid var(--color-border);
+  gap: 8px;
+}
+
+.nav-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 22px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: all var(--transition-fast);
+}
+
+.nav-tab:hover {
+  color: var(--color-primary);
+  background: var(--color-bg-subtle);
+}
+
+.nav-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: var(--color-bg-surface);
+}
+
+/* ── 8. ÁREA PRINCIPAL DE TRABALHO (GRID) ────────────────────────────────── */
+.workspace-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 960px) {
+  .workspace-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 12px 18px;
+  background: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-body {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+/* ── 9. TEXTAREAS & VISUALIZADORES ───────────────────────────────────────── */
+.text-input-area {
+  width: 100%;
+  min-height: 380px;
+  padding: 14px 16px;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-main);
+  resize: vertical;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.text-input-area:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-ring);
+}
+
+.viewer-container {
+  width: 100%;
+  min-height: 380px;
+  max-height: 520px;
+  overflow-y: auto;
+  padding: 14px 16px;
+  font-size: 0.94rem;
+  line-height: 1.6;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-surface);
+  color: var(--color-text-main);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.viewer-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-height: 320px;
+  color: var(--color-text-muted);
+  text-align: center;
+  gap: 12px;
+}
+
+.viewer-empty-state svg {
+  width: 48px;
+  height: 48px;
+  stroke: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+/* ── 10. HIGHLIGHT BADGES DE ENTIDADES ───────────────────────────────────── */
+.entity-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.84rem;
+  margin: 0 2px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.entity-tag:hover {
+  transform: scale(1.05);
+}
+
+.tag-nome {
+  background: var(--hl-nome-bg);
+  color: var(--hl-nome-text);
+  border-color: var(--hl-nome-border);
+}
+
+.tag-doc {
+  background: var(--hl-doc-bg);
+  color: var(--hl-doc-text);
+  border-color: var(--hl-doc-border);
+}
+
+.tag-oab {
+  background: var(--hl-oab-bg);
+  color: var(--hl-oab-text);
+  border-color: var(--hl-oab-border);
+}
+
+.tag-loc {
+  background: var(--hl-loc-bg);
+  color: var(--hl-loc-text);
+  border-color: var(--hl-loc-border);
+}
+
+.tag-contato {
+  background: var(--hl-contato-bg);
+  color: var(--hl-contato-text);
+  border-color: var(--hl-contato-border);
+}
+
+/* ── 11. ÁREA DE DRAG & DROP DE PDF ──────────────────────────────────────── */
+.dropzone-container {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--color-bg-subtle);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.dropzone-container:hover, .dropzone-container.dragover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
+.dropzone-icon {
+  width: 48px;
+  height: 48px;
+  color: var(--color-primary);
+}
+
+.dropzone-text h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+}
+
+.dropzone-text p {
+  font-size: 0.88rem;
+  color: var(--color-text-muted);
+}
+
+.file-info-badge {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  margin-top: 14px;
+}
+
+.file-info-badge.active {
+  display: flex;
+}
+
+/* ── 12. BARRA DE AÇÕES (BOTÕES OFICIAIS) ─────────────────────────────────── */
+.actions-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--color-primary);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active:not(:disabled) {
+  background: var(--color-primary-active);
+  transform: translateY(0);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: var(--color-bg-surface);
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all var(--transition-fast);
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-subtle);
+  border-color: var(--color-primary);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  color: var(--color-text-muted);
+  font-size: 0.90rem;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.btn-ghost:hover {
+  background: var(--color-bg-muted);
+  color: var(--color-text-main);
+}
+
+/* ── 13. STAT CARDS / BARRA DE RESUMO ────────────────────────────────────── */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.stat-card {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-icon-wrapper {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-light);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+/* ── 14. TABELA DE AUDITORIA DE ENTIDADES ────────────────────────────────── */
+.audit-panel {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  margin-top: 12px;
+}
+
+.audit-header {
+  padding: 14px 20px;
+  background: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.audit-filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.filter-chip.active {
+  background: var(--jf-azul);
+  color: #ffffff;
+  border-color: var(--jf-azul);
+}
+
+.audit-table-wrapper {
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.audit-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+  text-align: left;
+}
+
+.audit-table th {
+  padding: 10px 16px;
+  background: var(--color-bg-subtle);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.audit-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border-subtle);
+  color: var(--color-text-main);
+}
+
+.audit-table tr:hover td {
+  background: var(--color-bg-subtle);
+}
+
+/* ── 15. TOASTS & NOTIFICAÇÕES ───────────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.toast {
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  font-size: 0.90rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--color-bg-surface-elevated);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+}
+
+.toast.toast-success {
+  border-left: 4px solid var(--jf-verde);
+}
+
+.toast.toast-error {
+  border-left: 4px solid var(--color-error);
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ── 16. LOADING SPINNER ─────────────────────────────────────────────────── */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
