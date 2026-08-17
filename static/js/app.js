@@ -12,7 +12,7 @@
   const state = {
     theme: localStorage.getItem('sinergia-theme') || 'light',
     activeTab: 'tab-texto',
-    viewMode: localStorage.getItem('sinergia-view-mode') || 'split', // 'split' | 'focus' | 'diff'
+    viewMode: 'split', // Padrão definitivo: 'split' (Lado a Lado)
     textoResultados: null, // { texto_anonimizado, texto_original, entidades_detectadas, tempo_processamento }
     pdfResultados: null,
     highlightModeTexto: true,
