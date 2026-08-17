@@ -1,138 +1,124 @@
 /* ==========================================================================
-   ANONIMIZADOR SINERGIA - DESIGN SYSTEM OFICIAL (JUSTIÇA FEDERAL / TRF1)
+   ANONIMIZADOR SINERGIA - DESIGN SYSTEM INSTITUCIONAL PREMIUM (TRF1)
    Base Normativa: Manual de Identidade Visual da Justiça Federal (CF-RES-2012/00193)
    ========================================================================== */
 
-/* ── 1. CORES OFICIAIS & DESIGN TOKENS ───────────────────────────────────── */
+/* ── 1. DESIGN TOKENS & PALETA INSTITUCIONAL ─────────────────────────────── */
 :root {
-  /* Tipografia Institucional (Seção 2 do Manual: Calibri / Arial) */
-  --font-family: 'Calibri', 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+  /* Tipografia */
+  --font-family: 'Inter', 'Calibri', 'Segoe UI', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', Consolas, Monaco, monospace;
 
-  /* Cores Institucionais Oficiais da Justiça Federal (Seção 4 do Manual) */
-  --jf-azul: #002F6C;          /* Pantone 294 C (CMYK 100/69/7/30) */
-  --jf-azul-80: #1a4980;       /* Extensão 80% */
-  --jf-azul-60: #406a99;       /* Extensão 60% */
-  --jf-azul-40: #809cb9;       /* Extensão 40% */
-  --jf-azul-20: #bfcee0;       /* Extensão 20% */
-  --jf-azul-light: #e6edf4;    /* Fundo suave / 10% */
-  --jf-azul-ring: rgba(0, 47, 108, 0.25);
+  /* Cores Oficiais da Justiça Federal (Manual Seção 4) */
+  --jf-azul: #002F6C;          /* Pantone 294 C */
+  --jf-azul-hover: #083e87;
+  --jf-azul-active: #042452;
+  --jf-azul-gradient: linear-gradient(135deg, #002F6C 0%, #083e87 50%, #031e45 100%);
+  --jf-azul-light: #e8f1fa;
+  --jf-azul-border: #bfcee0;
+  --jf-azul-glow: rgba(0, 47, 108, 0.28);
 
-  --jf-verde: #007A33;         /* Pantone 356 C (CMYK 91/4/100/25) */
-  --jf-verde-80: #1a8848;      /* Extensão 80% */
-  --jf-verde-60: #409e66;      /* Extensão 60% */
-  --jf-verde-40: #80bc99;      /* Extensão 40% */
-  --jf-verde-20: #bfdecc;      /* Extensão 20% */
-  --jf-verde-light: #e6f2eb;   /* Fundo suave / 10% */
+  --jf-verde: #007A33;         /* Pantone 356 C */
+  --jf-verde-hover: #006329;
+  --jf-verde-light: #e6f7ed;
+  --jf-verde-border: #a3e0b9;
 
-  --jf-cinza: #97999F;         /* Cool Gray 7 (CMYK 0/0/0/45) */
-  --jf-cinza-80: #a4a6ab;      /* Extensão 80% */
-  --jf-cinza-60: #b8b9be;      /* Extensão 60% */
-  --jf-cinza-border: #d0d1d4;  /* Extensão 40% */
-  --jf-cinza-20: #e8e8ea;      /* Extensão 20% */
-  --jf-cinza-light: #f4f4f5;   /* Fundo suave / 10% */
+  --jf-cinza: #97999F;         /* Cool Gray 7 */
+  --jf-cinza-border: #cbd5e1;
+  --jf-cinza-subtle: #e2e8f0;
 
-  /* Mapeamento Semântico para Modo Claro */
-  --color-primary: var(--jf-azul);
-  --color-primary-hover: var(--jf-azul-80);
-  --color-primary-active: #001f47;
-  --color-primary-light: var(--jf-azul-light);
-  --color-primary-ring: var(--jf-azul-ring);
-
-  --color-bg-page: #f8fafc;
+  /* Superfícies & Fundo - Modo Claro (Confortável / Não-ofuscante) */
+  --color-bg-page: #edf2f7;    /* Slate neutro e suave para descanso visual */
   --color-bg-surface: #ffffff;
   --color-bg-surface-elevated: #ffffff;
-  --color-bg-subtle: #f1f5f9;
-  --color-bg-muted: var(--jf-cinza-light);
+  --color-bg-subtle: #f8fafc;
+  --color-bg-muted: #e2e8f0;
 
-  --color-border: var(--jf-cinza-border);
+  --color-border: #cbd5e1;
   --color-border-subtle: #e2e8f0;
-  --color-border-focus: var(--jf-azul);
+  --color-border-focus: #002F6C;
 
   --color-text-main: #0f172a;
   --color-text-body: #1e293b;
   --color-text-muted: #64748b;
   --color-text-inverse: #ffffff;
 
-  /* Cores de Feedback */
+  /* Feedback */
   --color-success: var(--jf-verde);
-  --color-success-hover: var(--jf-verde-80);
   --color-success-bg: var(--jf-verde-light);
-  --color-success-border: var(--jf-verde-20);
-
-  --color-warning: #d97706;
-  --color-warning-bg: #fffbeb;
-  --color-warning-border: #fde68a;
-
+  --color-success-border: var(--jf-verde-border);
   --color-error: #dc2626;
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
 
-  /* Cores de Highlight de Entidades (Em harmonia com a paleta oficial) */
-  --hl-nome-bg: var(--jf-azul-light);
-  --hl-nome-text: var(--jf-azul);
-  --hl-nome-border: var(--jf-azul-20);
+  /* Tags de Destaque das Entidades (Highlights) */
+  --hl-nome-bg: #dbeafe;
+  --hl-nome-text: #002F6C;
+  --hl-nome-border: #93c5fd;
 
   --hl-doc-bg: #fef3c7;
   --hl-doc-text: #92400e;
-  --hl-doc-border: #fde68a;
+  --hl-doc-border: #fcd34d;
 
   --hl-oab-bg: #f3e8ff;
   --hl-oab-text: #6b21a8;
-  --hl-oab-border: #e9d5ff;
+  --hl-oab-border: #d8b4fe;
 
-  --hl-loc-bg: var(--jf-verde-light);
-  --hl-loc-text: var(--jf-verde);
-  --hl-loc-border: var(--jf-verde-20);
+  --hl-loc-bg: #dcfce7;
+  --hl-loc-text: #007A33;
+  --hl-loc-border: #86efac;
 
   --hl-contato-bg: #ffe4e6;
   --hl-contato-text: #9f1239;
-  --hl-contato-border: #fecdd3;
+  --hl-contato-border: #fda4af;
 
-  /* Geometria e Sombras */
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  /* Sombras & Formas */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
   --radius-full: 9999px;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 47, 108, 0.04);
-  --shadow-md: 0 4px 6px -1px rgba(0, 47, 108, 0.07), 0 2px 4px -2px rgba(0, 47, 108, 0.04);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 47, 108, 0.08), 0 4px 6px -4px rgba(0, 47, 108, 0.04);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 47, 108, 0.05);
+  --shadow-md: 0 4px 12px -1px rgba(0, 47, 108, 0.08), 0 2px 6px -2px rgba(0, 47, 108, 0.04);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 47, 108, 0.10), 0 4px 8px -2px rgba(0, 47, 108, 0.04);
+  --shadow-button: 0 4px 14px rgba(0, 47, 108, 0.32);
 
   --transition-fast: 0.15s ease;
   --transition-normal: 0.25s ease;
 }
 
-/* ── 2. PALETA MODO ESCURO (PRESERVANDO CONTRASTE REGULAMENTAR) ───────────── */
+/* ── 2. MODO ESCURO (PREMIUM DARK NAVY) ──────────────────────────────────── */
 [data-theme="dark"] {
-  --color-primary: #38bdf8;
-  --color-primary-hover: #0ea5e9;
-  --color-primary-active: #0284c7;
-  --color-primary-light: #082f49;
-  --color-primary-ring: rgba(56, 189, 248, 0.3);
+  --jf-azul-gradient: linear-gradient(135deg, #091a33 0%, #0e2b54 50%, #06152b 100%);
+  --jf-azul-glow: rgba(56, 189, 248, 0.25);
 
-  --color-bg-page: #0b1120;
-  --color-bg-surface: #151e32;
-  --color-bg-surface-elevated: #1e293b;
-  --color-bg-subtle: #1e293b;
-  --color-bg-muted: #24324d;
+  --color-bg-page: #0a0f1d;
+  --color-bg-surface: #131b2e;
+  --color-bg-surface-elevated: #1a253d;
+  --color-bg-subtle: #182239;
+  --color-bg-muted: #24324f;
 
-  --color-border: #2c3b59;
-  --color-border-subtle: #1b263e;
+  --color-border: #23314d;
+  --color-border-subtle: #192338;
   --color-border-focus: #38bdf8;
 
   --color-text-main: #f8fafc;
   --color-text-body: #cbd5e1;
   --color-text-muted: #94a3b8;
-  --color-text-inverse: #0b1120;
+  --color-text-inverse: #0a0f1d;
+
+  --color-primary: #38bdf8;
+  --color-primary-hover: #0ea5e9;
+  --color-primary-active: #0284c7;
+  --color-primary-light: #082f49;
 
   --color-success: #4ade80;
-  --color-success-hover: #22c55e;
   --color-success-bg: #052e16;
   --color-success-border: #166534;
 
   --hl-nome-bg: #1e3a8a;
-  --hl-nome-text: #bfdbfe;
+  --hl-nome-text: #93c5fd;
   --hl-nome-border: #2563eb;
 
   --hl-doc-bg: #78350f;
@@ -144,19 +130,20 @@
   --hl-oab-border: #7e22ce;
 
   --hl-loc-bg: #064e3b;
-  --hl-loc-text: #a7f3d0;
+  --hl-loc-text: #86efac;
   --hl-loc-border: #059669;
 
   --hl-contato-bg: #881337;
-  --hl-contato-text: #fecdd3;
+  --hl-contato-text: #fda4af;
   --hl-contato-border: #be123c;
 
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px -1px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 12px 24px -4px rgba(0, 0, 0, 0.6);
+  --shadow-button: 0 4px 14px rgba(56, 189, 248, 0.35);
 }
 
-/* ── 3. RESET & BASE TIPOGRÁFICA ─────────────────────────────────────────── */
+/* ── 3. RESET & ESTRUTURA GERAL ──────────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -175,73 +162,68 @@ html, body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
-
-button {
-  font-family: inherit;
-  cursor: pointer;
-  border: none;
-  background: none;
-}
-
-textarea, input {
-  font-family: inherit;
-  color: inherit;
-}
-
-/* ── 4. ESTRUTURA DO CONTAINER ───────────────────────────────────────────── */
 .app-container {
   max-width: 1440px;
   margin: 0 auto;
-  padding: 24px 20px 48px;
+  padding: 24px 24px 60px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 22px;
 }
 
-/* ── 5. HEADER INSTITUCIONAL (RESERVA DE INTEGRIDADE DE 0,5 H) ───────────── */
+/* ── 4. HEADER INSTITUCIONAL PREMIUM (AZUL JF PROFUNDO) ──────────────────── */
 .app-header {
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-top: 4px solid var(--jf-azul);
-  border-radius: var(--radius-lg);
-  padding: 18px 24px;
+  background: var(--jf-azul-gradient);
+  border-radius: var(--radius-xl);
+  padding: 20px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  position: relative;
+  overflow: hidden;
+}
+
+.app-header::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40%;
+  background: radial-gradient(circle at right, rgba(255, 255, 255, 0.08) 0%, transparent 70%);
+  pointer-events: none;
 }
 
 .header-brand {
   display: flex;
   align-items: center;
-  gap: 24px; /* Reserva livre entre a marca e o texto */
+  gap: 22px;
+  z-index: 1;
 }
 
-/* Reserva de Integridade de 0,5 H no entorno da marca */
 .header-logo-wrapper {
+  background: #ffffff;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px 12px;
-  background: var(--color-bg-surface);
-  border-radius: var(--radius-md);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .header-logo {
-  height: 56px; /* Limite digital oficial >= 95px */
+  height: 52px;
   width: auto;
-  min-width: 100px;
+  min-width: 95px;
   object-fit: contain;
 }
 
 .header-titles h1 {
-  font-size: 1.35rem;
+  font-size: 1.45rem;
   font-weight: 700;
-  color: var(--color-primary);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 12px;
@@ -250,58 +232,88 @@ textarea, input {
 
 .header-titles p {
   font-size: 0.90rem;
-  color: var(--color-text-muted);
-  margin-top: 2px;
+  color: #d0e1f9;
+  margin-top: 3px;
+  font-weight: 400;
 }
 
-.badge-pill {
-  font-size: 0.75rem;
-  font-weight: 600;
+.badge-sinergia {
+  font-size: 0.74rem;
+  font-weight: 700;
   padding: 3px 10px;
   border-radius: var(--radius-full);
-  background: var(--jf-azul-light);
-  color: var(--jf-azul);
-  border: 1px solid var(--jf-azul-20);
-  letter-spacing: 0.02em;
+  background: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
+  z-index: 1;
 }
 
-.btn-icon {
+.status-pill {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 0.80rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.btn-theme-toggle {
   width: 42px;
   height: 42px;
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: var(--color-bg-surface);
-  color: var(--color-text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
-.btn-icon:hover {
-  background: var(--color-bg-subtle);
-  color: var(--color-text-main);
-  border-color: var(--color-primary);
+.btn-theme-toggle:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: #ffffff;
+  transform: scale(1.05);
 }
 
-/* ── 6. BANNER DE PRIVACIDADE E CONFORMIDADE ─────────────────────────────── */
+/* ── 5. BANNER DE PRIVACIDADE & CONFORMIDADE ─────────────────────────────── */
 .privacy-card {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
   border-left: 4px solid var(--jf-azul);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   overflow: hidden;
+  transition: box-shadow var(--transition-fast);
+}
+
+.privacy-card:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .privacy-header {
-  padding: 12px 18px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -320,11 +332,23 @@ textarea, input {
 .privacy-header-left {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
+}
+
+.privacy-icon-badge {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--jf-azul-light);
+  color: var(--jf-azul);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .privacy-body {
-  padding: 0 18px 14px;
+  padding: 4px 20px 16px;
   font-size: 0.88rem;
   color: var(--color-text-muted);
   border-top: 1px solid var(--color-border-subtle);
@@ -341,57 +365,71 @@ textarea, input {
 
 .privacy-toggle-icon {
   transition: transform var(--transition-fast);
+  color: var(--color-text-muted);
 }
 
 .privacy-body ul {
-  margin-top: 8px;
+  margin-top: 10px;
   padding-left: 20px;
 }
 
 .privacy-body li {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
-/* ── 7. NAVEGAÇÃO POR ABAS ───────────────────────────────────────────────── */
-.nav-tabs-wrapper {
+/* ── 6. SEGMENTED PILL TABS (NAVEGAÇÃO MODERNA) ──────────────────────────── */
+.nav-tabs-container {
   display: flex;
-  border-bottom: 2px solid var(--color-border);
-  gap: 8px;
+  align-items: center;
+  background: var(--color-bg-muted);
+  padding: 5px;
+  border-radius: var(--radius-lg);
+  gap: 6px;
+  width: fit-content;
+  border: 1px solid var(--color-border-subtle);
 }
 
 .nav-tab {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 22px;
-  font-size: 0.95rem;
+  gap: 9px;
+  padding: 10px 22px;
+  font-size: 0.94rem;
   font-weight: 600;
   color: var(--color-text-muted);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-  border-bottom: 3px solid transparent;
-  margin-bottom: -2px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  background: transparent;
   transition: all var(--transition-fast);
 }
 
 .nav-tab:hover {
-  color: var(--color-primary);
-  background: var(--color-bg-subtle);
+  color: var(--color-text-main);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .nav-tab.active {
-  color: var(--color-primary);
-  border-bottom-color: var(--color-primary);
+  color: var(--jf-azul);
   background: var(--color-bg-surface);
+  box-shadow: 0 2px 6px rgba(0, 47, 108, 0.08);
+  font-weight: 700;
 }
 
-/* ── 8. ÁREA PRINCIPAL DE TRABALHO (GRID) ────────────────────────────────── */
+[data-theme="dark"] .nav-tab.active {
+  color: #38bdf8;
+  background: var(--color-bg-surface-elevated);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ── 7. WORKSPACE GRID & ELEVATED PANELS ─────────────────────────────────── */
 .workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
 }
 
-@media (max-width: 960px) {
+@media (max-width: 980px) {
   .workspace-grid {
     grid-template-columns: 1fr;
   }
@@ -400,17 +438,23 @@ textarea, input {
 .panel-card {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.panel-card:focus-within {
+  border-color: var(--jf-azul);
+  box-shadow: var(--shadow-lg);
 }
 
 .panel-header {
-  padding: 12px 18px;
+  padding: 14px 20px;
   background: var(--color-bg-subtle);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-subtle);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -422,7 +466,15 @@ textarea, input {
   color: var(--color-text-main);
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
+}
+
+.panel-title svg {
+  color: var(--jf-azul);
+}
+
+[data-theme="dark"] .panel-title svg {
+  color: #38bdf8;
 }
 
 .panel-header-actions {
@@ -432,44 +484,45 @@ textarea, input {
 }
 
 .panel-body {
-  padding: 16px;
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
-/* ── 9. TEXTAREAS & VISUALIZADORES ───────────────────────────────────────── */
+/* ── 8. ÁREA DE TEXTO & VISUALIZADOR COM PROFUNDIDADE ────────────────────── */
 .text-input-area {
   width: 100%;
-  min-height: 380px;
-  padding: 14px 16px;
+  min-height: 400px;
+  padding: 16px;
   font-size: 0.94rem;
-  line-height: 1.6;
-  border: 1px solid var(--color-border);
+  line-height: 1.65;
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg-surface);
+  background: var(--color-bg-subtle);
   color: var(--color-text-main);
   resize: vertical;
   outline: none;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: all var(--transition-fast);
 }
 
 .text-input-area:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px var(--color-primary-ring);
+  background: var(--color-bg-surface);
+  border-color: var(--jf-azul);
+  box-shadow: 0 0 0 4px var(--jf-azul-glow);
 }
 
 .viewer-container {
   width: 100%;
-  min-height: 380px;
-  max-height: 520px;
+  min-height: 400px;
+  max-height: 540px;
   overflow-y: auto;
-  padding: 14px 16px;
+  padding: 16px;
   font-size: 0.94rem;
-  line-height: 1.6;
-  border: 1px solid var(--color-border);
+  line-height: 1.65;
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
-  background: var(--color-bg-surface);
+  background: var(--color-bg-subtle);
   color: var(--color-text-main);
   white-space: pre-wrap;
   word-break: break-word;
@@ -481,34 +534,58 @@ textarea, input {
   align-items: center;
   justify-content: center;
   height: 100%;
-  min-height: 320px;
+  min-height: 340px;
   color: var(--color-text-muted);
   text-align: center;
-  gap: 12px;
+  gap: 14px;
+  padding: 24px;
 }
 
-.viewer-empty-state svg {
-  width: 48px;
-  height: 48px;
-  stroke: var(--color-text-muted);
-  opacity: 0.5;
+.empty-state-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--jf-azul-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--jf-azul);
 }
 
-/* ── 10. HIGHLIGHT BADGES DE ENTIDADES ───────────────────────────────────── */
+[data-theme="dark"] .empty-state-icon-circle {
+  background: #0c4a6e;
+  color: #38bdf8;
+}
+
+.empty-state-icon-circle svg {
+  width: 32px;
+  height: 32px;
+}
+
+.viewer-empty-state p {
+  max-width: 340px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+/* ── 9. HIGHLIGHT BADGES (DESTACADOS E VIBRANTES) ─────────────────────────── */
 .entity-tag {
-  display: inline-block;
-  padding: 1px 7px;
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
   border-radius: var(--radius-sm);
-  font-weight: 600;
-  font-size: 0.84rem;
-  margin: 0 2px;
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin: 0 3px;
   border: 1px solid transparent;
   cursor: pointer;
-  transition: transform var(--transition-fast);
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
 }
 
 .entity-tag:hover {
-  transform: scale(1.05);
+  transform: translateY(-1px);
+  filter: brightness(0.95);
 }
 
 .tag-nome {
@@ -541,11 +618,11 @@ textarea, input {
   border-color: var(--hl-contato-border);
 }
 
-/* ── 11. ÁREA DE DRAG & DROP DE PDF ──────────────────────────────────────── */
+/* ── 10. DRAG & DROP DE PDF MODERNO ──────────────────────────────────────── */
 .dropzone-container {
   border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 40px 20px;
+  border-radius: var(--radius-xl);
+  padding: 44px 24px;
   text-align: center;
   background: var(--color-bg-subtle);
   cursor: pointer;
@@ -554,113 +631,131 @@ textarea, input {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .dropzone-container:hover, .dropzone-container.dragover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  border-color: var(--jf-azul);
+  background: var(--jf-azul-light);
+  transform: scale(1.005);
 }
 
-.dropzone-icon {
-  width: 48px;
-  height: 48px;
-  color: var(--color-primary);
+.dropzone-icon-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--jf-azul-light);
+  color: var(--jf-azul);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzone-icon-circle svg {
+  width: 30px;
+  height: 30px;
 }
 
 .dropzone-text h3 {
-  font-size: 1.05rem;
-  font-weight: 600;
+  font-size: 1.10rem;
+  font-weight: 700;
   color: var(--color-text-main);
 }
 
 .dropzone-text p {
   font-size: 0.88rem;
   color: var(--color-text-muted);
+  margin-top: 4px;
 }
 
 .file-info-badge {
   display: none;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  padding: 10px 16px;
+  padding: 12px 18px;
   border-radius: var(--radius-md);
-  margin-top: 14px;
+  margin-top: 16px;
+  box-shadow: var(--shadow-sm);
 }
 
 .file-info-badge.active {
   display: flex;
 }
 
-/* ── 12. BARRA DE AÇÕES (BOTÕES OFICIAIS) ─────────────────────────────────── */
+/* ── 11. BOTÕES E AÇÕES PRINCIPAIS ───────────────────────────────────────── */
 .actions-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-top: 16px;
+  gap: 14px;
+  margin-top: 18px;
 }
 
 .btn-primary {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--color-primary);
+  gap: 10px;
+  padding: 13px 28px;
+  background: var(--jf-azul-gradient);
   color: #ffffff;
-  font-weight: 600;
-  font-size: 0.95rem;
+  font-weight: 700;
+  font-size: 0.96rem;
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-sm);
+  border: none;
+  box-shadow: var(--shadow-button);
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 47, 108, 0.45);
 }
 
 .btn-primary:active:not(:disabled) {
-  background: var(--color-primary-active);
   transform: translateY(0);
 }
 
 .btn-primary:disabled {
-  opacity: 0.55;
+  opacity: 0.5;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .btn-secondary {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
+  gap: 7px;
+  padding: 8px 15px;
   background: var(--color-bg-surface);
-  color: var(--color-text-main);
+  color: var(--color-text-body);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   font-size: 0.88rem;
   font-weight: 600;
+  cursor: pointer;
   transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
 }
 
-.btn-secondary:hover {
+.btn-secondary:hover:not(:disabled) {
   background: var(--color-bg-subtle);
-  border-color: var(--color-primary);
+  border-color: var(--jf-azul);
+  color: var(--jf-azul);
 }
 
 .btn-ghost {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 16px;
+  padding: 10px 18px;
   color: var(--color-text-muted);
   font-size: 0.90rem;
   font-weight: 600;
   border-radius: var(--radius-md);
+  cursor: pointer;
   transition: all var(--transition-fast);
 }
 
@@ -669,35 +764,46 @@ textarea, input {
   color: var(--color-text-main);
 }
 
-/* ── 13. STAT CARDS / BARRA DE RESUMO ────────────────────────────────────── */
+/* ── 12. STAT CARDS / MÉTRICAS ───────────────────────────────────────────── */
 .stats-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 14px;
-  margin-top: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
 }
 
 .stat-card {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-icon-wrapper {
-  width: 42px;
-  height: 42px;
+  width: 48px;
+  height: 48px;
   border-radius: var(--radius-md);
-  background: var(--color-primary-light);
-  color: var(--color-primary);
+  background: var(--jf-azul-light);
+  color: var(--jf-azul);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .stat-icon-wrapper {
+  background: #082f49;
+  color: #38bdf8;
 }
 
 .stat-content {
@@ -707,50 +813,50 @@ textarea, input {
 
 .stat-label {
   font-size: 0.78rem;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
   color: var(--color-text-muted);
   letter-spacing: 0.05em;
 }
 
 .stat-value {
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: var(--color-text-main);
+  margin-top: 2px;
 }
 
-/* ── 14. TABELA DE AUDITORIA DE ENTIDADES ────────────────────────────────── */
+/* ── 13. TABELA DE AUDITORIA COM ZEBRA STRIPES ───────────────────────────── */
 .audit-panel {
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
   overflow: hidden;
-  margin-top: 12px;
 }
 
 .audit-header {
-  padding: 14px 20px;
+  padding: 16px 22px;
   background: var(--color-bg-subtle);
   border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 14px;
 }
 
 .audit-filter-chips {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .filter-chip {
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 4px 10px;
+  font-size: 0.80rem;
+  font-weight: 700;
+  padding: 5px 12px;
   border-radius: var(--radius-full);
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
@@ -759,64 +865,87 @@ textarea, input {
   transition: all var(--transition-fast);
 }
 
+.filter-chip:hover {
+  border-color: var(--jf-azul);
+  color: var(--jf-azul);
+}
+
 .filter-chip.active {
   background: var(--jf-azul);
   color: #ffffff;
   border-color: var(--jf-azul);
+  box-shadow: 0 2px 6px rgba(0, 47, 108, 0.25);
+}
+
+[data-theme="dark"] .filter-chip.active {
+  background: #38bdf8;
+  color: #0b1120;
+  border-color: #38bdf8;
 }
 
 .audit-table-wrapper {
-  max-height: 380px;
+  max-height: 400px;
   overflow-y: auto;
 }
 
 .audit-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.88rem;
+  font-size: 0.90rem;
   text-align: left;
 }
 
 .audit-table th {
-  padding: 10px 16px;
+  padding: 12px 18px;
   background: var(--color-bg-subtle);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-muted);
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
 .audit-table td {
-  padding: 10px 16px;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--color-border-subtle);
   color: var(--color-text-main);
 }
 
-.audit-table tr:hover td {
+.audit-table tbody tr:nth-child(even) {
   background: var(--color-bg-subtle);
 }
 
-/* ── 15. TOASTS & NOTIFICAÇÕES ───────────────────────────────────────────── */
+.audit-table tbody tr:hover td {
+  background: var(--jf-azul-light);
+}
+
+[data-theme="dark"] .audit-table tbody tr:hover td {
+  background: #1e293b;
+}
+
+/* ── 14. TOASTS & NOTIFICAÇÕES FLUTUANTES ────────────────────────────────── */
 .toast-container {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 28px;
+  right: 28px;
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .toast {
-  padding: 12px 18px;
+  padding: 14px 20px;
   border-radius: var(--radius-md);
-  font-size: 0.90rem;
+  font-size: 0.92rem;
   font-weight: 600;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   box-shadow: var(--shadow-lg);
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   background: var(--color-bg-surface-elevated);
@@ -837,11 +966,11 @@ textarea, input {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* ── 16. LOADING SPINNER ─────────────────────────────────────────────────── */
+/* ── 15. SPINNER ─────────────────────────────────────────────────────────── */
 .spinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2.5px solid rgba(255, 255, 255, 0.35);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: spin 0.6s linear infinite;

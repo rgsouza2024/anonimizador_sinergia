@@ -7,14 +7,14 @@
   <meta name="description" content="Anonimização de textos e documentos jurídicos com apoio de inteligência artificial generativa e regras contextuais. Projeto Sinergia - TRF1.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
 
   <div class="app-container">
 
-    <!-- ── 1. HEADER INSTITUCIONAL (JUSTIÇA FEDERAL / TRF1) ──────────────── -->
+    <!-- ── 1. HEADER INSTITUCIONAL PREMIUM (JUSTIÇA FEDERAL / TRF1) ──────── -->
     <header class="app-header">
       <div class="header-brand">
         <!-- Reserva livre de 0,5 H conforme Seção 5 do Manual de Identidade Visual -->
@@ -24,13 +24,17 @@
         <div class="header-titles">
           <h1>
             Anonimizador SINERGIA
-            <span class="badge-pill">TRF1 • v0.97 Beta</span>
+            <span class="badge-sinergia">TRF1 • v0.97 Beta</span>
           </h1>
           <p>Justiça Federal da 1ª Região • Portaria PRESI 1022/2024 • Resolução CNJ nº 615/2025</p>
         </div>
       </div>
       <div class="header-actions">
-        <button id="btn-theme-toggle" class="btn-icon" title="Alternar Modo Claro / Escuro" aria-label="Alternar tema">
+        <div class="status-pill" title="Motor Presidio + spaCy carregados em memória">
+          <div class="status-dot"></div>
+          <span>Motor Ativo</span>
+        </div>
+        <button id="btn-theme-toggle" class="btn-theme-toggle" title="Alternar Modo Claro / Escuro" aria-label="Alternar tema">
           <!-- Sol (Light Mode) -->
           <svg id="icon-sun" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="5"></circle>
@@ -55,29 +59,29 @@
     <section class="privacy-card" id="privacy-card">
       <div class="privacy-header" id="privacy-toggle">
         <div class="privacy-header-left">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="16" x2="12" y2="12"></line>
-            <line x1="12" y1="8" x2="12.01" y2="8"></line>
-          </svg>
+          <div class="privacy-icon-badge">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </div>
           <span>Orientações de Privacidade, Limites e Conformidade LGPD (CNJ nº 615/2025)</span>
         </div>
-        <svg class="privacy-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="privacy-toggle-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </div>
       <div class="privacy-body">
         <ul>
-          <li><strong>Tratamento Ético e Seguro:</strong> Os dados são processados estritamente em memória volátil para detecção e proteção de dados pessoais identificáveis (PII) em peças jurídicas.</li>
+          <li><strong>Tratamento Seguro em Memória:</strong> Os dados são processados estritamente em memória volátil para detecção e proteção de dados pessoais identificáveis (PII) em peças processuais.</li>
           <li><strong>Arquivos em PDF:</strong> O sistema realiza a extração textual em documentos PDF que possuam camada de texto pesquisável (OCR nativo).</li>
-          <li><strong>Revisão Funcional:</strong> Em respeito às diretrizes do CNJ, o resultado gerado deve ser revisado pelo usuário antes de sua juntada ou publicação processual definitiva.</li>
+          <li><strong>Revisão Humana:</strong> Em respeito às diretrizes do CNJ, o resultado gerado deve ser conferido pelo usuário antes de sua juntada ou publicação definitiva.</li>
           <li><strong>Fundamentação Normativa:</strong> Resolução CNJ nº 615/2025, Portaria PRESI 1022/2024 e Resolução CF-RES-2012/00193 da Justiça Federal.</li>
         </ul>
       </div>
     </section>
 
-    <!-- ── 3. NAVEGAÇÃO POR ABAS ─────────────────────────────────────────── -->
-    <nav class="nav-tabs-wrapper" role="tablist">
+    <!-- ── 3. SEGMENTED PILL TABS ────────────────────────────────────────── -->
+    <nav class="nav-tabs-container" role="tablist">
       <button class="nav-tab active" data-tab="tab-texto" role="tab" aria-selected="true">
         <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -107,13 +111,13 @@
         <div class="panel-card">
           <div class="panel-header">
             <span class="panel-title">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
               Texto Original
             </span>
-            <span id="char-counter" class="badge-pill">0 caracteres</span>
+            <span id="char-counter" class="badge-sinergia" style="background: var(--color-bg-muted); color: var(--color-text-muted); border-color: var(--color-border-subtle);">0 caracteres</span>
           </div>
           <div class="panel-body">
             <textarea id="input-texto" class="text-input-area" placeholder="Cole ou digite aqui a petição, decisão, sentença, despacho ou acórdão a ser anonimizado..."></textarea>
@@ -141,7 +145,7 @@
         <div class="panel-card">
           <div class="panel-header">
             <span class="panel-title">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
               Texto Anonimizado
@@ -174,10 +178,12 @@
           <div class="panel-body">
             <div id="viewer-texto" class="viewer-container">
               <div class="viewer-empty-state">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
+                <div class="empty-state-icon-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                </div>
                 <p>O texto anonimizado e os destaques das entidades identificadas aparecerão aqui após clicar em <strong>Anonimizar Texto</strong>.</p>
               </div>
             </div>
@@ -191,17 +197,19 @@
     <main id="tab-pdf" class="tab-content" style="display: none;">
       
       <!-- Dropzone de Upload -->
-      <div class="panel-card" style="margin-bottom: 20px;">
+      <div class="panel-card" style="margin-bottom: 24px;">
         <div class="panel-body">
           <div id="dropzone" class="dropzone-container">
-            <svg class="dropzone-icon" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-              <polyline points="17 8 12 3 7 8"></polyline>
-              <line x1="12" y1="3" x2="12" y2="15"></line>
-            </svg>
+            <div class="dropzone-icon-circle">
+              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+            </div>
             <div class="dropzone-text">
               <h3>Arraste e solte o arquivo PDF aqui</h3>
-              <p>ou clique para selecionar do seu computador (Limite oficial: até 40 MB e 500 páginas)</p>
+              <p>ou clique para selecionar do seu computador (Limite: até 40 MB e 500 páginas com texto pesquisável)</p>
             </div>
             <input type="file" id="file-input-pdf" accept=".pdf" style="display: none;">
           </div>
@@ -212,8 +220,8 @@
               <polyline points="14 2 14 8 20 8"></polyline>
             </svg>
             <div style="flex: 1;">
-              <strong id="pdf-file-name" style="font-size: 0.92rem; color: var(--color-text-main);">documento.pdf</strong>
-              <div id="pdf-file-size" style="font-size: 0.80rem; color: var(--color-text-muted);">0 KB</div>
+              <strong id="pdf-file-name" style="font-size: 0.94rem; color: var(--color-text-main);">documento.pdf</strong>
+              <div id="pdf-file-size" style="font-size: 0.82rem; color: var(--color-text-muted);">0 KB</div>
             </div>
             <button id="btn-remover-pdf" class="btn-ghost" style="padding: 6px;" title="Remover arquivo">
               <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -234,6 +242,12 @@
           <div class="panel-body">
             <div id="viewer-pdf-original" class="viewer-container">
               <div class="viewer-empty-state">
+                <div class="empty-state-icon-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                  </svg>
+                </div>
                 <p>Envie um arquivo PDF pesquisável para visualizar o conteúdo extraído.</p>
               </div>
             </div>
@@ -264,6 +278,12 @@
           <div class="panel-body">
             <div id="viewer-pdf-anonimizado" class="viewer-container">
               <div class="viewer-empty-state">
+                <div class="empty-state-icon-circle">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                  </svg>
+                </div>
                 <p>O texto do PDF devidamente anonimizado aparecerá aqui após o processamento.</p>
               </div>
             </div>
@@ -325,7 +345,7 @@
             </tr>
           </thead>
           <tbody id="audit-table-body">
-            <!-- Linhas inseridas via JS -->
+            <!-- Linhas inseridas dinamicamente via JS -->
           </tbody>
         </table>
       </div>
@@ -333,7 +353,7 @@
 
   </div>
 
-  <!-- Container de Toasts -->
+  <!-- Container de Toasts Flutuantes -->
   <div id="toast-container" class="toast-container"></div>
 
   <script src="/static/js/app.js"></script>
