@@ -1,11 +1,14 @@
 # Nome do arquivo: app.py (anonimizador_sinergia)
 # Versão 0.97 - Versão Beta
 
+import os
+import tempfile
 import time
 import gradio as gr
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request
-from fastapi.responses import RedirectResponse
+from fastapi import FastAPI, Request, File, UploadFile, HTTPException
+from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
 from pydantic import BaseModel
 import uvicorn
@@ -166,12 +169,68 @@ async def anonimizar_endpoint(req: AnonimizarRequest):
         "entidades_detectadas": entidades,
         "tempo_processamento": round(time.time() - inicio, 3)
     }
+
+@fastapi_app.post("/api/v1/anonimizar-pdf")
+async def anonimizar_pdf_endpoint(file: UploadFile = File(...)):
+    inicio = time.time()
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="O arquivo enviado deve ser um PDF (.pdf).")
+    
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        conteudo = await file.read()
+        tmp.write(conteudo)
+        tmp_path = tmp.name
+
+    try:
+        texto_extraido, erro, nomes_pf_metadados = extrair_texto_de_pdf(tmp_path)
+        if erro:
+            return {
+                "sucesso": False,
+                "erro": erro,
+                "texto_extraido": "",
+                "texto_anonimizado": "",
+                "entidades_detectadas": [],
+                "metadados_pdf": {},
+                "tempo_processamento": round(time.time() - inicio, 3)
+            }
+        
+        texto_anon, df_entidades, metricas = _anonimizar_logica(
+            texto_extraido,
+            nomes_pf_metadados=nomes_pf_metadados,
+            retornar_metricas=True
+        )
+        entidades = df_entidades.to_dict(orient="records") if not df_entidades.empty else []
+        info_metadado = metricas.get("metadado", {}) if isinstance(metricas, dict) else {}
+        
+        return {
+            "sucesso": True,
+            "erro": None,
+            "texto_extraido": texto_extraido,
+            "texto_anonimizado": texto_anon,
+            "entidades_detectadas": entidades,
+            "metadados_pdf": info_metadado,
+            "tempo_processamento": round(time.time() - inicio, 3)
+        }
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
 # Rota de compatibilidade para clientes legados
 @fastapi_app.post("/anonimizar")
 async def handle_compatibility_request(req: AnonimizarRequest):
     return await anonimizar_endpoint(req)
 
 # ── fim REST API ──────────────────────────────────────────────────────────────
+
+# Monta arquivos estáticos do frontend nativo
+if os.path.exists("static"):
+    fastapi_app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@fastapi_app.get("/")
+async def root_page():
+    if os.path.exists("static/index.html"):
+        return FileResponse("static/index.html")
+    return RedirectResponse(url="/ui/?__theme=light")
 
 demo = criar_interface_gradio(
     logo_file_path=LOGO_FILE_PATH,
@@ -189,13 +248,7 @@ demo = criar_interface_gradio(
     processar_arquivo_pdf_fn=processar_arquivo_pdf,
 )
 
-# --- Ponto de Entrada para Iniciar o App ---
-# Página de redirecionamento para o Gradio (com barra final para evitar hops extras)
-@fastapi_app.get("/")
-async def root_redirect():
-    return RedirectResponse(url="/ui/?__theme=light")
-
-# Monta a UI Gradio no caminho /ui para evitar conflitos de assets estáticos no HF
+# Monta a UI Gradio em /ui e /gradio para compatibilidade retroativa
 app = gr.mount_gradio_app(
     fastapi_app, 
     demo, 
