@@ -1,4 +1,4 @@
-﻿"""UI handler helpers for the Gradio application."""
+"""UI handler helpers for the Gradio application."""
 
 import time
 
@@ -27,20 +27,20 @@ def processar_texto_area(
     resumo_vazio_texto,
 ):
     if not texto_original or not texto_original.strip():
-        gr.Warning("Cole ou digite um texto antes de iniciar a anonimizaÃ§ao.")
+        gr.Warning("Cole ou digite um texto antes de iniciar a anonimização.")
         return estado_vazio_texto_anonimizado, dataframe_entidades_vazio_fn(), resumo_vazio_texto
     inicio_processamento = time.perf_counter()
     try:
         texto_anonimizado, df_resultados = anonimizar_logica_fn(texto_original)
         tempo_total = time.perf_counter() - inicio_processamento
         resumo_processamento = gerar_resumo_processamento_fn(df_resultados, "Texto", tempo_total)
-        gr.Info("Texto da area anonimizado com sucesso!")
+        gr.Info("Texto anonimizado com sucesso!")
         return texto_anonimizado, df_resultados, resumo_processamento
     except Exception as e:
-        gr.Error(f"Ocorreu um erro durante a anonimizaÃ§ao: {e}")
+        gr.Error(f"Ocorreu um erro durante a anonimização: {e}")
         tempo_total = time.perf_counter() - inicio_processamento
         return (
-            "Nao foi possivel processar o texto.",
+            "Não foi possível processar o texto.",
             dataframe_entidades_vazio_fn(),
             f"**Resumo:** erro no processamento. Tempo total: {tempo_total:.2f}s.",
         )
@@ -55,6 +55,7 @@ def processar_arquivo_pdf(
     anonimizar_logica_fn,
     extrair_texto_de_pdf_fn,
     gerar_resumo_processamento_fn,
+    dataframe_entidades_vazio_fn,
     estado_vazio_pdf_original,
     estado_vazio_pdf_anonimizado,
     resumo_vazio_pdf,
@@ -65,6 +66,7 @@ def processar_arquivo_pdf(
         return (
             estado_vazio_pdf_original,
             estado_vazio_pdf_anonimizado,
+            dataframe_entidades_vazio_fn(),
             resumo_vazio_pdf,
             gr.update(visible=False, interactive=False),
         )
@@ -86,11 +88,12 @@ def processar_arquivo_pdf(
             return (
                 estado_vazio_pdf_original,
                 estado_vazio_pdf_anonimizado,
+                dataframe_entidades_vazio_fn(),
                 f"**Resumo:** erro na extração. Tempo total: {tempo_total:.2f}s.",
                 gr.update(visible=True, interactive=True),
             )
 
-        progress(0.6, desc="Anonimizando o conteudo...")
+        progress(0.6, desc="Anonimizando o conteúdo...")
         retorno_anonimizacao = anonimizar_logica_fn(
             texto_extraido,
             nomes_pf_metadados,
@@ -113,11 +116,12 @@ def processar_arquivo_pdf(
             tempo_total,
             info_metadado_pdf=info_metadado_pdf,
         )
-        progress(1, desc="Concluido!")
+        progress(1, desc="Concluído!")
         gr.Info("Arquivo PDF anonimizado com sucesso!")
         return (
             texto_extraido,
             texto_anonimizado,
+            df_resultados,
             resumo_processamento,
             gr.update(visible=False, interactive=False),
         )
@@ -127,7 +131,9 @@ def processar_arquivo_pdf(
         return (
             estado_vazio_pdf_original,
             estado_vazio_pdf_anonimizado,
+            dataframe_entidades_vazio_fn(),
             f"**Resumo:** erro no processamento. Tempo total: {tempo_total:.2f}s.",
             gr.update(visible=True, interactive=True),
         )
+
 
