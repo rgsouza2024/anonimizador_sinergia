@@ -259,11 +259,14 @@
     dom.btnToggleHighlightTexto.style.display = 'none';
     dom.viewerTexto.innerHTML = `
       <div class="viewer-empty-state">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-        </svg>
-        <p>O texto anonimizado e os destaques das entidades identificadas aparecerão aqui após clicar em <strong>Anonimizar Texto</strong>.</p>
+        <div class="empty-icon-bubble">
+          <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+          </svg>
+        </div>
+        <div class="empty-state-title">Aguardando Documento</div>
+        <div class="empty-state-desc">Cole o texto na coluna ao lado e clique em <strong>Anonimizar Texto</strong> para identificar e proteger dados pessoais.</div>
       </div>
     `;
     state.textoResultados = null;
@@ -429,6 +432,16 @@
       const len = dom.inputTexto.value.length;
       dom.charCounter.textContent = `${len.toLocaleString('pt-BR')} caracteres`;
       dom.btnAnonimizarTexto.disabled = len === 0;
+    });
+
+    // Atalho Ctrl+Enter ou Cmd+Enter para anonimização rápida
+    dom.inputTexto.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!dom.btnAnonimizarTexto.disabled) {
+          processarTexto();
+        }
+      }
     });
 
     dom.btnAnonimizarTexto.addEventListener('click', processarTexto);
