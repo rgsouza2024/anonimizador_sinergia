@@ -139,6 +139,7 @@ def processar_arquivo_pdf(arquivo_temp, progress=gr.Progress()):
         anonimizar_logica_fn=_anonimizar_logica,
         extrair_texto_de_pdf_fn=extrair_texto_de_pdf,
         gerar_resumo_processamento_fn=gerar_resumo_processamento,
+        dataframe_entidades_vazio_fn=dataframe_entidades_vazio,
         estado_vazio_pdf_original=ESTADO_VAZIO_PDF_ORIGINAL,
         estado_vazio_pdf_anonimizado=ESTADO_VAZIO_PDF_ANONIMIZADO,
         resumo_vazio_pdf=RESUMO_VAZIO_PDF,
@@ -192,7 +193,7 @@ demo = criar_interface_gradio(
 # Página de redirecionamento para o Gradio (com barra final para evitar hops extras)
 @fastapi_app.get("/")
 async def root_redirect():
-    return RedirectResponse(url="/ui/")
+    return RedirectResponse(url="/ui/?__theme=light")
 
 # Monta a UI Gradio no caminho /ui para evitar conflitos de assets estáticos no HF
 app = gr.mount_gradio_app(
