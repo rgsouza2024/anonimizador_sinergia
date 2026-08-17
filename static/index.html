@@ -14,29 +14,27 @@
 
   <div class="app-container">
 
-    <!-- ── 1. HEADER INSTITUCIONAL PREMIUM (JUSTIÇA FEDERAL / TRF1) ──────── -->
+    <!-- ── 1. HEADER INSTITUCIONAL INTEGRADO (JUSTIÇA FEDERAL / TRF1) ────── -->
     <header class="app-header">
       <div class="header-brand">
-        <!-- Reserva livre de 0,5 H conforme Seção 5 do Manual de Identidade Visual -->
-        <div class="header-logo-wrapper">
-          <img src="/static/img/logo.png" alt="Marca Oficial da Justiça Federal / Projeto Sinergia TRF1" class="header-logo" onerror="this.style.display='none'">
-        </div>
+        <!-- Logo oficial com fundo transparente integrado naturalmente -->
+        <img src="/static/img/logo.png" alt="Marca Oficial do Projeto Sinergia TRF1" class="header-logo" onerror="this.style.display='none'">
         <div class="header-titles">
           <h1>
             Anonimizador SINERGIA
-            <span class="badge-sinergia">TRF1 • v0.97 Beta</span>
+            <span class="badge-version">v0.97 Beta</span>
           </h1>
           <p>Justiça Federal da 1ª Região • Portaria PRESI 1022/2024 • Resolução CNJ nº 615/2025</p>
         </div>
       </div>
       <div class="header-actions">
-        <div class="status-pill" title="Motor Presidio + spaCy carregados em memória">
+        <div class="status-pill" title="Motores de NLP (Presidio + spaCy) operando em memória local">
           <div class="status-dot"></div>
-          <span>Motor Ativo</span>
+          <span>Motor NLP Online</span>
         </div>
         <button id="btn-theme-toggle" class="btn-theme-toggle" title="Alternar Modo Claro / Escuro" aria-label="Alternar tema">
           <!-- Sol (Light Mode) -->
-          <svg id="icon-sun" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+          <svg id="icon-sun" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="5"></circle>
             <line x1="12" y1="1" x2="12" y2="3"></line>
             <line x1="12" y1="21" x2="12" y2="23"></line>
@@ -48,42 +46,41 @@
             <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
           </svg>
           <!-- Lua (Dark Mode) -->
-          <svg id="icon-moon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="display: none;">
+          <svg id="icon-moon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="display: none;">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
         </button>
       </div>
     </header>
 
-    <!-- ── 2. BANNER DE PRIVACIDADE E CONFORMIDADE ───────────────────────── -->
+    <!-- ── 2. BANNER DE CONFORMIDADE LGPD (COMPACTO) ─────────────────────── -->
     <section class="privacy-card" id="privacy-card">
       <div class="privacy-header" id="privacy-toggle">
         <div class="privacy-header-left">
-          <div class="privacy-icon-badge">
+          <div class="privacy-icon">
             <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             </svg>
           </div>
-          <span>Orientações de Privacidade, Limites e Conformidade LGPD (CNJ nº 615/2025)</span>
+          <span>Ambiente Seguro: Processamento estritamente em memória volátil • Conformidade com a Resolução CNJ nº 615/2025</span>
         </div>
-        <svg class="privacy-toggle-icon" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <svg class="privacy-toggle-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
           <polyline points="6 9 12 15 18 9"></polyline>
         </svg>
       </div>
       <div class="privacy-body">
         <ul>
-          <li><strong>Tratamento Seguro em Memória:</strong> Os dados são processados estritamente em memória volátil para detecção e proteção de dados pessoais identificáveis (PII) em peças processuais.</li>
-          <li><strong>Arquivos em PDF:</strong> O sistema realiza a extração textual em documentos PDF que possuam camada de texto pesquisável (OCR nativo).</li>
-          <li><strong>Revisão Humana:</strong> Em respeito às diretrizes do CNJ, o resultado gerado deve ser conferido pelo usuário antes de sua juntada ou publicação definitiva.</li>
-          <li><strong>Fundamentação Normativa:</strong> Resolução CNJ nº 615/2025, Portaria PRESI 1022/2024 e Resolução CF-RES-2012/00193 da Justiça Federal.</li>
+          <li><strong>Privacidade Absoluta:</strong> Os textos são processados sem persistência de dados ou compartilhamento externo com terceiros.</li>
+          <li><strong>Documentos em PDF:</strong> Suporte para arquivos PDF com camada de texto pesquisável (OCR nativo).</li>
+          <li><strong>Revisão Funcional:</strong> Em respeito à governança de IA do Poder Judiciário, revise as peças antes de sua destinação definitiva.</li>
         </ul>
       </div>
     </section>
 
-    <!-- ── 3. SEGMENTED PILL TABS ────────────────────────────────────────── -->
-    <nav class="nav-tabs-container" role="tablist">
+    <!-- ── 3. NAVEGAÇÃO SEGMENTADA (PILL TABS) ───────────────────────────── -->
+    <nav class="nav-tabs-wrapper" role="tablist">
       <button class="nav-tab active" data-tab="tab-texto" role="tab" aria-selected="true">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
           <line x1="16" y1="13" x2="8" y2="13"></line>
@@ -93,7 +90,7 @@
         Anonimizar Texto
       </button>
       <button class="nav-tab" data-tab="tab-pdf" role="tab" aria-selected="false">
-        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
           <polyline points="14 2 14 8 20 8"></polyline>
           <line x1="12" y1="18" x2="12" y2="12"></line>
@@ -107,86 +104,86 @@
     <main id="tab-texto" class="tab-content active">
       <div class="workspace-grid">
         
-        <!-- Coluna Entrada -->
+        <!-- Coluna Entrada (Texto Original) -->
         <div class="panel-card">
           <div class="panel-header">
             <span class="panel-title">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
                 <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
               </svg>
               Texto Original
             </span>
-            <span id="char-counter" class="badge-sinergia" style="background: var(--color-bg-muted); color: var(--color-text-muted); border-color: var(--color-border-subtle);">0 caracteres</span>
+            <span id="char-counter" class="badge-counter">0 caracteres</span>
           </div>
           <div class="panel-body">
             <textarea id="input-texto" class="text-input-area" placeholder="Cole ou digite aqui a petição, decisão, sentença, despacho ou acórdão a ser anonimizado..."></textarea>
-            
-            <div class="actions-bar">
-              <button id="btn-anonimizar-texto" class="btn-primary" disabled>
-                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                </svg>
-                <span>Anonimizar Texto</span>
-              </button>
-              <button id="btn-limpar-texto" class="btn-ghost">
-                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <polyline points="3 6 5 6 21 6"></polyline>
-                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                </svg>
-                Limpar
-              </button>
-            </div>
+          </div>
+          <div class="panel-footer">
+            <button id="btn-anonimizar-texto" class="btn-primary" disabled>
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+              <span>Anonimizar Texto</span>
+            </button>
+            <button id="btn-limpar-texto" class="btn-ghost" title="Limpar campo de texto">
+              <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              </svg>
+              Limpar
+            </button>
           </div>
         </div>
 
-        <!-- Coluna Saída -->
+        <!-- Coluna Saída (Texto Anonimizado) -->
         <div class="panel-card">
           <div class="panel-header">
             <span class="panel-title">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
               Texto Anonimizado
             </span>
-            <div class="panel-header-actions">
-              <button id="btn-toggle-highlight-texto" class="btn-secondary" title="Alternar Destaques Coloridos" style="display: none;">
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M12 20h9"></path>
-                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                </svg>
-                Destaques
-              </button>
-              <button id="btn-copiar-texto" class="btn-secondary" title="Copiar para área de transferência" disabled>
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copiar
-              </button>
-              <button id="btn-download-texto" class="btn-secondary" title="Baixar arquivo .txt" disabled>
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Baixar
-              </button>
-            </div>
+            <button id="btn-toggle-highlight-texto" class="btn-secondary" title="Alternar Destaques Coloridos" style="display: none;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M12 20h9"></path>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+              </svg>
+              Destaques
+            </button>
           </div>
           <div class="panel-body">
             <div id="viewer-texto" class="viewer-container">
               <div class="viewer-empty-state">
-                <div class="empty-state-icon-circle">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <div class="empty-icon-bubble">
+                  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                   </svg>
                 </div>
-                <p>O texto anonimizado e os destaques das entidades identificadas aparecerão aqui após clicar em <strong>Anonimizar Texto</strong>.</p>
+                <div class="empty-state-title">Aguardando Documento</div>
+                <div class="empty-state-desc">Cole o texto na coluna ao lado e clique em <strong>Anonimizar Texto</strong> para identificar e proteger dados pessoais.</div>
               </div>
             </div>
+          </div>
+          <div class="panel-footer" style="justify-content: flex-end;">
+            <button id="btn-copiar-texto" class="btn-secondary" title="Copiar para área de transferência" disabled>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copiar
+            </button>
+            <button id="btn-download-texto" class="btn-secondary" title="Baixar arquivo .txt" disabled>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Baixar (.txt)
+            </button>
           </div>
         </div>
 
@@ -197,11 +194,11 @@
     <main id="tab-pdf" class="tab-content" style="display: none;">
       
       <!-- Dropzone de Upload -->
-      <div class="panel-card" style="margin-bottom: 24px;">
+      <div class="panel-card" style="margin-bottom: var(--space-5);">
         <div class="panel-body">
           <div id="dropzone" class="dropzone-container">
             <div class="dropzone-icon-circle">
-              <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
                 <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -215,16 +212,16 @@
           </div>
 
           <div id="pdf-file-badge" class="file-info-badge">
-            <svg width="24" height="24" fill="none" stroke="var(--jf-azul)" stroke-width="2" viewBox="0 0 24 24">
+            <svg width="22" height="22" fill="none" stroke="var(--jf-azul)" stroke-width="2" viewBox="0 0 24 24">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
             </svg>
             <div style="flex: 1;">
-              <strong id="pdf-file-name" style="font-size: 0.94rem; color: var(--color-text-main);">documento.pdf</strong>
-              <div id="pdf-file-size" style="font-size: 0.82rem; color: var(--color-text-muted);">0 KB</div>
+              <strong id="pdf-file-name" style="font-size: 0.90rem; color: var(--color-text-main);">documento.pdf</strong>
+              <div id="pdf-file-size" style="font-size: 0.80rem; color: var(--color-text-muted);">0 KB</div>
             </div>
-            <button id="btn-remover-pdf" class="btn-ghost" style="padding: 6px;" title="Remover arquivo">
-              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <button id="btn-remover-pdf" class="btn-ghost" style="padding: 4px;" title="Remover arquivo">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
                 <line x1="6" y1="6" x2="18" y2="18"></line>
               </svg>
@@ -242,13 +239,14 @@
           <div class="panel-body">
             <div id="viewer-pdf-original" class="viewer-container">
               <div class="viewer-empty-state">
-                <div class="empty-state-icon-circle">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <div class="empty-icon-bubble">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                   </svg>
                 </div>
-                <p>Envie um arquivo PDF pesquisável para visualizar o conteúdo extraído.</p>
+                <div class="empty-state-title">Aguardando PDF</div>
+                <div class="empty-state-desc">Envie um arquivo PDF pesquisável para visualizar o conteúdo extraído.</div>
               </div>
             </div>
           </div>
@@ -257,36 +255,37 @@
         <div class="panel-card">
           <div class="panel-header">
             <span class="panel-title">Texto Anonimizado do PDF</span>
-            <div class="panel-header-actions">
-              <button id="btn-copiar-pdf" class="btn-secondary" disabled>
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-                Copiar
-              </button>
-              <button id="btn-download-pdf" class="btn-secondary" disabled>
-                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="7 10 12 15 17 10"></polyline>
-                  <line x1="12" y1="15" x2="12" y2="3"></line>
-                </svg>
-                Baixar
-              </button>
-            </div>
           </div>
           <div class="panel-body">
             <div id="viewer-pdf-anonimizado" class="viewer-container">
               <div class="viewer-empty-state">
-                <div class="empty-state-icon-circle">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                <div class="empty-icon-bubble">
+                  <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                   </svg>
                 </div>
-                <p>O texto do PDF devidamente anonimizado aparecerá aqui após o processamento.</p>
+                <div class="empty-state-title">Resultado da Anonimização</div>
+                <div class="empty-state-desc">O texto anonimizado do PDF aparecerá aqui após o processamento.</div>
               </div>
             </div>
+          </div>
+          <div class="panel-footer" style="justify-content: flex-end;">
+            <button id="btn-copiar-pdf" class="btn-secondary" disabled>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              Copiar
+            </button>
+            <button id="btn-download-pdf" class="btn-secondary" disabled>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Baixar (.txt)
+            </button>
           </div>
         </div>
       </div>
@@ -321,7 +320,7 @@
     <section class="audit-panel" id="audit-section" style="display: none;">
       <div class="audit-header">
         <div class="panel-title">
-          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
             <polyline points="14 2 14 8 20 8"></polyline>
             <line x1="16" y1="13" x2="8" y2="13"></line>
