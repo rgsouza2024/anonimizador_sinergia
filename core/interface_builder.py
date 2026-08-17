@@ -332,7 +332,7 @@ def criar_interface_gradio(
     limpar_texto_area_fn,
     processar_arquivo_pdf_fn,
 ):
-    with gr.Blocks(title="Anonimizador SINERGIA - TRF1", js=INIT_LIGHT_THEME_JS) as demo:
+    with gr.Blocks(title="Anonimizador SINERGIA - TRF1") as demo:
         # Header Institucional
         with gr.Row(elem_id="header-container"):
             with gr.Column(scale=0, min_width=90, elem_id="header-logo"):
@@ -530,6 +530,14 @@ def criar_interface_gradio(
             inputs=[texto_anonimizado_pdf],
             outputs=[],
             js=COPY_TEXT_JS,
+            queue=False,
+        )
+
+        demo.load(
+            fn=None,
+            inputs=None,
+            outputs=None,
+            js=INIT_LIGHT_THEME_JS,
             queue=False,
         )
 
