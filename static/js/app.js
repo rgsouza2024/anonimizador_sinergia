@@ -259,14 +259,18 @@
     dom.btnToggleHighlightTexto.style.display = 'none';
     dom.viewerTexto.innerHTML = `
       <div class="viewer-empty-state">
-        <div class="empty-icon-bubble">
-          <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        <div class="empty-art-wrapper">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            <circle cx="12" cy="11" r="2.5"></circle>
+            <line x1="12" y1="8.5" x2="12" y2="5"></line>
+            <line x1="12" y1="13.5" x2="12" y2="17"></line>
+            <line x1="9.5" y1="11" x2="6.5" y2="11"></line>
+            <line x1="14.5" y1="11" x2="17.5" y2="11"></line>
           </svg>
         </div>
-        <div class="empty-state-title">Aguardando Documento</div>
-        <div class="empty-state-desc">Cole o texto na coluna ao lado e clique em <strong>Anonimizar Texto</strong> para identificar e proteger dados pessoais.</div>
+        <div class="empty-state-title">Proteção Inteligente de Dados</div>
+        <div class="empty-state-desc">Cole uma peça jurídica na coluna ao lado e clique em <strong>Anonimizar Texto</strong> para identificar e mascarar dados sensíveis em conformidade com a LGPD.</div>
       </div>
     `;
     state.textoResultados = null;
