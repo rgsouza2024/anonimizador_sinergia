@@ -953,10 +953,16 @@ body::after {
   background: var(--color-bg-surface-subtle);
   border-bottom: 1px solid var(--color-border);
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.audit-header .panel-title {
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: 8px;
+  font-size: 0.94rem;
+  font-weight: 700;
 }
 
 .audit-filter-chips {
@@ -967,15 +973,16 @@ body::after {
 }
 
 .filter-chip {
-  font-size: 0.78rem;
-  font-weight: 700;
-  padding: 5px 12px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
   border-radius: var(--radius-full);
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
   color: var(--color-text-muted);
   cursor: pointer;
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 .filter-chip:hover {
@@ -987,7 +994,7 @@ body::after {
   background: var(--jf-azul);
   color: #ffffff;
   border-color: var(--jf-azul);
-  box-shadow: 0 2px 6px rgba(0, 47, 108, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 47, 108, 0.20);
 }
 
 [data-theme="dark"] .filter-chip.active {
@@ -999,41 +1006,86 @@ body::after {
 .audit-table-wrapper {
   max-height: 380px;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Scrollbar sutil para tabela */
+.audit-table-wrapper::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.audit-table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(0, 47, 108, 0.18);
+  border-radius: var(--radius-full);
+}
+
+[data-theme="dark"] .audit-table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.25);
 }
 
 .audit-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 0.88rem;
   text-align: left;
 }
 
+/* Cabeçalho 100% SÓLIDO e OPACO (sem nenhuma transparência) */
 .audit-table th {
-  padding: 11px 18px;
-  background: var(--color-bg-surface-subtle);
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  font-weight: 700;
-  font-size: 0.78rem;
+  padding: 12px 18px;
+  background-color: #ffffff;
+  border-bottom: 2px solid var(--jf-azul-border);
+  color: var(--jf-azul);
+  font-weight: 800;
+  font-size: 0.76rem;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="dark"] .audit-table th {
+  background-color: #111827;
+  color: #38bdf8;
+  border-bottom-color: #1e3a8a;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
 }
 
 .audit-table td {
   padding: 11px 18px;
   border-bottom: 1px solid var(--color-border-subtle);
   color: var(--color-text-main);
+  background-color: var(--color-bg-surface);
 }
 
-.audit-table tbody tr:nth-child(even) {
-  background: var(--color-bg-surface-subtle);
+/* Números tabulares alinhados */
+.audit-table td:nth-child(3),
+.audit-table td:nth-child(4),
+.audit-table td:nth-child(5) {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-text-muted);
+}
+
+.audit-table tbody tr:nth-child(even) td {
+  background-color: #f8fafc;
+}
+
+[data-theme="dark"] .audit-table tbody tr:nth-child(even) td {
+  background-color: #162032;
 }
 
 .audit-table tbody tr:hover td {
-  background: var(--jf-azul-light);
+  background-color: var(--jf-azul-light);
+}
+
+[data-theme="dark"] .audit-table tbody tr:hover td {
+  background-color: #0c2547;
 }
 
 /* ── 13. NOTIFICAÇÕES TOAST (SEM EMOJIS, APENAS ÍCONES VETORIAIS) ────────── */
