@@ -1089,53 +1089,66 @@ body::after {
   background: var(--jf-azul-light);
 }
 
-/* ── 14. DRAG & DROP DE PDF ──────────────────────────────────────────────── */
+/* ── 14. DRAG & DROP DE PDF (COMPACTO & HORIZONTAL) ──────────────────────── */
 .dropzone-container {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 38px 24px;
-  text-align: center;
-  background: var(--color-bg-surface-subtle);
+  border: 1.5px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  background: var(--color-bg-surface);
   cursor: pointer;
   transition: all var(--transition-fast);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
+  justify-content: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-xs);
 }
 
 .dropzone-container:hover, .dropzone-container.dragover {
   border-color: var(--jf-azul);
   background: var(--jf-azul-light);
-  transform: scale(1.005);
+  transform: translateY(-1px);
 }
 
 .dropzone-icon-circle {
-  width: 54px;
-  height: 54px;
-  border-radius: var(--radius-lg);
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
   background: var(--jf-azul-light);
   color: var(--jf-azul);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 [data-theme="dark"] .dropzone-icon-circle {
   color: #38bdf8;
+  background: #0c2547;
+}
+
+.dropzone-text {
+  flex: 1;
+  text-align: left;
 }
 
 .dropzone-text h3 {
-  font-size: 1.05rem;
+  font-size: 0.94rem;
   font-weight: 700;
   color: var(--color-text-main);
 }
 
 .dropzone-text p {
-  font-size: 0.86rem;
+  font-size: 0.80rem;
   color: var(--color-text-muted);
-  margin-top: 2px;
+  margin-top: 1px;
+}
+
+.dropzone-btn-action {
+  flex-shrink: 0;
+  pointer-events: none; /* Deixa o clique passar para o dropzone */
 }
 
 .file-info-badge {
@@ -1144,9 +1157,10 @@ body::after {
   gap: var(--space-3);
   background: var(--color-bg-surface);
   border: 1px solid var(--color-border);
-  padding: 12px 18px;
+  padding: 8px 16px;
   border-radius: var(--radius-md);
-  margin-top: 14px;
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-xs);
 }
 
 .file-info-badge.active {

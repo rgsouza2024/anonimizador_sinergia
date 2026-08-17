@@ -243,41 +243,46 @@
     <!-- ── 5. CONTEÚDO: ABA PDF ──────────────────────────────────────────── -->
     <main id="tab-pdf" class="tab-content" style="display: none;">
       
-      <!-- Dropzone de Upload -->
-      <div class="panel-card" style="margin-bottom: var(--space-5);">
-        <div class="panel-body">
-          <div id="dropzone" class="dropzone-container">
-            <div class="dropzone-icon-circle">
-              <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-            </div>
-            <div class="dropzone-text">
-              <h3>Arraste e solte o arquivo PDF aqui</h3>
-              <p>ou clique para selecionar do seu computador (Limite: até 40 MB e 500 páginas com texto pesquisável)</p>
-            </div>
-            <input type="file" id="file-input-pdf" accept=".pdf" style="display: none;">
-          </div>
-
-          <div id="pdf-file-badge" class="file-info-badge">
-            <svg width="22" height="22" fill="none" stroke="var(--jf-azul)" stroke-width="2" viewBox="0 0 24 24">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-              <polyline points="14 2 14 8 20 8"></polyline>
-            </svg>
-            <div style="flex: 1;">
-              <strong id="pdf-file-name" style="font-size: 0.90rem; color: var(--color-text-main);">documento.pdf</strong>
-              <div id="pdf-file-size" style="font-size: 0.80rem; color: var(--color-text-muted);">0 KB</div>
-            </div>
-            <button id="btn-remover-pdf" class="btn-ghost" style="padding: 4px;" title="Remover arquivo">
-              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
-          </div>
+      <!-- Dropzone de Upload Compacto -->
+      <div id="dropzone" class="dropzone-container">
+        <div class="dropzone-icon-circle">
+          <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
         </div>
+        <div class="dropzone-text">
+          <h3>Arraste o arquivo PDF aqui ou clique para selecionar</h3>
+          <p>Suporte a até 40 MB e 500 páginas com camada de texto pesquisável</p>
+        </div>
+        <button type="button" class="btn-secondary dropzone-btn-action" title="Selecionar arquivo PDF">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="7 10 12 15 17 10"></polyline>
+            <line x1="12" y1="15" x2="12" y2="3"></line>
+          </svg>
+          Selecionar PDF
+        </button>
+        <input type="file" id="file-input-pdf" accept=".pdf" style="display: none;">
+      </div>
+
+      <div id="pdf-file-badge" class="file-info-badge">
+        <svg width="20" height="20" fill="none" stroke="var(--jf-azul)" stroke-width="2" viewBox="0 0 24 24">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        <div style="flex: 1; display: flex; align-items: center; gap: 8px;">
+          <strong id="pdf-file-name" style="font-size: 0.88rem; color: var(--color-text-main);">documento.pdf</strong>
+          <span id="pdf-file-size" style="font-size: 0.78rem; color: var(--color-text-muted);">0 KB</span>
+        </div>
+        <button id="btn-remover-pdf" class="btn-ghost" style="padding: 4px 10px; font-size: 0.82rem;" title="Remover arquivo">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+          Remover
+        </button>
       </div>
 
       <!-- Comparação Lado a Lado do PDF -->
