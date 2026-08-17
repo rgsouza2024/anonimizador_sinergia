@@ -1,6 +1,6 @@
 /* ==========================================================================
    ANONIMIZADOR SINERGIA - DESIGN SYSTEM INSTITUCIONAL & ARTÍSTICO (TRF1)
-   Identidade: Manual da Justiça Federal • Estética: Glassmorphism & Mesh Glow
+   Opção C: Layout Híbrido Flexível (Split View • Single Canvas • Inline Diff)
    ========================================================================== */
 
 /* ── 1. TOKENS DE DESIGN & VARIÁVEIS DE AMBIENTE ─────────────────────────── */
@@ -34,14 +34,10 @@
 
   --jf-cinza: #97999F;         /* Cool Gray 7 */
 
-  /* Gradientes de Assinatura Artística */
-  --brand-gradient: linear-gradient(135deg, #002F6C 0%, #005a9c 45%, #007A33 100%);
-  --btn-gradient: linear-gradient(135deg, #002F6C 0%, #083e87 60%, #007A33 100%);
-
   /* Superfícies Glassmorphic (Modo Claro) */
   --color-bg-page: #f1f5f9;
-  --color-bg-surface: rgba(255, 255, 255, 0.88);
-  --color-bg-surface-subtle: rgba(248, 250, 252, 0.75);
+  --color-bg-surface: rgba(255, 255, 255, 0.90);
+  --color-bg-surface-subtle: rgba(248, 250, 252, 0.80);
   --color-bg-muted: #e2e8f0;
 
   --color-border: rgba(203, 213, 225, 0.85);
@@ -61,7 +57,12 @@
   --color-error-bg: #fef2f2;
   --color-error-border: #fecaca;
 
-  /* Destaques de Entidades (Highlights com Alto Contraste e Acabamento Premium) */
+  /* Diff Styling */
+  --diff-del-bg: #fee2e2;
+  --diff-del-text: #991b1b;
+  --diff-del-border: #fca5a5;
+
+  /* Destaques de Entidades (Highlights com Alto Contraste) */
   --hl-nome-bg: #dbeafe;
   --hl-nome-text: #002F6C;
   --hl-nome-border: #93c5fd;
@@ -93,7 +94,6 @@
   --shadow-sm: 0 2px 6px 0 rgba(0, 47, 108, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.03);
   --shadow-md: 0 6px 16px -2px rgba(0, 47, 108, 0.07), 0 2px 6px -2px rgba(0, 0, 0, 0.04);
   --shadow-lg: 0 16px 32px -4px rgba(0, 47, 108, 0.09), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
-  --shadow-button: 0 4px 14px rgba(0, 47, 108, 0.28);
 
   --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -102,8 +102,8 @@
 /* ── 2. MODO ESCURO (DEEP COSMIC NAVY) ───────────────────────────────────── */
 [data-theme="dark"] {
   --color-bg-page: #080c14;
-  --color-bg-surface: rgba(17, 24, 39, 0.85);
-  --color-bg-surface-subtle: rgba(22, 32, 50, 0.75);
+  --color-bg-surface: rgba(17, 24, 39, 0.88);
+  --color-bg-surface-subtle: rgba(22, 32, 50, 0.80);
   --color-bg-muted: #1f293d;
 
   --color-border: rgba(35, 49, 77, 0.85);
@@ -115,8 +115,9 @@
   --color-text-muted: #94a3b8;
   --color-text-inverse: #080c14;
 
-  --brand-gradient: linear-gradient(135deg, #38bdf8 0%, #60a5fa 45%, #4ade80 100%);
-  --btn-gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 60%, #059669 100%);
+  --diff-del-bg: #450a0a;
+  --diff-del-text: #fca5a5;
+  --diff-del-border: #7f1d1d;
 
   --jf-azul-light: #0c2547;
   --jf-azul-border: #1e3a8a;
@@ -145,10 +146,9 @@
   --shadow-sm: 0 2px 6px 0 rgba(0, 0, 0, 0.4);
   --shadow-md: 0 6px 16px -2px rgba(0, 0, 0, 0.5);
   --shadow-lg: 0 16px 32px -4px rgba(0, 0, 0, 0.6);
-  --shadow-button: 0 4px 14px rgba(56, 189, 248, 0.35);
 }
 
-/* ── 3. RESET & ATMOSFERA AMBIENTE (MESH GLOW) ───────────────────────────── */
+/* ── 3. RESET & ATMOSFERA AMBIENTE ───────────────────────────────────────── */
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -169,7 +169,6 @@ html, body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
-/* Iluminação de Fundo Dinâmica (Subtle Mesh Auroral Glow) */
 body::before {
   content: '';
   position: fixed;
@@ -215,9 +214,10 @@ body::after {
   gap: var(--space-5);
   position: relative;
   z-index: 1;
+  transition: max-width var(--transition-normal);
 }
 
-/* ── 4. HEADER INSTITUCIONAL ARTÍSTICO ───────────────────────────────────── */
+/* ── 4. HEADER INSTITUCIONAL ─────────────────────────────────────────────── */
 .app-header {
   background: var(--color-bg-surface);
   backdrop-filter: blur(20px);
@@ -233,11 +233,6 @@ body::after {
   transition: all var(--transition-normal);
 }
 
-.app-header:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--jf-azul-border);
-}
-
 .header-brand {
   display: flex;
   align-items: center;
@@ -245,27 +240,22 @@ body::after {
 }
 
 .header-logo {
-  height: 54px;
+  height: 52px;
   width: auto;
   max-width: 145px;
   object-fit: contain;
   display: block;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.05));
-  transition: transform var(--transition-fast);
-}
-
-.header-logo:hover {
-  transform: scale(1.02);
 }
 
 .header-titles h1 {
-  font-size: 1.40rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: var(--jf-azul);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
+}
+
+[data-theme="dark"] .header-titles h1 {
+  color: #38bdf8;
 }
 
 .header-titles p {
@@ -281,7 +271,6 @@ body::after {
   gap: var(--space-3);
 }
 
-/* Indicador de Status com Pulso Luminoso */
 .status-pill {
   display: flex;
   align-items: center;
@@ -342,7 +331,7 @@ body::after {
   background: var(--jf-azul-light);
   color: var(--jf-azul);
   border-color: var(--jf-azul);
-  transform: rotate(15deg) scale(1.05);
+  transform: rotate(15deg);
 }
 
 [data-theme="dark"] .btn-theme-toggle:hover {
@@ -360,16 +349,10 @@ body::after {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-xs);
   overflow: hidden;
-  transition: all var(--transition-fast);
-}
-
-.privacy-card:hover {
-  border-color: var(--jf-azul-border);
-  box-shadow: var(--shadow-sm);
 }
 
 .privacy-header {
-  padding: 11px 18px;
+  padding: 10px 16px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -401,7 +384,7 @@ body::after {
 }
 
 .privacy-body {
-  padding: 4px 18px 14px;
+  padding: 4px 16px 14px;
   font-size: 0.84rem;
   color: var(--color-text-muted);
   border-top: 1px solid var(--color-border-subtle);
@@ -430,7 +413,15 @@ body::after {
   margin-bottom: 4px;
 }
 
-/* ── 6. SEGMENTED PILL TABS (NAVEGAÇÃO SIMÉTRICA) ────────────────────────── */
+/* ── 6. BARRA SUPERIOR DE CONTROLE (NAV + MODO DE VISÃO + MÁSCARA) ────────── */
+.controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
 .nav-tabs-wrapper {
   display: flex;
   align-items: center;
@@ -438,7 +429,6 @@ body::after {
   padding: 4px;
   border-radius: var(--radius-md);
   gap: 4px;
-  width: fit-content;
   border: 1px solid var(--color-border-subtle);
 }
 
@@ -446,8 +436,8 @@ body::after {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 9px 22px;
-  font-size: 0.90rem;
+  padding: 8px 18px;
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--color-text-muted);
   border-radius: var(--radius-sm);
@@ -464,7 +454,7 @@ body::after {
 .nav-tab.active {
   color: var(--jf-azul);
   background: var(--color-bg-surface);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
   font-weight: 700;
 }
 
@@ -473,11 +463,94 @@ body::after {
   background: var(--color-bg-surface-subtle);
 }
 
-/* ── 7. PAINÉIS DE TRABALHO (GLASS ELEVATION) ────────────────────────────── */
+/* Seletor de Modo de Exibição (Opção C) */
+.view-modes-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--color-bg-surface);
+  padding: 3px 6px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-xs);
+}
+
+.view-mode-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-right: 4px;
+  letter-spacing: 0.03em;
+}
+
+.view-mode-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.view-mode-btn:hover {
+  color: var(--color-text-main);
+  background: var(--color-bg-surface-subtle);
+}
+
+.view-mode-btn.active {
+  background: var(--jf-azul-light);
+  color: var(--jf-azul);
+  font-weight: 700;
+}
+
+[data-theme="dark"] .view-mode-btn.active {
+  background: #0c2547;
+  color: #38bdf8;
+}
+
+/* ── 7. PAINÉIS DE TRABALHO & MODOS DE LAYOUT ────────────────────────────── */
 .workspace-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-5);
+  transition: all var(--transition-normal);
+}
+
+/* MODO: DOCUMENTO FOCADO (SINGLE CANVAS) */
+.layout-focus .workspace-grid {
+  grid-template-columns: 1fr;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+.layout-focus .panel-card-input {
+  display: none; /* Em modo foco com resultado, exibe apenas a decisão */
+}
+
+.layout-focus .panel-card-input.show-input {
+  display: flex;
+}
+
+.layout-focus .panel-card-output.hide-output {
+  display: none;
+}
+
+/* MODO: COMPARAÇÃO DIFF */
+.layout-diff .panel-card-input {
+  display: none;
+}
+
+.layout-diff .workspace-grid {
+  grid-template-columns: 1fr;
+  max-width: 1040px;
+  margin: 0 auto;
 }
 
 @media (max-width: 960px) {
@@ -496,16 +569,15 @@ body::after {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .panel-card:focus-within {
   border-color: var(--jf-azul-border);
-  box-shadow: var(--shadow-md);
 }
 
 .panel-header {
-  padding: 13px 20px;
+  padding: 12px 18px;
   background: var(--color-bg-surface-subtle);
   border-bottom: 1px solid var(--color-border-subtle);
   display: flex;
@@ -530,15 +602,21 @@ body::after {
   color: #38bdf8;
 }
 
+.panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .panel-body {
-  padding: 18px 20px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   flex: 1;
 }
 
 .panel-footer {
-  padding: 13px 20px;
+  padding: 12px 18px;
   background: var(--color-bg-surface-subtle);
   border-top: 1px solid var(--color-border-subtle);
   display: flex;
@@ -547,14 +625,14 @@ body::after {
   gap: var(--space-3);
 }
 
-/* ── 8. ÁREA DE TEXTO E VISUALIZADOR ─────────────────────────────────────── */
+/* ── 8. ÁREA DE TEXTO E VISUALIZADORES ───────────────────────────────────── */
 .text-input-area {
   width: 100%;
-  min-height: 380px;
+  min-height: 400px;
   padding: 16px;
   font-family: var(--font-sans);
-  font-size: 0.94rem;
-  line-height: 1.65;
+  font-size: 0.95rem;
+  line-height: 1.68;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg-surface);
@@ -571,22 +649,23 @@ body::after {
 
 .viewer-container {
   width: 100%;
-  min-height: 380px;
-  max-height: 520px;
+  min-height: 400px;
+  max-height: 560px;
   overflow-y: auto;
   padding: 16px;
   font-family: var(--font-sans);
-  font-size: 0.94rem;
-  line-height: 1.65;
+  font-size: 0.95rem;
+  line-height: 1.68;
   border: 1.5px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-bg-surface-subtle);
   color: var(--color-text-main);
   white-space: pre-wrap;
   word-break: break-word;
+  scroll-behavior: smooth;
 }
 
-/* Empty State Artístico (Escudo Neural de IA) */
+/* Empty State Artístico */
 .viewer-empty-state {
   display: flex;
   flex-direction: column;
@@ -603,12 +682,12 @@ body::after {
 
 @keyframes floatShield {
   0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-5px); }
+  50% { transform: translateY(-4px); }
 }
 
 .empty-art-wrapper {
-  width: 72px;
-  height: 72px;
+  width: 68px;
+  height: 68px;
   border-radius: var(--radius-lg);
   background: linear-gradient(135deg, var(--jf-azul-light) 0%, var(--jf-verde-light) 100%);
   display: flex;
@@ -616,8 +695,8 @@ body::after {
   justify-content: center;
   color: var(--jf-azul);
   border: 1px solid var(--jf-azul-border);
-  box-shadow: 0 4px 14px var(--jf-azul-glow);
-  margin-bottom: 6px;
+  box-shadow: 0 4px 12px var(--jf-azul-glow);
+  margin-bottom: 4px;
 }
 
 [data-theme="dark"] .empty-art-wrapper {
@@ -630,7 +709,6 @@ body::after {
   font-size: 1.0rem;
   font-weight: 800;
   color: var(--color-text-main);
-  letter-spacing: -0.01em;
 }
 
 .empty-state-desc {
@@ -640,7 +718,23 @@ body::after {
   line-height: 1.55;
 }
 
-/* ── 9. HIGHLIGHT BADGES COM ENTRADA FLUIDA ──────────────────────────────── */
+/* ── 9. INLINE DIFF STYLING ──────────────────────────────────────────────── */
+.diff-del {
+  text-decoration: line-through;
+  background: var(--diff-del-bg);
+  color: var(--diff-del-text);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 500;
+  margin-right: 3px;
+  border: 1px solid var(--diff-del-border);
+}
+
+.diff-ins {
+  margin-left: 2px;
+}
+
+/* ── 10. HIGHLIGHT BADGES ─────────────────────────────────────────────────── */
 .entity-tag {
   display: inline-flex;
   align-items: center;
@@ -648,22 +742,14 @@ body::after {
   border-radius: var(--radius-sm);
   font-weight: 700;
   font-size: 0.82rem;
-  margin: 0 2.5px;
+  margin: 0 2px;
   border: 1px solid transparent;
   cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  animation: badgeReveal 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transition: transform var(--transition-fast), filter var(--transition-fast);
-}
-
-@keyframes badgeReveal {
-  from { opacity: 0; transform: scale(0.92); }
-  to { opacity: 1; transform: scale(1); }
+  transition: transform var(--transition-fast);
 }
 
 .entity-tag:hover {
-  transform: translateY(-1.5px);
-  filter: brightness(0.94);
+  transform: translateY(-1px);
 }
 
 .tag-nome {
@@ -694,72 +780,6 @@ body::after {
   background: var(--hl-contato-bg);
   color: var(--hl-contato-text);
   border-color: var(--hl-contato-border);
-}
-
-/* ── 10. DRAG & DROP DE PDF ──────────────────────────────────────────────── */
-.dropzone-container {
-  border: 2px dashed var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: 40px 24px;
-  text-align: center;
-  background: var(--color-bg-surface-subtle);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-3);
-}
-
-.dropzone-container:hover, .dropzone-container.dragover {
-  border-color: var(--jf-azul);
-  background: var(--jf-azul-light);
-  transform: scale(1.005);
-}
-
-.dropzone-icon-circle {
-  width: 58px;
-  height: 58px;
-  border-radius: var(--radius-lg);
-  background: var(--jf-azul-light);
-  color: var(--jf-azul);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px var(--jf-azul-glow);
-}
-
-[data-theme="dark"] .dropzone-icon-circle {
-  color: #38bdf8;
-}
-
-.dropzone-text h3 {
-  font-size: 1.08rem;
-  font-weight: 700;
-  color: var(--color-text-main);
-}
-
-.dropzone-text p {
-  font-size: 0.86rem;
-  color: var(--color-text-muted);
-  margin-top: 3px;
-}
-
-.file-info-badge {
-  display: none;
-  align-items: center;
-  gap: var(--space-3);
-  background: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  padding: 12px 18px;
-  border-radius: var(--radius-md);
-  margin-top: 14px;
-  box-shadow: var(--shadow-xs);
-}
-
-.file-info-badge.active {
-  display: flex;
 }
 
 /* ── 11. BOTÕES E CONTROLES DE AÇÃO ──────────────────────────────────────── */
@@ -800,7 +820,7 @@ body::after {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 15px;
+  padding: 7px 14px;
   background: var(--color-bg-surface);
   color: var(--color-text-main);
   border: 1px solid var(--color-border);
@@ -816,7 +836,6 @@ body::after {
   background: var(--color-bg-surface-subtle);
   border-color: var(--jf-azul);
   color: var(--jf-azul);
-  transform: translateY(-1px);
 }
 
 [data-theme="dark"] .btn-secondary:hover:not(:disabled) {
@@ -1016,7 +1035,71 @@ body::after {
   background: var(--jf-azul-light);
 }
 
-/* ── 14. TOASTS FLUTUANTES ───────────────────────────────────────────────── */
+/* ── 14. DRAG & DROP DE PDF ──────────────────────────────────────────────── */
+.dropzone-container {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 38px 24px;
+  text-align: center;
+  background: var(--color-bg-surface-subtle);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+}
+
+.dropzone-container:hover, .dropzone-container.dragover {
+  border-color: var(--jf-azul);
+  background: var(--jf-azul-light);
+  transform: scale(1.005);
+}
+
+.dropzone-icon-circle {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-lg);
+  background: var(--jf-azul-light);
+  color: var(--jf-azul);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[data-theme="dark"] .dropzone-icon-circle {
+  color: #38bdf8;
+}
+
+.dropzone-text h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+
+.dropzone-text p {
+  font-size: 0.86rem;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.file-info-badge {
+  display: none;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: 12px 18px;
+  border-radius: var(--radius-md);
+  margin-top: 14px;
+}
+
+.file-info-badge.active {
+  display: flex;
+}
+
+/* ── 15. TOASTS & SPINNER ────────────────────────────────────────────────── */
 .toast-container {
   position: fixed;
   bottom: 24px;
@@ -1055,7 +1138,6 @@ body::after {
   to { transform: translateY(0); opacity: 1; }
 }
 
-/* ── 15. SPINNER ─────────────────────────────────────────────────────────── */
 .spinner {
   width: 16px;
   height: 16px;
