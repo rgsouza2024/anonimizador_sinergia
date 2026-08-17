@@ -268,14 +268,6 @@ body::after {
   letter-spacing: -0.02em;
 }
 
-/* Tipografia de Destaque com Gradiente de Marca */
-.brand-gradient-text {
-  background: var(--brand-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  display: inline-block;
-}
-
 .header-titles p {
   font-size: 0.88rem;
   color: var(--color-text-muted);
@@ -770,47 +762,31 @@ body::after {
   display: flex;
 }
 
-/* ── 11. BOTÕES COM LUMINOUS HOVER & SHIMMER ─────────────────────────────── */
+/* ── 11. BOTÕES E CONTROLES DE AÇÃO ──────────────────────────────────────── */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: 11px 24px;
-  background: var(--btn-gradient);
+  padding: 10px 22px;
+  background: var(--jf-azul);
   color: #ffffff;
   font-weight: 700;
   font-size: 0.92rem;
   border-radius: var(--radius-md);
   border: none;
-  box-shadow: var(--shadow-button);
+  box-shadow: 0 2px 6px rgba(0, 47, 108, 0.25);
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
   transition: all var(--transition-fast);
 }
 
-.btn-primary::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.25), transparent);
-  transform: rotate(30deg) translateX(-100%);
-  transition: transform 0.6s ease;
-}
-
-.btn-primary:hover:not(:disabled)::after {
-  transform: rotate(30deg) translateX(100%);
-}
-
 .btn-primary:hover:not(:disabled) {
-  transform: translateY(-1.5px);
-  box-shadow: 0 6px 18px rgba(0, 47, 108, 0.40);
+  background: var(--jf-azul-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 47, 108, 0.35);
 }
 
 .btn-primary:active:not(:disabled) {
+  background: var(--jf-azul-active);
   transform: translateY(0);
 }
 
