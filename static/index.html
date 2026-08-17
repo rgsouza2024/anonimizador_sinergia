@@ -12,9 +12,9 @@
 </head>
 <body>
 
-  <div class="app-container">
+  <div class="app-container" id="app-container">
 
-    <!-- ── 1. HEADER INSTITUCIONAL ARTÍSTICO (TRF1 / SINERGIA) ─────────── -->
+    <!-- ── 1. HEADER INSTITUCIONAL (TRF1 / SINERGIA) ─────────────────────── -->
     <header class="app-header">
       <div class="header-brand">
         <!-- Logo oficial com fundo transparente integrado organicamente -->
@@ -77,35 +77,70 @@
       </div>
     </section>
 
-    <!-- ── 3. NAVEGAÇÃO SEGMENTADA (PILL TABS) ───────────────────────────── -->
-    <nav class="nav-tabs-wrapper" role="tablist">
-      <button class="nav-tab active" data-tab="tab-texto" role="tab" aria-selected="true">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="16" y1="13" x2="8" y2="13"></line>
-          <line x1="16" y1="17" x2="8" y2="17"></line>
-          <polyline points="10 9 9 9 8 9"></polyline>
-        </svg>
-        Anonimizar Texto
-      </button>
-      <button class="nav-tab" data-tab="tab-pdf" role="tab" aria-selected="false">
-        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-          <polyline points="14 2 14 8 20 8"></polyline>
-          <line x1="12" y1="18" x2="12" y2="12"></line>
-          <line x1="9" y1="15" x2="15" y2="15"></line>
-        </svg>
-        Anonimizar Arquivo PDF
-      </button>
-    </nav>
+    <!-- ── 3. BARRA DE CONTROLE: ABAS + MODOS DE VISÃO (OPÇÃO C) ─────────── -->
+    <div class="controls-bar">
+      
+      <!-- Abas de Tipo de Entrada -->
+      <nav class="nav-tabs-wrapper" role="tablist">
+        <button class="nav-tab active" data-tab="tab-texto" role="tab" aria-selected="true">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+          </svg>
+          Anonimizar Texto
+        </button>
+        <button class="nav-tab" data-tab="tab-pdf" role="tab" aria-selected="false">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="12" y1="18" x2="12" y2="12"></line>
+            <line x1="9" y1="15" x2="15" y2="15"></line>
+          </svg>
+          Anonimizar Arquivo PDF
+        </button>
+      </nav>
+
+      <!-- Seletor de Modo de Exibição (Opção C: Lado a Lado, Documento Único, Comparação Diff) -->
+      <div class="view-modes-wrapper" id="view-modes-container">
+        <span class="view-mode-label">Exibição:</span>
+        <button class="view-mode-btn active" data-mode="split" id="btn-mode-split" title="Visualização lado a lado em duas colunas">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="12" y1="3" x2="12" y2="21"></line>
+          </svg>
+          Lado a Lado
+        </button>
+        <button class="view-mode-btn" data-mode="focus" id="btn-mode-focus" title="Documento amplo com foco na leitura (estilo Word/Decisão)">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="4" y="3" width="16" height="18" rx="2" ry="2"></rect>
+            <line x1="8" y1="8" x2="16" y2="8"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+            <line x1="8" y1="16" x2="12" y2="16"></line>
+          </svg>
+          Documento Focado
+        </button>
+        <button class="view-mode-btn" data-mode="diff" id="btn-mode-diff" title="Comparação no próprio texto com o dado original tachado">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          Comparação Diff
+        </button>
+      </div>
+
+    </div>
 
     <!-- ── 4. CONTEÚDO: ABA TEXTO ────────────────────────────────────────── -->
     <main id="tab-texto" class="tab-content active">
-      <div class="workspace-grid">
+      <div class="workspace-grid" id="workspace-grid-texto">
         
         <!-- Coluna Entrada (Texto Original) -->
-        <div class="panel-card">
+        <div class="panel-card panel-card-input" id="panel-input-texto">
           <div class="panel-header">
             <span class="panel-title">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -117,7 +152,7 @@
             <span id="char-counter" class="badge-counter">0 caracteres</span>
           </div>
           <div class="panel-body">
-            <textarea id="input-texto" class="text-input-area" placeholder="Cole ou digite aqui a petição, decisão, sentença, despacho ou acórdão a ser anonimizado..."></textarea>
+            <textarea id="input-texto" class="text-input-area" placeholder="Cole ou digite aqui a petição, decisão, sentença, despacho ou acórdão a ser anonimizado (Atalho: Ctrl + Enter)..."></textarea>
           </div>
           <div class="panel-footer">
             <button id="btn-anonimizar-texto" class="btn-primary" disabled>
@@ -125,7 +160,7 @@
                 <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
-              <span>Anonimizar Texto</span>
+              <span>Anonimizar Texto (Ctrl+Enter)</span>
             </button>
             <button id="btn-limpar-texto" class="btn-ghost" title="Limpar campo de texto">
               <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -137,29 +172,39 @@
           </div>
         </div>
 
-        <!-- Coluna Saída (Texto Anonimizado) -->
-        <div class="panel-card">
+        <!-- Coluna Saída (Texto Anonimizado / Diff / Focus Canvas) -->
+        <div class="panel-card panel-card-output" id="panel-output-texto">
           <div class="panel-header">
-            <span class="panel-title">
+            <span class="panel-title" id="output-panel-title">
               <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
               Texto Anonimizado
             </span>
-            <button id="btn-toggle-highlight-texto" class="btn-secondary" title="Alternar Destaques Coloridos" style="display: none;">
-              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path d="M12 20h9"></path>
-                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-              </svg>
-              Destaques
-            </button>
+            <div class="panel-header-actions">
+              <!-- Botão para voltar à edição no modo foco -->
+              <button id="btn-switch-focus-edit" class="btn-secondary" style="display: none;" title="Voltar para editar o texto">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Editar Texto
+              </button>
+
+              <button id="btn-toggle-highlight-texto" class="btn-secondary" title="Alternar Destaques Coloridos" style="display: none;">
+                <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M12 20h9"></path>
+                  <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+                Destaques
+              </button>
+            </div>
           </div>
           <div class="panel-body">
             <div id="viewer-texto" class="viewer-container">
               <div class="viewer-empty-state">
-                <!-- Escudo Neural Artístico -->
                 <div class="empty-art-wrapper">
-                  <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     <circle cx="12" cy="11" r="2.5"></circle>
                     <line x1="12" y1="8.5" x2="12" y2="5"></line>
@@ -169,7 +214,7 @@
                   </svg>
                 </div>
                 <div class="empty-state-title">Proteção Inteligente de Dados</div>
-                <div class="empty-state-desc">Cole uma peça jurídica na coluna ao lado e clique em <strong>Anonimizar Texto</strong> para identificar e mascarar dados sensíveis em conformidade com a LGPD.</div>
+                <div class="empty-state-desc">Cole uma peça jurídica e clique em <strong>Anonimizar Texto</strong> para identificar e mascarar dados sensíveis.</div>
               </div>
             </div>
           </div>
@@ -203,7 +248,7 @@
         <div class="panel-body">
           <div id="dropzone" class="dropzone-container">
             <div class="dropzone-icon-circle">
-              <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+              <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                 <polyline points="17 8 12 3 7 8"></polyline>
                 <line x1="12" y1="3" x2="12" y2="15"></line>
@@ -236,8 +281,8 @@
       </div>
 
       <!-- Comparação Lado a Lado do PDF -->
-      <div class="workspace-grid">
-        <div class="panel-card">
+      <div class="workspace-grid" id="workspace-grid-pdf">
+        <div class="panel-card panel-card-input" id="panel-input-pdf">
           <div class="panel-header">
             <span class="panel-title">Texto Original Extraído do PDF</span>
           </div>
@@ -245,7 +290,7 @@
             <div id="viewer-pdf-original" class="viewer-container">
               <div class="viewer-empty-state">
                 <div class="empty-art-wrapper">
-                  <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                     <polyline points="14 2 14 8 20 8"></polyline>
                   </svg>
@@ -257,7 +302,7 @@
           </div>
         </div>
 
-        <div class="panel-card">
+        <div class="panel-card panel-card-output" id="panel-output-pdf">
           <div class="panel-header">
             <span class="panel-title">Texto Anonimizado do PDF</span>
           </div>
@@ -265,7 +310,7 @@
             <div id="viewer-pdf-anonimizado" class="viewer-container">
               <div class="viewer-empty-state">
                 <div class="empty-art-wrapper">
-                  <svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                  <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
                     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     <circle cx="12" cy="11" r="2.5"></circle>
                   </svg>

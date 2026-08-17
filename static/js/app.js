@@ -1,6 +1,7 @@
 /**
  * ==============================================================================
  * ANONIMIZADOR SINERGIA - FRONTEND JAVASCRIPT
+ * Opção C: Layout Híbrido Flexível (Split View • Documento Focado • Inline Diff)
  * ==============================================================================
  */
 
@@ -11,15 +12,18 @@
   const state = {
     theme: localStorage.getItem('sinergia-theme') || 'light',
     activeTab: 'tab-texto',
-    textoResultados: null, // { texto_anonimizado, entidades_detectadas, tempo_processamento }
+    viewMode: localStorage.getItem('sinergia-view-mode') || 'split', // 'split' | 'focus' | 'diff'
+    textoResultados: null, // { texto_anonimizado, texto_original, entidades_detectadas, tempo_processamento }
     pdfResultados: null,
     highlightModeTexto: true,
-    filtroEntidadeAtual: 'ALL'
+    filtroEntidadeAtual: 'ALL',
+    focusShowingInput: false
   };
 
   // ── ELEMENTOS DO DOM ───────────────────────────────────────────────────────
   const dom = {
     html: document.documentElement,
+    appContainer: document.getElementById('app-container'),
     themeToggle: document.getElementById('btn-theme-toggle'),
     iconSun: document.getElementById('icon-sun'),
     iconMoon: document.getElementById('icon-moon'),
@@ -28,7 +32,17 @@
     navTabs: document.querySelectorAll('.nav-tab'),
     tabContents: document.querySelectorAll('.tab-content'),
     
+    // Controles de Modo de Exibição (Opção C)
+    viewModeBtns: document.querySelectorAll('.view-mode-btn'),
+    btnModeSplit: document.getElementById('btn-mode-split'),
+    btnModeFocus: document.getElementById('btn-mode-focus'),
+    btnModeDiff: document.getElementById('btn-mode-diff'),
+    btnSwitchFocusEdit: document.getElementById('btn-switch-focus-edit'),
+    outputPanelTitle: document.getElementById('output-panel-title'),
+
     // Aba Texto
+    panelInputTexto: document.getElementById('panel-input-texto'),
+    panelOutputTexto: document.getElementById('panel-output-texto'),
     inputTexto: document.getElementById('input-texto'),
     charCounter: document.getElementById('char-counter'),
     btnAnonimizarTexto: document.getElementById('btn-anonimizar-texto'),
@@ -80,7 +94,71 @@
     aplicarTema(state.theme === 'light' ? 'dark' : 'light');
   }
 
-  // ── 2. GERENCIADOR DE ABAS ─────────────────────────────────────────────────
+  // ── 2. GERENCIADOR DE MODOS DE EXIBIÇÃO (OPÇÃO C) ──────────────────────────
+  function aplicarModoExibicao(modo) {
+    state.viewMode = modo;
+    localStorage.setItem('sinergia-view-mode', modo);
+
+    // Atualiza classes do container principal
+    dom.appContainer.classList.remove('layout-split', 'layout-focus', 'layout-diff');
+    dom.appContainer.classList.add(`layout-${modo}`);
+
+    // Atualiza botões ativos
+    dom.viewModeBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.mode === modo);
+    });
+
+    // Ajustes específicos do modo
+    if (modo === 'focus') {
+      if (dom.btnSwitchFocusEdit) {
+        dom.btnSwitchFocusEdit.style.display = state.textoResultados ? 'inline-flex' : 'none';
+      }
+      if (dom.outputPanelTitle) {
+        dom.outputPanelTitle.innerHTML = `
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <rect x="4" y="3" width="16" height="18" rx="2" ry="2"></rect>
+            <line x1="8" y1="8" x2="16" y2="8"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Documento Anonimizado (Visão Ampla)
+        `;
+      }
+    } else if (modo === 'diff') {
+      if (dom.btnSwitchFocusEdit) dom.btnSwitchFocusEdit.style.display = 'none';
+      if (dom.outputPanelTitle) {
+        dom.outputPanelTitle.innerHTML = `
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+          </svg>
+          Comparação Diff (Dado Suprimido vs Tag)
+        `;
+      }
+    } else {
+      // Split
+      if (dom.btnSwitchFocusEdit) dom.btnSwitchFocusEdit.style.display = 'none';
+      if (dom.panelInputTexto) dom.panelInputTexto.classList.remove('show-input');
+      if (dom.panelOutputTexto) dom.panelOutputTexto.classList.remove('hide-output');
+      if (dom.outputPanelTitle) {
+        dom.outputPanelTitle.innerHTML = `
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+          </svg>
+          Texto Anonimizado
+        `;
+      }
+    }
+
+    // Re-renderiza o resultado na visualização adequada
+    if (state.activeTab === 'tab-texto' && state.textoResultados) {
+      renderizarResultadoTexto(state.textoResultados);
+    } else if (state.activeTab === 'tab-pdf' && state.pdfResultados) {
+      renderizarResultadoPdf(state.pdfResultados);
+    }
+  }
+
+  // ── 3. GERENCIADOR DE ABAS ─────────────────────────────────────────────────
   function alternarAba(tabId) {
     state.activeTab = tabId;
     dom.navTabs.forEach(tab => {
@@ -93,7 +171,6 @@
       content.style.display = content.id === tabId ? 'block' : 'none';
     });
 
-    // Atualiza a tabela de auditoria conforme a aba ativa
     const resultados = tabId === 'tab-texto' ? state.textoResultados : state.pdfResultados;
     if (resultados && resultados.entidades_detectadas && resultados.entidades_detectadas.length > 0) {
       renderizarAuditoriaEEstatisticas(resultados);
@@ -103,11 +180,75 @@
     }
   }
 
-  // ── 3. TOASTS & NOTIFICAÇÕES ───────────────────────────────────────────────
+  // ── 4. MOTOR DE DESTAQUES & INLINE DIFF ─────────────────────────────────────
+  function classificarTagEntidade(token) {
+    const u = (token || '').toUpperCase();
+    if (u.includes('NOME')) return 'tag-nome';
+    if (u.includes('CPF') || u.includes('CIN') || u.includes('RG') || u.includes('CNH') || u.includes('SIAPE')) return 'tag-doc';
+    if (u.includes('OAB')) return 'tag-oab';
+    if (u.includes('ENDERECO') || u.includes('CEP') || u.includes('LOCATION')) return 'tag-loc';
+    if (u.includes('EMAIL') || u.includes('PHONE') || u.includes('TELEFONE')) return 'tag-contato';
+    return 'tag-doc';
+  }
+
+  function escaparHtml(texto) {
+    if (!texto) return '';
+    return texto
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  }
+
+  function gerarHtmlComDestaques(textoAnonimizado) {
+    if (!textoAnonimizado) return '';
+    const textoEscapado = escaparHtml(textoAnonimizado);
+    return textoEscapado.replace(/&lt;([A-Z0-9_\/\s-]+)&gt;/g, (match, p1) => {
+      const classe = classificarTagEntidade(p1);
+      return `<span class="entity-tag ${classe}" title="Entidade Anonimizada: ${p1}">&lt;${p1}&gt;</span>`;
+    });
+  }
+
+  function gerarHtmlDiffInline(textoOriginal, entidades) {
+    if (!textoOriginal) return '';
+    if (!entidades || entidades.length === 0) {
+      return escaparHtml(textoOriginal);
+    }
+
+    // Ordena entidades por posição inicial (crescente)
+    const sorted = [...entidades]
+      .filter(e => e['Início'] !== undefined && e['Fim'] !== undefined)
+      .sort((a, b) => a['Início'] - b['Início']);
+
+    let html = '';
+    let lastIdx = 0;
+
+    for (const ent of sorted) {
+      const start = ent['Início'];
+      const end = ent['Fim'];
+      const textDetectado = ent['Texto Detectado'] || textoOriginal.substring(start, end);
+      const tipo = ent['Entidade'] || 'DADO_PESSOAL';
+      const classe = classificarTagEntidade(tipo);
+
+      if (start < lastIdx) continue; // Evita sobreposições
+
+      // Adiciona texto intermediário
+      html += escaparHtml(textoOriginal.substring(lastIdx, start));
+
+      // Adiciona o elemento Diff
+      html += `<span class="diff-del" title="Dado Original">${escaparHtml(textDetectado)}</span><span class="entity-tag ${classe} diff-ins" title="Substituído por: &lt;${tipo}&gt;">&lt;${tipo}&gt;</span>`;
+
+      lastIdx = end;
+    }
+
+    // Adiciona resto do texto
+    html += escaparHtml(textoOriginal.substring(lastIdx));
+    return html;
+  }
+
+  // ── 5. TOASTS & NOTIFICAÇÕES ───────────────────────────────────────────────
   function mostrarToast(mensagem, tipo = 'success', duracaoMs = 3000) {
     const toast = document.createElement('div');
     toast.className = `toast toast-${tipo}`;
-    
     const icone = tipo === 'success' ? '✓' : '⚠️';
     toast.innerHTML = `<span>${icone}</span> <span>${mensagem}</span>`;
 
@@ -121,7 +262,6 @@
     }, duracaoMs);
   }
 
-  // ── 4. ÁREA DE TRANSFERÊNCIA & DOWNLOAD ────────────────────────────────────
   function copiarParaClipboard(texto, mensagemSucesso = 'Texto copiado com sucesso!') {
     if (!texto || !texto.trim()) return;
 
@@ -164,32 +304,6 @@
     mostrarToast('Download iniciado!', 'success');
   }
 
-  // ── 5. MOTOR DE DESTAQUE VISUAL (HIGHLIGHTS) ───────────────────────────────
-  function classificarTagEntidade(token) {
-    const u = token.toUpperCase();
-    if (u.includes('NOME')) return 'tag-nome';
-    if (u.includes('CPF') || u.includes('CIN') || u.includes('RG') || u.includes('CNH') || u.includes('SIAPE')) return 'tag-doc';
-    if (u.includes('OAB')) return 'tag-oab';
-    if (u.includes('ENDERECO') || u.includes('CEP') || u.includes('LOCATION')) return 'tag-loc';
-    if (u.includes('EMAIL') || u.includes('PHONE') || u.includes('TELEFONE')) return 'tag-contato';
-    return 'tag-doc';
-  }
-
-  function gerarHtmlComDestaques(textoAnonimizado) {
-    if (!textoAnonimizado) return '';
-    // Escapa caracteres HTML perigosos
-    const textoEscapado = textoAnonimizado
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
-
-    // Substitui placeholders como &lt;NOME&gt;, &lt;CPF/CIN&gt;, etc. por badges estilizados
-    return textoEscapado.replace(/&lt;([A-Z0-9_\/\s-]+)&gt;/g, (match, p1) => {
-      const classe = classificarTagEntidade(p1);
-      return `<span class="entity-tag ${classe}" title="Entidade Anonimizada: ${p1}">&lt;${p1}&gt;</span>`;
-    });
-  }
-
   // ── 6. PROCESSAMENTO: ABA TEXTO ────────────────────────────────────────────
   async function processarTexto() {
     const texto = dom.inputTexto.value.trim();
@@ -198,7 +312,6 @@
       return;
     }
 
-    // Estado de Loading
     const btnTextoOriginal = dom.btnAnonimizarTexto.innerHTML;
     dom.btnAnonimizarTexto.disabled = true;
     dom.btnAnonimizarTexto.innerHTML = '<span class="spinner"></span> <span>Processando...</span>';
@@ -215,11 +328,16 @@
       }
 
       const data = await response.json();
+      data.texto_original = texto;
       state.textoResultados = data;
 
-      // Renderiza resultado
       renderizarResultadoTexto(data);
       renderizarAuditoriaEEstatisticas(data);
+
+      if (state.viewMode === 'focus') {
+        aplicarModoExibicao('focus');
+      }
+
       mostrarToast('Texto anonimizado com sucesso!', 'success');
 
     } catch (err) {
@@ -232,7 +350,11 @@
   }
 
   function renderizarResultadoTexto(data) {
-    if (state.highlightModeTexto) {
+    if (!data) return;
+
+    if (state.viewMode === 'diff') {
+      dom.viewerTexto.innerHTML = gerarHtmlDiffInline(data.texto_original, data.entidades_detectadas);
+    } else if (state.highlightModeTexto) {
       dom.viewerTexto.innerHTML = gerarHtmlComDestaques(data.texto_anonimizado);
     } else {
       dom.viewerTexto.textContent = data.texto_anonimizado;
@@ -240,7 +362,10 @@
 
     dom.btnCopiarTexto.disabled = false;
     dom.btnDownloadTexto.disabled = false;
-    dom.btnToggleHighlightTexto.style.display = 'inline-flex';
+    dom.btnToggleHighlightTexto.style.display = state.viewMode === 'diff' ? 'none' : 'inline-flex';
+    if (dom.btnSwitchFocusEdit) {
+      dom.btnSwitchFocusEdit.style.display = state.viewMode === 'focus' ? 'inline-flex' : 'none';
+    }
   }
 
   function alternarHighlightTexto() {
@@ -257,10 +382,12 @@
     dom.btnCopiarTexto.disabled = true;
     dom.btnDownloadTexto.disabled = true;
     dom.btnToggleHighlightTexto.style.display = 'none';
+    if (dom.btnSwitchFocusEdit) dom.btnSwitchFocusEdit.style.display = 'none';
+    
     dom.viewerTexto.innerHTML = `
       <div class="viewer-empty-state">
         <div class="empty-art-wrapper">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
             <circle cx="12" cy="11" r="2.5"></circle>
             <line x1="12" y1="8.5" x2="12" y2="5"></line>
@@ -270,7 +397,7 @@
           </svg>
         </div>
         <div class="empty-state-title">Proteção Inteligente de Dados</div>
-        <div class="empty-state-desc">Cole uma peça jurídica na coluna ao lado e clique em <strong>Anonimizar Texto</strong> para identificar e mascarar dados sensíveis em conformidade com a LGPD.</div>
+        <div class="empty-state-desc">Cole uma peça jurídica e clique em <strong>Anonimizar Texto</strong> para identificar e mascarar dados sensíveis.</div>
       </div>
     `;
     state.textoResultados = null;
@@ -293,14 +420,12 @@
       return;
     }
 
-    // Exibe badge do arquivo
     dom.pdfFileName.textContent = arquivo.name;
     dom.pdfFileSize.textContent = `${(arquivo.size / 1024).toFixed(1)} KB`;
     dom.pdfFileBadge.classList.add('active');
 
-    // Estado de Loading nos visualizadores
-    dom.viewerPdfOriginal.innerHTML = '<div class="viewer-empty-state"><span class="spinner" style="border-color: var(--color-primary); border-top-color: transparent;"></span><p>Extraindo texto do PDF...</p></div>';
-    dom.viewerPdfAnonimizado.innerHTML = '<div class="viewer-empty-state"><span class="spinner" style="border-color: var(--color-primary); border-top-color: transparent;"></span><p>Anonimizando conteúdo...</p></div>';
+    dom.viewerPdfOriginal.innerHTML = '<div class="viewer-empty-state"><span class="spinner" style="border-color: var(--jf-azul); border-top-color: transparent;"></span><p>Extraindo texto do PDF...</p></div>';
+    dom.viewerPdfAnonimizado.innerHTML = '<div class="viewer-empty-state"><span class="spinner" style="border-color: var(--jf-azul); border-top-color: transparent;"></span><p>Anonimizando conteúdo...</p></div>';
 
     const formData = new FormData();
     formData.append('file', arquivo);
@@ -318,14 +443,7 @@
       }
 
       state.pdfResultados = data;
-
-      // Renderiza textos
-      dom.viewerPdfOriginal.textContent = data.texto_extraido;
-      dom.viewerPdfAnonimizado.innerHTML = gerarHtmlComDestaques(data.texto_anonimizado);
-
-      dom.btnCopiarPdf.disabled = false;
-      dom.btnDownloadPdf.disabled = false;
-
+      renderizarResultadoPdf(data);
       renderizarAuditoriaEEstatisticas(data);
       mostrarToast('PDF anonimizado com sucesso!', 'success');
 
@@ -335,6 +453,20 @@
       dom.viewerPdfAnonimizado.innerHTML = '<div class="viewer-empty-state"><p>Não foi possível gerar a versão anonimizada.</p></div>';
       mostrarToast(err.message, 'error');
     }
+  }
+
+  function renderizarResultadoPdf(data) {
+    if (!data) return;
+    dom.viewerPdfOriginal.textContent = data.texto_extraido;
+
+    if (state.viewMode === 'diff') {
+      dom.viewerPdfAnonimizado.innerHTML = gerarHtmlDiffInline(data.texto_extraido, data.entidades_detectadas);
+    } else {
+      dom.viewerPdfAnonimizado.innerHTML = gerarHtmlComDestaques(data.texto_anonimizado);
+    }
+
+    dom.btnCopiarPdf.disabled = false;
+    dom.btnDownloadPdf.disabled = false;
   }
 
   function removerArquivoPdf() {
@@ -349,14 +481,43 @@
     dom.auditSection.style.display = 'none';
   }
 
-  // ── 8. ESTATÍSTICAS E AUDITORIA ────────────────────────────────────────────
+  // ── 8. ROLAGEM SINCRONIZADA (SYNC SCROLL) ──────────────────────────────────
+  function inicializarRolagemSincronizada() {
+    let bloqueioScroll = false;
+
+    function sincronizar(origem, destino) {
+      if (bloqueioScroll || state.viewMode !== 'split') return;
+      bloqueioScroll = true;
+
+      const maxOrigem = origem.scrollHeight - origem.clientHeight;
+      const maxDestino = destino.scrollHeight - destino.clientHeight;
+
+      if (maxOrigem > 0 && maxDestino > 0) {
+        const proporcao = origem.scrollTop / maxOrigem;
+        destino.scrollTop = proporcao * maxDestino;
+      }
+
+      requestAnimationFrame(() => {
+        bloqueioScroll = false;
+      });
+    }
+
+    // Sincronia na Aba Texto
+    dom.inputTexto.addEventListener('scroll', () => sincronizar(dom.inputTexto, dom.viewerTexto));
+    dom.viewerTexto.addEventListener('scroll', () => sincronizar(dom.viewerTexto, dom.inputTexto));
+
+    // Sincronia na Aba PDF
+    dom.viewerPdfOriginal.addEventListener('scroll', () => sincronizar(dom.viewerPdfOriginal, dom.viewerPdfAnonimizado));
+    dom.viewerPdfAnonimizado.addEventListener('scroll', () => sincronizar(dom.viewerPdfAnonimizado, dom.viewerPdfOriginal));
+  }
+
+  // ── 9. ESTATÍSTICAS E AUDITORIA ────────────────────────────────────────────
   function renderizarAuditoriaEEstatisticas(data) {
     if (!data) return;
 
     const entidades = data.entidades_detectadas || [];
     const tempo = data.tempo_processamento || 0;
 
-    // Atualiza Stat Cards
     dom.statTempo.textContent = `${tempo.toFixed(2)}s`;
     dom.statTotalEntidades.textContent = entidades.length;
 
@@ -368,10 +529,8 @@
 
     const totalTipos = Object.keys(contagemPorTipo).length;
     dom.statTiposEntidades.textContent = totalTipos;
-
     dom.statsSection.style.display = 'grid';
 
-    // Renderiza Filtros Chips
     dom.auditFilterChips.innerHTML = `
       <button class="filter-chip ${state.filtroEntidadeAtual === 'ALL' ? 'active' : ''}" data-filter="ALL">Todas (${entidades.length})</button>
     `;
@@ -384,7 +543,6 @@
       dom.auditFilterChips.appendChild(chip);
     });
 
-    // Renderiza Tabela
     renderizarLinhasTabela(entidades, state.filtroEntidadeAtual);
     dom.auditSection.style.display = 'block';
   }
@@ -406,7 +564,7 @@
       const classe = classificarTagEntidade(e.Entidade || '');
       tr.innerHTML = `
         <td><span class="entity-tag ${classe}">${e.Entidade}</span></td>
-        <td><strong>${e['Texto Detectado'] || '-'}</strong></td>
+        <td><strong>${escaparHtml(e['Texto Detectado'] || '-')}</strong></td>
         <td>${e['Início'] !== undefined ? e['Início'] : '-'}</td>
         <td>${e['Fim'] !== undefined ? e['Fim'] : '-'}</td>
         <td>${e['Score'] || '1.00'}</td>
@@ -415,11 +573,44 @@
     });
   }
 
-  // ── 9. INICIALIZAÇÃO E EVENT LISTENERS ──────────────────────────────────────
+  // ── 10. INICIALIZAÇÃO E EVENT LISTENERS ─────────────────────────────────────
   function inicializarEventos() {
     // Tema
     aplicarTema(state.theme);
     dom.themeToggle.addEventListener('click', alternarTema);
+
+    // Modo de Exibição (Opção C)
+    aplicarModoExibicao(state.viewMode);
+    dom.viewModeBtns.forEach(btn => {
+      btn.addEventListener('click', () => aplicarModoExibicao(btn.dataset.mode));
+    });
+
+    // Botão Voltar para Editar no modo foco
+    if (dom.btnSwitchFocusEdit) {
+      dom.btnSwitchFocusEdit.addEventListener('click', () => {
+        state.focusShowingInput = !state.focusShowingInput;
+        if (state.focusShowingInput) {
+          dom.panelInputTexto.classList.add('show-input');
+          dom.panelOutputTexto.classList.add('hide-output');
+          dom.btnSwitchFocusEdit.innerHTML = `
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+            Ver Documento
+          `;
+        } else {
+          dom.panelInputTexto.classList.remove('show-input');
+          dom.panelOutputTexto.classList.remove('hide-output');
+          dom.btnSwitchFocusEdit.innerHTML = `
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+            </svg>
+            Editar Texto
+          `;
+        }
+      });
+    }
 
     // Banner de Privacidade
     dom.privacyToggle.addEventListener('click', () => {
@@ -431,14 +622,13 @@
       tab.addEventListener('click', () => alternarAba(tab.dataset.tab));
     });
 
-    // Aba Texto: Contador e Input
+    // Aba Texto
     dom.inputTexto.addEventListener('input', () => {
       const len = dom.inputTexto.value.length;
       dom.charCounter.textContent = `${len.toLocaleString('pt-BR')} caracteres`;
       dom.btnAnonimizarTexto.disabled = len === 0;
     });
 
-    // Atalho Ctrl+Enter ou Cmd+Enter para anonimização rápida
     dom.inputTexto.addEventListener('keydown', (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
@@ -464,7 +654,7 @@
       }
     });
 
-    // Aba PDF: Drag & Drop
+    // Aba PDF
     dom.dropzone.addEventListener('click', () => dom.fileInputPdf.click());
     dom.fileInputPdf.addEventListener('change', (e) => {
       if (e.target.files && e.target.files[0]) {
@@ -517,9 +707,11 @@
         renderizarLinhasTabela(resultados.entidades_detectadas || [], state.filtroEntidadeAtual);
       }
     });
+
+    // Rolagem Sincronizada
+    inicializarRolagemSincronizada();
   }
 
-  // Inicializa a aplicação ao carregar o DOM
   document.addEventListener('DOMContentLoaded', inicializarEventos);
 
 })();
