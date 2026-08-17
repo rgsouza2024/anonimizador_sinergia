@@ -938,36 +938,20 @@ body::after {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--color-border);
+  border-left: 3.5px solid var(--jf-azul);
   border-radius: var(--radius-md);
-  padding: 16px 20px;
+  padding: 14px 20px;
   display: flex;
-  align-items: center;
-  gap: var(--space-4);
+  flex-direction: column;
+  justify-content: center;
   box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color var(--transition-fast);
 }
 
 .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
   border-color: var(--jf-azul-border);
-}
-
-.stat-icon-wrapper {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-md);
-  background: var(--jf-azul-light);
-  color: var(--jf-azul);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-
-[data-theme="dark"] .stat-icon-wrapper {
-  color: #38bdf8;
 }
 
 .stat-content {
@@ -984,10 +968,14 @@ body::after {
 }
 
 .stat-value {
-  font-size: 1.30rem;
+  font-size: 1.35rem;
   font-weight: 800;
-  color: var(--color-text-main);
+  color: var(--jf-azul);
   margin-top: 2px;
+}
+
+[data-theme="dark"] .stat-value {
+  color: #38bdf8;
 }
 
 /* ── 13. TABELA DE AUDITORIA ─────────────────────────────────────────────── */
