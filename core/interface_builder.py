@@ -340,8 +340,6 @@ def criar_interface_gradio(
                     value=logo_file_path,
                     interactive=False,
                     show_label=False,
-                    show_download_button=False,
-                    show_fullscreen_button=False,
                     width=85,
                 )
             with gr.Column(scale=4, elem_id="header-text"):
