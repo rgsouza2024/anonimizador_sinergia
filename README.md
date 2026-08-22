@@ -1,4 +1,4 @@
-﻿---
+---
 title: Anonimizador Sinergia
 emoji: 👁️
 colorFrom: indigo
@@ -13,13 +13,13 @@ short_description: Anonimizador de dados do Projeto Sinergia
 
 # Anonimizador Sinergia
 
-Aplicação de anonimização de textos jurídicos em português (pt-BR), com interface Gradio e motor híbrido baseado em:
+Aplicação de anonimização de textos e documentos jurídicos em português (pt-BR), com **Interface Web Nativa (HTML5 / CSS3 / JavaScript)** como padrão oficial, interface secundária em **Gradio** e motor híbrido de alta precisão baseado em:
 
 - **Regras determinísticas (regex + listas de domínio)**
-- **Reconhecimento de entidades com Presidio + spaCy**
-- **Pós-filtro de precisão para reduzir falso positivo em CPF/OAB**
+- **Reconhecimento de entidades com Presidio + spaCy (`pt_core_news_lg`)**
+- **Pós-filtro de precisão para reduzir falso positivo em CPF, OAB e IDs**
 
-O foco do projeto é anonimizar dados pessoais sensíveis sem perder contexto jurídico essencial.
+O foco do projeto é anonimizar dados pessoais sensíveis (LGPD) preservando a integridade e o contexto técnico processual.
 
 ## Sumário
 
@@ -40,28 +40,37 @@ O foco do projeto é anonimizar dados pessoais sensíveis sem perder contexto ju
 
 ### Objetivo principal
 
-Anonimizar conteúdo jurídico (texto livre e PDF com texto pesquisável), preservando o máximo possível de legibilidade processual.
+Anonimizar conteúdo jurídico em múltiplos formatos (texto livre, PDF com texto pesquisável e documentos Word `.docx`), preservando a legibilidade processual e os termos de interesse do Judiciário.
 
 ### Escopo funcional atual
 
-- Entrada de **texto** (colar na interface)
-- Entrada de **PDF textual** (extração por PyMuPDF)
-- **Interface Web**: acessível em `/ui/` (redirecionamento automático da raiz `/`)
-- **API HTTP dedicada**: endpoint principal em `/api/v1/anonimizar` (JSON POST), com suporte legado em `/anonimizar`.
-- Saída com:
-- Garantia de 100% de cobertura sem revisão humana
+- **Entrada Omnimodal:**
+  - **Texto direto** (digitação ou colagem na interface)
+  - **PDF textual** (extração por PyMuPDF)
+  - **Documentos Word (.docx)** (extração de parágrafos e tabelas via `python-docx`)
+- **Interfaces de Usuário:**
+  - **Interface Web Nativa (Padrão Oficial):** SPA moderna servida na raiz (`/`), com realce visual de entidades (*highlighting*), alternância de tema (Claro/Escuro) e download de documento.
+  - **Interface Gradio (Secundária / Alternativa):** Acessível em `/ui/`.
+- **API HTTP RESTful dedicada:**
+  - `POST /api/v1/anonimizar`: Endpoint JSON para anonimização de textos livres e metadados.
+  - `POST /api/v1/anonimizar-arquivo`: Endpoint universal para upload de arquivos PDF e DOCX via `multipart/form-data`.
+  - `POST /anonimizar`: Rota de compatibilidade retroativa para clientes legados.
+- **Saídas estruturadas:**
+  - Texto anonimizado com substituições parametrizadas (`<CPF/CIN>`, `<ENDERECO>`, `<NOME>`, etc.).
+  - Tabela detalhada de auditoria com spans, pontuação de confiança (*score*) e tipologia de cada entidade detectada.
+  - Resumo de telemetria e tempo de processamento.
 
 ## 2. Arquitetura
 
-A aplicação está modularizada em camadas.
+A aplicação está modularizada em camadas para isolar responsabilidades de API, interfaces, regras de negócio e processamento de NLP.
 
-### 2.1 Ponto de entrada
+### 2.1 Ponto de entrada e Servidor HTTP (`app.py`)
 
-- `app.py`
-  - Inicializa engines e recursos
-  - Injeta dependências nas funções de pipeline/UI
-  - Sobe a interface Gradio (isolada em `/ui`)
-  - Configura o espelhamento de rotas e redirecionamentos
+- **FastAPI / Uvicorn**: Servidor assíncrono principal que:
+  - Entrega os arquivos estáticos da **Interface Web Nativa** (`static/index.html`, `static/css/`, `static/js/`) na raiz (`/`).
+  - Expõe a API RESTful em `/api/v1/` com suporte a CORS.
+  - Monta a **Interface Gradio** na rota `/ui` através de `gr.mount_gradio_app`.
+  - Injeta dependências nos pipelines de processamento e extração de PDF/DOCX.
 
 ### 2.2 Núcleo (`core/`)
 
@@ -205,29 +214,37 @@ A lista `nomes_comuns.txt` é propositalmente agressiva para reduzir vazamento d
 
 ```text
 .
-├── app.py
+├── app.py                      # Servidor FastAPI + montagem da Web UI e Gradio
+├── api_anonimizador.py         # Microserviço REST alternativo e independente
+├── requirements.txt            # Dependências Python do backend e NLP
+├── nomes_comuns.txt            # Dicionário de prenomes e sobrenomes para varredura lexical
+├── termos_comuns.txt           # Dicionário de termos comuns para evitar falsos positivos
+├── titulos_legais.txt          # Termos legais e papéis processuais protegidos
 ├── core/
-│   ├── app_services.py
-│   ├── config.py
-│   ├── engine_setup.py
-│   ├── interface_builder.py
-│   ├── operators.py
-│   ├── pipeline.py
-│   ├── resources.py
-│   ├── text_filters.py
-│   ├── ui_handlers.py
+│   ├── app_services.py         # Extração de PDF/DOCX e formatação de telemetria
+│   ├── config.py               # Constantes globais, regexes e listas de exclusão PJ
+│   ├── engine_setup.py         # Configuração dos motores Presidio + spaCy
+│   ├── interface_builder.py    # Definição dos componentes da UI Gradio
+│   ├── operators.py            # Mapeamento de operadores e tags de substituição
+│   ├── pipeline.py             # Orquestrador linear das fases de anonimização
+│   ├── resources.py            # Carregamento e indexação das listas/dicionários
+│   ├── text_filters.py         # Heurísticas PF/PJ, regex contextuais e pós-filtros
+│   ├── ui_handlers.py          # Callbacks de interação da interface Gradio
 │   └── __init__.py
-├── tests/
-│   └── regression/
-│       ├── cases.json
-│       ├── baseline_snapshot.json
-│       ├── run_baseline.py
-│       └── README.md
-├── nomes_comuns.txt
-├── termos_comuns.txt
-├── titulos_legais.txt
-├── requirements.txt
-└── README.md
+├── static/                     # Interface Web Nativa (SPA moderna)
+│   ├── index.html              # Estrutura HTML5 da interface padrão
+│   ├── css/
+│   │   └── styles.css          # Estilização com design system e tema dark/light
+│   ├── js/
+│   │   └── app.js              # Lógica do frontend em Vanilla JS (fetch assíncrono)
+│   └── img/
+│       └── logo.png            # Logotipo oficial do Projeto Sinergia TRF1
+└── tests/
+    └── regression/             # Suíte de testes de regressão por snapshot
+        ├── cases.json
+        ├── baseline_snapshot.json
+        ├── run_baseline.py
+        └── README.md
 ```
 
 ## 7. Requisitos e Setup Local
@@ -243,14 +260,19 @@ Definidas em `requirements.txt`:
 - `presidio-analyzer==2.2.359`
 - `presidio-anonymizer==2.2.359`
 - `spacy==3.8.7`
-- modelo spaCy pt-BR via URL: `pt_core_news_lg-3.8.0`
+- `pt_core_news_lg` (modelo spaCy pt-BR)
+- `fastapi`
+- `uvicorn[standard]`
+- `gradio>=6.0.0`
 
 ### 7.2 Instalação recomendada
 
 ```bash
 python -m venv .venv
-# Windows
-.\.venv\Scripts\activate
+
+# Windows (PowerShell)
+.\.venv\Scripts\Activate.ps1
+
 # Linux/macOS
 source .venv/bin/activate
 
@@ -263,13 +285,21 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Se os motores carregarem corretamente, a aplicação abrirá a interface Gradio.
+Após a inicialização dos motores de NLP, o servidor Uvicorn estará disponível na porta `7860`.
 
-### 8.1 Endpoints no Hugging Face Spaces
+### 8.1 URLs Locais
 
-- **Web UI**: `https://[seu-space].hf.space/ui/`
-- **API (Versão Atual)**: `POST https://[seu-space].hf.space/api/v1/anonimizar`
-- **API (Legada)**: `POST https://[seu-space].hf.space/anonimizar`
+- **Interface Web Nativa (Padrão):** `http://localhost:7860/`
+- **Interface Gradio (Secundária):** `http://localhost:7860/ui`
+- **Documentação OpenAPI / Swagger:** `http://localhost:7860/docs`
+
+### 8.2 Endpoints no Hugging Face Spaces
+
+- **Web UI Nativa (Padrão):** `https://[seu-space].hf.space/`
+- **Web UI Gradio (Alternativa):** `https://[seu-space].hf.space/ui/`
+- **API - Texto:** `POST https://[seu-space].hf.space/api/v1/anonimizar`
+- **API - Arquivo (PDF/DOCX):** `POST https://[seu-space].hf.space/api/v1/anonimizar-arquivo`
+- **API - Legada:** `POST https://[seu-space].hf.space/anonimizar`
 
 ## 9. Testes de Regressão
 
