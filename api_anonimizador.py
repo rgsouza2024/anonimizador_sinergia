@@ -1,46 +1,83 @@
 # Nome do arquivo: api_anonimizador.py
 # Objetivo: Expor o motor de anonimização como um Microserviço REST para consumo por outras linguagens (Node.js, C#, etc.)
 
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+import time
 from typing import List, Optional
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
 import uvicorn
 
-# Reaproveitando sua lógica existente do app.py
-from app import _anonimizar_logica
+from core.anonymizer_service import (
+    executar_anonimizacao,
+    analyzer_engine,
+    anonymizer_engine,
+)
 
-app = FastAPI(title="Motor de Anonimização Sinergia API")
+app = FastAPI(
+    title="Motor de Anonimização Sinergia API",
+    description="Microserviço RESTful desacoplado para anonimização de textos e documentos jurídicos.",
+    version="1.0.0",
+)
+
+# CORS habilitado para integração livre
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 class TextoRequest(BaseModel):
-    texto: str
-    nomes_metadados: Optional[List[str]] = []
+    texto: str = Field(..., description="Texto original a ser anonimizado")
+    nomes_metadados: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Lista opcional de nomes para anonimização forçada",
+    )
+
 
 class AnonimizacaoResponse(BaseModel):
     texto_anonimizado: str
-    entidades_detectadas: List[dict] # Você pode tipar melhor isso se desejar
+    entidades_detectadas: List[dict]
     tempo_processamento: float
+
+
+@app.get("/health")
+async def health():
+    return {
+        "status": "ok",
+        "analyzer_carregado": analyzer_engine is not None,
+        "anonymizer_carregado": anonymizer_engine is not None,
+    }
+
 
 @app.post("/api/v1/anonimizar", response_model=AnonimizacaoResponse)
 async def api_anonimizar(request: TextoRequest):
     try:
-        # Executa a pipeline que já definimos no app.py
-        # _anonimizar_logica retorna (texto_anon, df_entidades) ou (texto_anon, df, metricas)
-        resultado = _anonimizar_logica(
+        inicio = time.time()
+        nomes_set = set(request.nomes_metadados) if request.nomes_metadados else set()
+
+        texto_anon, df_entidades, metricas = executar_anonimizacao(
             texto_original=request.texto,
-            nomes_pf_metadados=set(request.nomes_metadados),
-            retornar_metricas=True
+            nomes_pf_metadados=nomes_set,
+            retornar_metricas=True,
         )
-        
-        texto_anon, df_entidades, metricas = resultado
-        
+
+        entidades = df_entidades.to_dict("records") if not df_entidades.empty else []
+        tempo_processamento = round(time.time() - inicio, 3)
+
         return AnonimizacaoResponse(
             texto_anonimizado=texto_anon,
-            entidades_detectadas=df_entidades.to_dict('records'),
-            tempo_processamento=metricas.get("tempo_segundos", 0) if isinstance(metricas, dict) else 0
+            entidades_detectadas=entidades,
+            tempo_processamento=tempo_processamento,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 if __name__ == "__main__":
-    # Rodar a API na porta 8000
+    print("Iniciando microserviço REST de anonimização na porta 8000...")
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

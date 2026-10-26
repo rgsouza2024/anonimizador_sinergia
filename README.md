@@ -30,11 +30,17 @@ O foco do projeto é anonimizar dados pessoais sensíveis (LGPD) preservando a i
 - [5. Estratégia de Nomes (PF x PJ)](#5-estratégia-de-nomes-pf-x-pj)
 - [6. Estrutura de Pastas](#6-estrutura-de-pastas)
 - [7. Requisitos e Setup Local](#7-requisitos-e-setup-local)
-- [8. Execução](#8-execução)
-- [9. Testes de Regressão](#9-testes-de-regressão)
+- [8. Como Usar (Guia de Execução)](#8-como-usar-guia-de-execução)
+  - [8.1 Opção A: Subir o Microserviço REST Isolado (Porta 8000)](#81-opção-a-subir-o-microserviço-rest-isolado-porta-8000)
+  - [8.2 Opção B: Subir a Aplicação Completa com Frontend (Porta 7860)](#82-opção-b-subir-a-aplicação-completa-com-frontend-porta-7860)
+  - [8.3 Resumo Comparativo das Opções](#83-resumo-comparativo-das-opções)
+  - [8.4 URLs e Endpoints (Local e Nuvem)](#84-urls-e-endpoints-local-e-nuvem)
+- [9. Testes e Validação](#9-testes-e-validação)
 - [10. Ajustes e Extensibilidade](#10-ajustes-e-extensibilidade)
 - [11. Limitações Conhecidas](#11-limitações-conhecidas)
 - [12. Troubleshooting](#12-troubleshooting)
+- [13. Guia de Implementação do Motor de Anonimização (Nível Engenharia)](#13-guia-de-implementação-do-motor-de-anonimização-nível-engenharia)
+- [Referência de Desenvolvimento](#referência-de-desenvolvimento)
 
 ## 1. Objetivo e Escopo
 
@@ -64,29 +70,45 @@ Anonimizar conteúdo jurídico em múltiplos formatos (texto livre, PDF com text
 
 A aplicação está modularizada em camadas para isolar responsabilidades de API, interfaces, regras de negócio e processamento de NLP.
 
-### 2.1 Ponto de entrada e Servidor HTTP (`app.py`)
+### 2.1 Servidores HTTP e Pontos de Entrada
 
-- **FastAPI / Uvicorn**: Servidor assíncrono principal que:
-  - Entrega os arquivos estáticos da **Interface Web Nativa** (`static/index.html`, `static/css/`, `static/js/`) na raiz (`/`).
-  - Expõe a API RESTful em `/api/v1/` com suporte a CORS.
-  - Monta a **Interface Gradio** na rota `/ui` através de `gr.mount_gradio_app`.
-  - Injeta dependências nos pipelines de processamento e extração de PDF/DOCX.
+A aplicação oferece dois pontos de entrada independentes para atender a diferentes casos de uso:
+
+1. **Aplicação Completa (`app.py` - Porta 7860):**
+   - Servidor assíncrono baseado em **FastAPI + Uvicorn**.
+   - Serve a **Interface Web Nativa SPA** (`static/index.html`, `static/css/`, `static/js/`) na raiz (`/`).
+   - Monta a **Interface Gradio** na rota `/ui` através de `gr.mount_gradio_app`.
+   - Expõe a API RESTful universal com suporte a CORS:
+     - `POST /api/v1/anonimizar` (texto livre via JSON)
+     - `POST /api/v1/anonimizar-arquivo` (PDF e Word `.docx` via upload multipart)
+     - `POST /anonimizar` (compatibilidade retroativa)
+
+2. **Microserviço REST Isolado (`api_anonimizador.py` - Porta 8000):**
+   - Servidor FastAPI enxuto e estritamente focado em API (*headless*).
+   - Sem carregamento de dependências de interface gráfica (Gradio/HTML/CSS), reduzindo consumo de memória e tempo de boot.
+   - Ideal para integração backend com sistemas externos (Node.js, C#, Java, microsserviços judiciais).
+   - Expõe `POST /api/v1/anonimizar`, `GET /health` e documentação Swagger `/docs`.
 
 ### 2.2 Núcleo (`core/`)
+
+- `core/anonymizer_service.py`
+  - Camada de serviço de NLP singleton e desacoplada de interfaces gráficas.
+  - Inicializa uma única vez o `AnalyzerEngine` e o `AnonymizerEngine` (Presidio + spaCy).
+  - Centraliza a função `executar_anonimizacao()`, consumida tanto por `app.py` quanto por `api_anonimizador.py`.
 
 - `core/config.py`
   - Constantes globais e listas de controle (placeholders, papéis, indicadores PJ etc.)
 
 - `core/resources.py`
-  - Carregamento de arquivos de lista:
+  - Carregamento e indexação de arquivos de listas com codificação UTF-8:
     - `nomes_comuns.txt`
     - `termos_comuns.txt`
     - `titulos_legais.txt`
-  - Também define listas estáticas (estados/capitais, termos legais de cabeçalho etc.)
+  - Definição de listas estáticas (estados/capitais, termos legais de cabeçalho etc.)
 
 - `core/engine_setup.py`
   - Configuração do `AnalyzerEngine` (Presidio)
-  - Registro de recognizers customizados (CPF, OAB, CEP, endereço, RG etc.)
+  - Registro de recognizers customizados (CPF, OAB, CEP, endereço, RG, CNH, SIAPE etc.)
   - Inicialização do `AnonymizerEngine`
 
 - `core/operators.py`
@@ -94,21 +116,21 @@ A aplicação está modularizada em camadas para isolar responsabilidades de API
 
 - `core/text_filters.py`
   - Extração e filtragem de nomes
-  - Regras PF/PJ
+  - Regras de diferenciação PF/PJ
   - Etapa lexical por `nomes_comuns.txt`
   - Pós-filtro de resultados (validação/contexto CPF/OAB)
 
 - `core/pipeline.py`
-  - Orquestração completa do fluxo de anonimização
+  - Orquestração linear do fluxo completo de anonimização
 
 - `core/app_services.py`
-  - Serviços de apoio (extração PDF, DataFrame vazio, resumo)
+  - Serviços de apoio (extração PDF com PyMuPDF, leitura DOCX, DataFrame de auditoria, telemetria)
 
 - `core/ui_handlers.py`
-  - Handlers de interação da UI
+  - Handlers de interação e callbacks da interface Gradio
 
 - `core/interface_builder.py`
-  - Construção da interface Gradio
+  - Construção da interface Gradio e injeção de CSS personalizado
 
 ## 3. Fluxo de Anonimização
 
@@ -214,13 +236,17 @@ A lista `nomes_comuns.txt` é propositalmente agressiva para reduzir vazamento d
 
 ```text
 .
-├── app.py                      # Servidor FastAPI + montagem da Web UI e Gradio
-├── api_anonimizador.py         # Microserviço REST alternativo e independente
-├── requirements.txt            # Dependências Python do backend e NLP
+├── app.py                      # Servidor FastAPI completo (SPA Web UI + Gradio + REST API universal)
+├── api_anonimizador.py         # Microserviço REST isolado e headless (Porta 8000)
+├── Dockerfile                  # Configuração multi-serviço para container Linux
+├── docker-compose.yml          # Orquestração do microserviço (porta 8000) e app completo (porta 7860)
+├── .dockerignore               # Arquivos e pastas excluídos do build do container
+├── requirements.txt            # Dependências Python do backend, NLP e interface
 ├── nomes_comuns.txt            # Dicionário de prenomes e sobrenomes para varredura lexical
 ├── termos_comuns.txt           # Dicionário de termos comuns para evitar falsos positivos
 ├── titulos_legais.txt          # Termos legais e papéis processuais protegidos
 ├── core/
+│   ├── anonymizer_service.py   # Serviço central desacoplado de inicialização de Presidio + spaCy
 │   ├── app_services.py         # Extração de PDF/DOCX e formatação de telemetria
 │   ├── config.py               # Constantes globais, regexes e listas de exclusão PJ
 │   ├── engine_setup.py         # Configuração dos motores Presidio + spaCy
@@ -240,6 +266,7 @@ A lista `nomes_comuns.txt` é propositalmente agressiva para reduzir vazamento d
 │   └── img/
 │       └── logo.png            # Logotipo oficial do Projeto Sinergia TRF1
 └── tests/
+    ├── smoke_test_api.py       # Smoke test automatizado para validação rápida da API REST
     └── regression/             # Suíte de testes de regressão por snapshot
         ├── cases.json
         ├── baseline_snapshot.json
@@ -249,73 +276,278 @@ A lista `nomes_comuns.txt` é propositalmente agressiva para reduzir vazamento d
 
 ## 7. Requisitos e Setup Local
 
-### 7.1 Dependências Python
+### 7.1 Requisitos de Sistema
+
+- **Python:** 3.10 a 3.14 (compatível com os wheels pré-compilados do ecossistema)
+- **RAM Recomendada:** Mínimo de 2 GB livres (para carregamento do modelo spaCy `pt_core_news_lg` em memória)
+- **Docker e Docker Compose:** (Opcional) para execução em containers
+
+### 7.2 Dependências Python
 
 Definidas em `requirements.txt`:
 
-- `pandas==2.3.1`
-- `PyMuPDF==1.26.3`
-- `python-docx==1.2.0`
-- `python-dotenv==1.1.1`
-- `presidio-analyzer==2.2.359`
-- `presidio-anonymizer==2.2.359`
-- `spacy==3.8.7`
-- `pt_core_news_lg` (modelo spaCy pt-BR)
+- `pandas>=2.2.0`
+- `PyMuPDF>=1.24.0`
+- `python-docx>=1.1.0`
+- `python-dotenv>=1.0.0`
+- `presidio-analyzer>=2.2.355`
+- `presidio-anonymizer>=2.2.355`
+- `spacy>=3.8.0`
+- `pt_core_news_lg` (modelo spaCy pt-BR grande pré-treinado)
 - `fastapi`
 - `uvicorn[standard]`
 - `gradio>=6.0.0`
 
-### 7.2 Instalação recomendada
+### 7.3 Instalação Passo a Passo
 
 ```bash
+# 1. Clonar o repositório
+git clone https://github.com/rgsouza2024/anonimizador_sinergia.git
+cd anonimizador_sinergia
+
+# 2. Criar o ambiente virtual
 python -m venv .venv
 
-# Windows (PowerShell)
+# 3. Ativar o ambiente virtual
+# No Windows (PowerShell):
 .\.venv\Scripts\Activate.ps1
 
-# Linux/macOS
+# No Linux / macOS:
 source .venv/bin/activate
 
+# 4. Atualizar o pip e instalar dependências
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-## 8. Execução
+> [!TIP]
+> Para validar se o ambiente foi configurado corretamente sem precisar subir servidores, execute o smoke test rápido:
+> ```bash
+> python tests/smoke_test_api.py
+> ```
 
+## 8. Como Usar (Guia de Execução)
+
+A aplicação pode ser executada de duas formas principais, dependendo do seu objetivo de uso:
+
+---
+
+### 8.1 Opção A: Subir o Microserviço REST Isolado (Porta 8000)
+
+Esta opção é indicada para:
+- **Integração com outros sistemas e linguagens** (Node.js, C#/.NET, Java, Go, PHP, etc.);
+- **Uso em pipelines automatizados de ETL ou microsserviços judiciais**;
+- **Cenários de consumo mínimo de memória**, pois não inicializa componentes de interface gráfica (Gradio ou HTML).
+
+#### Como Iniciar:
+
+**Via Python local:**
+```bash
+python api_anonimizador.py
+```
+
+**Via Docker Compose:**
+```bash
+docker compose up -d --build
+```
+
+#### URLs e Documentação:
+- **Documentação OpenAPI / Swagger:** `http://localhost:8000/docs`
+- **Documentação ReDoc:** `http://localhost:8000/redoc`
+- **Healthcheck de Monitoramento:** `http://localhost:8000/health`
+
+#### Endpoints Disponíveis:
+
+##### 1. Healthcheck (`GET /health`)
+Verifica se o microserviço está operando e se os motores spaCy/Presidio estão devidamente carregados na memória:
+```bash
+curl -X GET "http://localhost:8000/health"
+```
+*Resposta de exemplo:*
+```json
+{
+  "status": "ok",
+  "analyzer_carregado": true,
+  "anonymizer_carregado": true
+}
+```
+
+##### 2. Anonimização de Texto (`POST /api/v1/anonimizar`)
+Recebe um texto em formato JSON e devolve o texto anonimizado junto com a lista de entidades detectadas e tempo de processamento.
+
+- **Requisição via cURL:**
+  ```bash
+  curl -X POST "http://localhost:8000/api/v1/anonimizar" \
+       -H "Content-Type: application/json; charset=utf-8" \
+       -d '{
+         "texto": "O reclamante Carlos Eduardo Souza, portador do CPF 123.456.789-00, reside na Rua das Palmeiras, 450.",
+         "nomes_metadados": ["Carlos Eduardo Souza"]
+       }'
+  ```
+
+- **Requisição via Python (`requests`):**
+  ```python
+  import requests
+
+  payload = {
+      "texto": "O reclamante Carlos Eduardo Souza, portador do CPF 123.456.789-00, reside na Rua das Palmeiras, 450.",
+      "nomes_metadados": ["Carlos Eduardo Souza"]  # opcional
+  }
+  response = requests.post("http://localhost:8000/api/v1/anonimizar", json=payload)
+  dados = response.json()
+
+  print("Texto Anonimizado:", dados["texto_anonimizado"])
+  print("Tempo de Processamento:", dados["tempo_processamento"], "s")
+  ```
+
+- **Exemplo de Resposta JSON:**
+  ```json
+  {
+    "texto_anonimizado": "O reclamante <NOME>, portador do <CPF/CIN>, reside na <ENDERECO>.",
+    "entidades_detectadas": [
+      {
+        "Entidade": "CPF",
+        "Texto Detectado": "CPF 123.456.789-00",
+        "Início": 39,
+        "Fim": 57,
+        "Score": "1.00"
+      },
+      {
+        "Entidade": "ENDERECO_LOGRADOURO",
+        "Texto Detectado": "Rua das Palmeiras, 450",
+        "Início": 69,
+        "Fim": 91,
+        "Score": "0.90"
+      }
+    ],
+    "tempo_processamento": 0.177
+  }
+  ```
+
+---
+
+### 8.2 Opção B: Subir a Aplicação Completa com Frontend (Porta 7860)
+
+Esta opção é indicada para:
+- **Usuários finais** (magistrados, servidores, advogados e analistas);
+- **Uso interativo no navegador**, com comparação lado a lado entre original e anonimizado;
+- **Upload e processamento direto de arquivos PDF e documentos Word (.docx)**;
+- **Visualização com realce gráfico de entidades (*entity highlighting*) e modo escuro/claro**.
+
+#### Como Iniciar:
+
+**Via Python local:**
 ```bash
 python app.py
 ```
 
-Após a inicialização dos motores de NLP, o servidor Uvicorn estará disponível na porta `7860`.
-
-### 8.1 URLs Locais
-
-- **Interface Web Nativa (Padrão):** `http://localhost:7860/`
-- **Interface Gradio (Secundária):** `http://localhost:7860/ui`
-- **Documentação OpenAPI / Swagger:** `http://localhost:7860/docs`
-
-### 8.2 Endpoints no Hugging Face Spaces
-
-- **Web UI Nativa (Padrão):** `https://[seu-space].hf.space/`
-- **Web UI Gradio (Alternativa):** `https://[seu-space].hf.space/ui/`
-- **API - Texto:** `POST https://[seu-space].hf.space/api/v1/anonimizar`
-- **API - Arquivo (PDF/DOCX):** `POST https://[seu-space].hf.space/api/v1/anonimizar-arquivo`
-- **API - Legada:** `POST https://[seu-space].hf.space/anonimizar`
-
-## 9. Testes de Regressão
-
-A suíte atual é baseada em snapshot.
-
-### 9.1 Rodar verificação
-
+**Via Docker Compose:**
 ```bash
-python tests/regression/run_baseline.py verify
+docker compose --profile full up -d --build app-completo
 ```
 
-### 9.2 Regerar baseline (quando mudança é intencional)
+#### URLs Disponíveis:
+- **Interface Web Nativa SPA (Padrão Oficial):** `http://localhost:7860/`
+- **Interface Gradio (Secundária / Alternativa):** `http://localhost:7860/ui`
+- **Documentação Swagger:** `http://localhost:7860/docs`
+
+#### Recursos e Endpoints Disponíveis:
+
+##### 1. Interface Web Nativa (`http://localhost:7860/`)
+- SPA moderna em HTML5/CSS3/JavaScript servida diretamente pelo FastAPI.
+- Alternância instantânea de tema Claro/Escuro (*Dark/Light Mode*).
+- Realce colorido de cada tipo de entidade detectada sobre o texto.
+- Tabela interativa com estatísticas e filtros por tipo de dado sensível.
+- Botão de cópia e download imediato do documento sanitizado.
+
+##### 2. Upload de Arquivos PDF e Word DOCX (`POST /api/v1/anonimizar-arquivo`)
+Endpoint universal que aceita documentos PDF e Word via `multipart/form-data`:
+
+- **Exemplo via cURL:**
+  ```bash
+  curl -X POST "http://localhost:7860/api/v1/anonimizar-arquivo" \
+       -F "file=@peticao_inicial.pdf"
+  ```
+  *(Também compatível com arquivos `.docx`: `-F "file=@sentenca.docx"`)*
+
+- **Exemplo de Resposta:**
+  ```json
+  {
+    "sucesso": true,
+    "nome_arquivo": "peticao_inicial.pdf",
+    "tipo_arquivo": "pdf",
+    "texto_extraido": "Texto bruto lido do arquivo...",
+    "texto_anonimizado": "Texto sanitizado...",
+    "entidades_detectadas": [...],
+    "metadados_pdf": {},
+    "tempo_processamento": 0.452
+  }
+  ```
+
+##### 3. Rota de Compatibilidade Retroativa (`POST /anonimizar`)
+Mantida para garantir compatibilidade com sistemas legados que consumiam a versão inicial da API.
+
+---
+
+### 8.3 Resumo Comparativo das Opções
+
+| Característica | Opção A: Microserviço REST Isolado | Opção B: Aplicação Completa |
+| :--- | :--- | :--- |
+| **Arquivo de Entrada** | `api_anonimizador.py` | `app.py` |
+| **Porta Padrão** | `8000` | `7860` |
+| **Comando Local** | `python api_anonimizador.py` | `python app.py` |
+| **Comando Docker** | `docker compose up -d` | `docker compose --profile full up -d app-completo` |
+| **Interface Web SPA** | ❌ Não | ✔️ Sim (`/`) |
+| **Interface Gradio** | ❌ Não | ✔️ Sim (`/ui`) |
+| **API Texto JSON** | ✔️ Sim (`/api/v1/anonimizar`) | ✔️ Sim (`/api/v1/anonimizar`) |
+| **Upload PDF / DOCX** | ❌ Não | ✔️ Sim (`/api/v1/anonimizar-arquivo`) |
+| **Healthcheck** | ✔️ Sim (`/health`) | Embutido no FastAPI |
+| **Consumo de Memória** | Mais enxuto (~700 MB a 1 GB) | Completo (~1 GB a 1.4 GB) |
+| **Público Alvo** | Sistemas externos, integrações, microsserviços | Usuários finais, servidores, analistas |
+
+---
+
+### 8.4 URLs e Endpoints (Local e Nuvem)
+
+#### Ambiente Local
+- **Opção A (API Isolada):**
+  - Base: `http://localhost:8000`
+  - Swagger: `http://localhost:8000/docs`
+  - Health: `http://localhost:8000/health`
+- **Opção B (App Completo):**
+  - Web UI SPA: `http://localhost:7860/`
+  - Gradio UI: `http://localhost:7860/ui/`
+  - Swagger: `http://localhost:7860/docs`
+
+#### Hugging Face Spaces (quando publicado)
+- **Web UI Nativa:** `https://[seu-space].hf.space/`
+- **Web UI Gradio:** `https://[seu-space].hf.space/ui/`
+- **API Texto:** `POST https://[seu-space].hf.space/api/v1/anonimizar`
+- **API Arquivo (PDF/DOCX):** `POST https://[seu-space].hf.space/api/v1/anonimizar-arquivo`
+
+## 9. Testes e Validação
+
+O projeto dispõe de duas estratégias complementares de testes automatizados:
+
+### 9.1 Smoke Test da API (Rápido)
+Testa a integridade do microserviço REST, validação de esquemas Pydantic, healthcheck e pipeline de anonimização em segundos:
 
 ```bash
-python tests/regression/run_baseline.py snapshot
+python tests/smoke_test_api.py
 ```
+
+### 9.2 Teste de Regressão por Baseline (Snapshot)
+A suíte de regressão garante que alterações nas listas ou heurísticas não provoquem vazamento de dados ou sobreanonimização acidental:
+
+- **Executar verificação comparativa:**
+  ```bash
+  python tests/regression/run_baseline.py verify
+  ```
+
+- **Atualizar snapshot de baseline (quando a alteração for intencional):**
+  ```bash
+  python tests/regression/run_baseline.py snapshot
+  ```
 
 ### 9.3 O que é validado
 

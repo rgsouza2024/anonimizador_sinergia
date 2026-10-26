@@ -61,19 +61,12 @@ from core.ui_handlers import (
 # Carrega as variáveis de ambiente do arquivo .env (opcional, mas bom manter)
 load_dotenv()
 
-# --- Funções e Listas para o Motor de Anonimização ---
-# --- Configuração e Inicialização do Presidio (Motor Principal) ---
-analyzer_engine = carregar_analyzer_engine(
-    LISTA_ESTADOS_CAPITAIS_BR,
-    TERMOS_CABECALHO_LEGAL_NAO_ANONIMIZAR,
-    LISTA_NOMES_COMUNS,
-    LISTA_ESTADO_CIVIL,
-    LISTA_ORGANIZACOES_CONHECIDAS,
-    LISTA_TERMOS_COMUNS,
-    LISTA_TITULOS_LEGAIS
+from core.anonymizer_service import (
+    analyzer_engine,
+    anonymizer_engine,
+    executar_anonimizacao as _anonimizar_logica,
+    operadores,
 )
-anonymizer_engine = carregar_anonymizer_engine()
-operadores = obter_operadores_anonimizacao()
 
 def dataframe_entidades_vazio():
     return service_dataframe_entidades_vazio(COLUNAS_ENTIDADES_DETECTADAS)
@@ -84,26 +77,6 @@ def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None, info_
 
 def extrair_texto_de_pdf(caminho_arquivo_pdf):
     return service_extrair_texto_de_pdf(caminho_arquivo_pdf)
-
-# --- Funções de Lógica da Interface (Event Handlers) ---
-def _anonimizar_logica(texto_original, nomes_pf_metadados=None, retornar_metricas=False):
-    return executar_pipeline_anonimizacao(
-        texto_original=texto_original,
-        analyzer_engine=analyzer_engine,
-        anonymizer_engine=anonymizer_engine,
-        operadores=operadores,
-        anonimizar_nomes_pf_metadados_fn=anonimizar_nomes_pf_metadados,
-        nomes_pf_metadados=nomes_pf_metadados or set(),
-        extrair_nomes_parte_alvo_fn=extrair_nomes_parte_alvo,
-        extrair_nomes_pessoais_contextuais_fn=extrair_nomes_pessoais_contextuais,
-        anonimizar_nomes_extraidos_fn=anonimizar_nomes_extraidos,
-        anonimizar_por_lista_nomes_comuns_fn=anonimizar_por_lista_nomes_comuns,
-        lista_nomes_comuns=LISTA_NOMES_COMUNS,
-        filtrar_resultados_analise_fn=filtrar_resultados_analise,
-        normalizar_placeholders_nome_parte_fn=normalizar_placeholders_nome_parte,
-        placeholder_nome_parte_interno=PLACEHOLDER_NOME_PARTE_INTERNO,
-        retornar_metricas=retornar_metricas,
-    )
 
 def atualizar_estado_botao_texto(texto_original):
     return ui_atualizar_estado_botao_texto(texto_original)
