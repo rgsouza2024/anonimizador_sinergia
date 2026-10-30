@@ -8,6 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+import api_anonimizador
 from api_anonimizador import app
 
 client = TestClient(app)
@@ -19,7 +20,7 @@ def test_smoke():
     print("=" * 60)
 
     # 1. Teste de Health Check
-    print("\n[1/4] Testando GET /health...")
+    print("\n[1/5] Testando GET /health...")
     resp_health = client.get("/health")
     assert resp_health.status_code == 200, f"Falha no healthcheck: {resp_health.status_code}"
     health_data = resp_health.json()
@@ -31,7 +32,7 @@ def test_smoke():
     print("  [OK] Healthcheck passou com sucesso!")
 
     # 2. Teste de Anonimização Simples
-    print("\n[2/4] Testando POST /api/v1/anonimizar com texto simples...")
+    print("\n[2/5] Testando POST /api/v1/anonimizar com texto simples...")
     payload_1 = {
         "texto": "O reclamante Carlos Eduardo Souza, portador do CPF 123.456.789-00, reside na Rua das Palmeiras, 450."
     }
@@ -51,7 +52,7 @@ def test_smoke():
     print("  [OK] Anonimização de texto básico passou com sucesso!")
 
     # 3. Teste com nomes nos metadados
-    print("\n[3/4] Testando POST /api/v1/anonimizar com 'nomes_metadados'...")
+    print("\n[3/5] Testando POST /api/v1/anonimizar com 'nomes_metadados'...")
     payload_2 = {
         "texto": "Notifique-se Roberto Alencar de Lima sobre a decisão da 1ª Vara Federal.",
         "nomes_metadados": ["Roberto Alencar de Lima"]
@@ -65,11 +66,25 @@ def test_smoke():
     print("  [OK] Anonimização forçada por metadados passou com sucesso!")
 
     # 4. Teste de validação de erro (payload inválido)
-    print("\n[4/4] Testando validação de entrada inválida...")
+    print("\n[4/5] Testando validação de entrada inválida...")
     resp_invalid = client.post("/api/v1/anonimizar", json={"campo_errado": 123})
     assert resp_invalid.status_code == 422, f"Esperava 422, obteve {resp_invalid.status_code}"
     print(f"  -> Status esperado retornado: {resp_invalid.status_code}")
     print("  [OK] Validação de esquema Pydantic funcionou perfeitamente!")
+
+    # 5. Healthcheck deve falhar (503) quando um motor não carregou
+    print("\n[5/5] Testando GET /health com motor ausente...")
+    analyzer_original = api_anonimizador.analyzer_engine
+    api_anonimizador.analyzer_engine = None
+    try:
+        resp_falha = client.get("/health")
+    finally:
+        api_anonimizador.analyzer_engine = analyzer_original
+    assert resp_falha.status_code == 503, f"Esperava 503, obteve {resp_falha.status_code}"
+    assert resp_falha.json()["status"] == "erro"
+    assert resp_falha.json()["analyzer_carregado"] is False
+    print(f"  -> Status esperado retornado: {resp_falha.status_code}")
+    print("  [OK] Healthcheck sinaliza falha do motor corretamente!")
 
     print("\n" + "=" * 60)
     print("TODOS OS TESTES DO SMOKE TEST PASSARAM COM SUCESSO!")

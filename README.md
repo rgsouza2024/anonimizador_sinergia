@@ -286,17 +286,22 @@ A lista `nomes_comuns.txt` é propositalmente agressiva para reduzir vazamento d
 
 Definidas em `requirements.txt`:
 
-- `pandas>=2.2.0`
-- `PyMuPDF>=1.24.0`
-- `python-docx>=1.1.0`
-- `python-dotenv>=1.0.0`
-- `presidio-analyzer>=2.2.355`
-- `presidio-anonymizer>=2.2.355`
-- `spacy>=3.8.0`
+- `pandas==2.3.1`
+- `PyMuPDF==1.26.3`
+- `python-docx==1.2.0`
+- `python-dotenv==1.1.1`
+- `presidio-analyzer==2.2.359`
+- `presidio-anonymizer==2.2.359`
+- `spacy==3.8.7`
 - `pt_core_news_lg` (modelo spaCy pt-BR grande pré-treinado)
-- `fastapi`
-- `uvicorn[standard]`
-- `gradio>=6.0.0`
+- `fastapi==0.141.1`
+- `uvicorn[standard]==0.52.4`
+- `gradio==6.0.0` (deve coincidir com `sdk_version` no cabeçalho deste README)
+
+As versões são fixadas de propósito: o baseline de regressão (`tests/regression/`) foi gerado com elas, e qualquer atualização deve ser seguida de `run_baseline.py verify`.
+
+> [!NOTE]
+> **Decisão sobre a versão do Gradio (out/2026):** o Gradio fica fixado em `6.0.0`, a mesma versão declarada em `sdk_version`, para não alterar o ambiente que já roda em produção no Hugging Face Spaces. Uma versão mais nova (6.25.0) foi testada localmente com sucesso, mas a atualização foi adiada de forma deliberada. Para atualizar no futuro, altere **os dois lugares ao mesmo tempo** (`requirements.txt` e `sdk_version`) e rode o smoke test e a regressão; se só um deles mudar, o pip troca a versão instalada pelo Space logo após o build.
 
 ### 7.3 Instalação Passo a Passo
 

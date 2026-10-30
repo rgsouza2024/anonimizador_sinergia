@@ -5,6 +5,7 @@ import time
 from typing import List, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import uvicorn
 
@@ -46,11 +47,18 @@ class AnonimizacaoResponse(BaseModel):
 
 @app.get("/health")
 async def health():
-    return {
-        "status": "ok",
-        "analyzer_carregado": analyzer_engine is not None,
-        "anonymizer_carregado": anonymizer_engine is not None,
-    }
+    analyzer_ok = analyzer_engine is not None
+    anonymizer_ok = anonymizer_engine is not None
+    motores_ok = analyzer_ok and anonymizer_ok
+    # 503 quando algum motor falhou ao carregar, para o healthcheck do Docker marcar o container como unhealthy
+    return JSONResponse(
+        status_code=200 if motores_ok else 503,
+        content={
+            "status": "ok" if motores_ok else "erro",
+            "analyzer_carregado": analyzer_ok,
+            "anonymizer_carregado": anonymizer_ok,
+        },
+    )
 
 
 @app.post("/api/v1/anonimizar", response_model=AnonimizacaoResponse)
