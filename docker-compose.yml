@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Serviço padrão: Motor de anonimização isolado via REST API (Porta 8000)
   api-anonimizador:
