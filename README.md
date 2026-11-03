@@ -52,7 +52,7 @@ Anonimizar conteúdo jurídico em múltiplos formatos (texto livre, PDF com text
 
 - **Entrada Omnimodal:**
   - **Texto direto** (digitação ou colagem na interface)
-  - **PDF textual** (extração por PyMuPDF)
+  - **PDF textual** (extração por PyMuPDF). Página gravada em recortes verticais, em que cada linha vem em pedaços fora de ordem, é detectada e tem o texto remontado linha a linha pela posição dos caracteres (`core/pdf_texto.py`); o PDF tarjado usa o mesmo texto.
   - **Documentos Word (.docx)** (extração de parágrafos e tabelas via `python-docx`)
 - **Interfaces de Usuário:**
   - **Interface Web Nativa (Padrão Oficial):** SPA moderna servida na raiz (`/`), com realce visual de entidades (*highlighting*), alternância de tema (Claro/Escuro) e download de documento.

@@ -6,6 +6,7 @@ import fitz  # PyMuPDF
 import pandas as pd
 
 from core.config import LIMITE_PDF_MB, LIMITE_PDF_PAGINAS
+from core.pdf_texto import texto_da_pagina
 from core.text_filters import extrair_nomes_pf_metadados_pdf
 
 
@@ -67,7 +68,7 @@ def extrair_texto_de_pdf(caminho_arquivo_pdf):
                 )
             nomes_pf_metadados = extrair_nomes_pf_metadados_pdf(documento_pdf.metadata or {})
             for pagina in documento_pdf:
-                texto_completo += pagina.get_text()
+                texto_completo += texto_da_pagina(pagina)[0]
     except Exception as e:
         print(f"Erro ao extrair texto do PDF: {e}")
         return None, f"Erro ao extrair texto do PDF: {e}", set()

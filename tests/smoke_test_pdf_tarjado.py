@@ -78,6 +78,53 @@ def test_pdf_tarjado_com_revisao():
     print("[OK] PDF tarjado respeita nomes_manuais e nao_tarjar.")
 
 
+def _pdf_fatiado():
+    """Página gravada em 3 recortes verticais sobrepostos, como em petições geradas por certos editores."""
+    origem = fitz.open()
+    pagina_origem = origem.new_page()
+    linhas = [
+        "AUTOR: JOAO PEDRO KOWALCZYK",
+        "brasileiro, solteiro, portador do CPF 926.511.422-72, residente na cidade de Goiânia,",
+        "a presente ação em face do INSS, conforme os fatos a seguir narrados.",
+        "O autor Kowalczyk trabalhou como eletricista por vinte anos seguidos.",
+        "A perícia médica constatou a incapacidade total para o trabalho.",
+        "Requer a concessão do benefício desde a data do requerimento.",
+    ]
+    for i, linha in enumerate(linhas):
+        pagina_origem.insert_text((72, 100 + 20 * i), linha, fontsize=11)
+    documento = fitz.open()
+    pagina = documento.new_page()
+    largura = pagina.rect.width
+    for x0, x1 in ((0, 220), (214, 390), (384, largura)):
+        recorte = fitz.Rect(x0, 0, x1, pagina.rect.height)
+        pagina.show_pdf_page(recorte, origem, 0, clip=recorte)
+    conteudo = documento.tobytes()
+    documento.close()
+    origem.close()
+    return conteudo
+
+
+def test_pdf_fatiado():
+    from core.pdf_texto import texto_da_pagina
+
+    conteudo = _pdf_fatiado()
+    with fitz.open(stream=conteudo, filetype="pdf") as documento:
+        assert "portador do CPF 926.511.422-72" not in documento[0].get_text(), "O PDF de teste não ficou fatiado"
+        texto, _ = texto_da_pagina(documento[0])
+    assert "AUTOR: JOAO PEDRO KOWALCZYK\n" in texto, texto
+    assert "brasileiro, solteiro, portador do CPF 926.511.422-72, residente" in texto, texto
+
+    resposta = client.post("/api/v1/pdf-tarjado", files={"file": ("fatiado.pdf", conteudo, "application/pdf")})
+    assert resposta.status_code == 200, resposta.text
+    with fitz.open(stream=resposta.content, filetype="pdf") as tarjado:
+        texto_tarjado, _ = texto_da_pagina(tarjado[0])
+    for sigiloso in ["KOWALCZYK", "Kowalczyk", "926.511", "422-72"]:
+        assert sigiloso not in texto_tarjado, f"'{sigiloso}' continua no PDF fatiado tarjado"
+    for publico in ["brasileiro", "INSS", "eletricista", "perícia"]:
+        assert publico in texto_tarjado, f"'{publico}' foi tarjado sem necessidade"
+    print("[OK] PDF fatiado em recortes: texto remontado e tarjado no lugar certo.")
+
+
 def test_pdf_tarjado_recusa_outro_formato():
     resposta = client.post("/api/v1/pdf-tarjado", files={"file": ("peca.docx", b"x", "application/octet-stream")})
     assert resposta.status_code == 400
@@ -87,5 +134,6 @@ def test_pdf_tarjado_recusa_outro_formato():
 if __name__ == "__main__":
     test_pdf_tarjado()
     test_pdf_tarjado_com_revisao()
+    test_pdf_fatiado()
     test_pdf_tarjado_recusa_outro_formato()
     print("TODOS OS TESTES DO PDF TARJADO PASSARAM COM SUCESSO!")

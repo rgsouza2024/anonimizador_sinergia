@@ -4,10 +4,12 @@ Usa a redacao do PyMuPDF: o texto debaixo da tarja e removido do arquivo (nao fi
 retangulo), e o restante do PDF continua pesquisavel. Os metadados sao apagados.
 
 As posicoes dos trechos referem-se ao texto extraido por extrair_texto_de_pdf (core/app_services.py),
-que concatena page.get_text() de cada pagina.
+que concatena texto_da_pagina() de cada pagina (core/pdf_texto.py).
 """
 
 import fitz  # PyMuPDF
+
+from core.pdf_texto import FLAGS_RAWDICT_SO_TEXTO, texto_da_pagina
 
 # A caixa de cada caractere vai do topo das maiusculas ao fim das descendentes e pode invadir a linha
 # vizinha. Por isso a REMOCAO usa uma faixa estreita no meio da letra (so toca a propria linha), e a
@@ -24,7 +26,7 @@ def _caracteres_da_pagina(pagina):
     Quebra de linha recebe None.
     """
     texto, caixas = [], []
-    for bloco in pagina.get_text("rawdict")["blocks"]:
+    for bloco in pagina.get_text("rawdict", flags=FLAGS_RAWDICT_SO_TEXTO)["blocks"]:
         if bloco.get("type") != 0:
             continue
         for linha in bloco["lines"]:
@@ -43,9 +45,14 @@ def _faixa(x0, x1, base, tamanho, faixa):
     return fitz.Rect(x0, base - acima * tamanho, x1, base + abaixo * tamanho)
 
 
-def _tarjas(pagina, texto_pagina, trechos):
-    """Lista de (retangulo de remocao, retangulo pintado) para os trechos da pagina."""
-    texto_reconstruido, caixas = _caracteres_da_pagina(pagina)
+def _tarjas(pagina, texto_pagina, trechos, caixas=None):
+    """Lista de (retangulo de remocao, retangulo pintado) para os trechos da pagina.
+
+    caixas vem de texto_da_pagina() quando a pagina foi remontada; senao, e reconstruida aqui.
+    """
+    texto_reconstruido = texto_pagina
+    if caixas is None:
+        texto_reconstruido, caixas = _caracteres_da_pagina(pagina)
     tarjas = []
     if texto_reconstruido == texto_pagina:
         for inicio, fim in trechos:
@@ -75,14 +82,14 @@ def gerar_pdf_tarjado(conteudo_pdf, trechos_tarjados):
     with fitz.open(stream=conteudo_pdf, filetype="pdf") as documento:
         deslocamento = 0
         for pagina in documento:
-            texto_pagina = pagina.get_text()
+            texto_pagina, caixas = texto_da_pagina(pagina)
             fim_pagina = deslocamento + len(texto_pagina)
             trechos_pagina = [
                 (max(inicio, deslocamento) - deslocamento, min(fim, fim_pagina) - deslocamento)
                 for inicio, fim in trechos_tarjados
                 if inicio < fim_pagina and fim > deslocamento
             ]
-            tarjas = _tarjas(pagina, texto_pagina, trechos_pagina) if trechos_pagina else []
+            tarjas = _tarjas(pagina, texto_pagina, trechos_pagina, caixas) if trechos_pagina else []
             if tarjas:
                 for remocao, _ in tarjas:
                     pagina.add_redact_annot(remocao, fill=False)
