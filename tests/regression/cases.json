@@ -175,5 +175,9 @@
   {
     "id": "estado_sozinho_nao_e_nome",
     "input": "Jequié-Bahia, 09 de agosto de 2024. SEÇÃO JUDICIÁRIA DA BAHIA. A testemunha Maria Bahia depôs e Vitória compareceu."
+  },
+  {
+    "id": "telefone_digitado_fora_do_padrao",
+    "input": "Telefone: (73) 98869 – 98833 | (71) 9917-7805. Fone (62) 3201.4455. Valor R$ 334.837,00."
   }
 ]

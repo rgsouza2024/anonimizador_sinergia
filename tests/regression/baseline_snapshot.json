@@ -1503,5 +1503,40 @@
         "text": "Vitória"
       }
     ]
+  },
+  {
+    "id": "telefone_digitado_fora_do_padrao",
+    "input": "Telefone: (73) 98869 – 98833 | (71) 9917-7805. Fone (62) 3201.4455. Valor R$ 334.837,00.",
+    "output": "Telefone: (73) 98869 – 9**** | (71) 9917-****. Fone (62) 3201.****. Valor R$ 334.837,00.",
+    "entities": [
+      {
+        "entity": "LOCATION",
+        "text": "Telefone"
+      },
+      {
+        "entity": "PHONE_NUMBER_BR",
+        "text": "(73) 98869 – 98833"
+      },
+      {
+        "entity": "PHONE_NUMBER_BR",
+        "text": "(71) 9917-7805"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Fone"
+      },
+      {
+        "entity": "PHONE_NUMBER_BR",
+        "text": "(62) 3201.4455"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Valor"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Valor"
+      }
+    ]
   }
 ]

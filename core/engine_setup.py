@@ -126,6 +126,12 @@ def carregar_analyzer_engine(
                     regex=r"(?<!\d)(?:\(?\d{2}\)?\s*)(?:9\d{4}|\d{4})[-\s]\d{4}(?!\d)",
                     score=0.93,
                 ),
+                # Digitado fora do padrão, com DDD entre parênteses: "(73) 98869 – 98833", "(62) 3201.4455".
+                Pattern(
+                    name="telefone_ddd_parenteses_tolerante",
+                    regex=r"\(\d{2}\)\s*(?:9\d{4}|\d{4})\s*[-–—.]?\s*\d{4,5}(?!\d)",
+                    score=0.90,
+                ),
                 Pattern(
                     name="telefone_sem_ddd",
                     regex=r"(?<!\d)(?:9\d{4}|\d{4})-\d{4}(?!\d)",
