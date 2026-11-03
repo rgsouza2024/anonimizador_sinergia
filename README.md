@@ -490,7 +490,7 @@ Endpoint universal que aceita documentos PDF e Word via `multipart/form-data`:
   ```
 
 ##### 3. PDF Tarjado (`POST /api/v1/pdf-tarjado`)
-Recebe o mesmo PDF (`multipart/form-data`) e devolve o arquivo com tarja preta sobre cada dado retirado. Usa a redação do PyMuPDF: o texto sob a tarja é removido do arquivo (não fica apenas encoberto), o restante continua pesquisável e os metadados (autor, título, assunto) são apagados. Na Interface Web Nativa, o botão **Baixar PDF tarjado** aparece quando o documento processado é um PDF.
+Recebe o mesmo PDF (`multipart/form-data`) e devolve o arquivo com tarja preta sobre cada dado retirado. Usa a redação do PyMuPDF: o texto sob a tarja é removido do arquivo (não fica apenas encoberto), o restante continua pesquisável e os metadados (autor, título, assunto) são apagados. Na Interface Web Nativa, o botão **Baixar PDF tarjado** aparece quando o documento processado é um PDF; ao concluir o download, o aviso lembra que texto dentro de imagens (logotipo, marca d'água, página digitalizada) não é tarjado.
 
 ```bash
 curl -X POST "http://localhost:7860/api/v1/pdf-tarjado" -F "file=@peticao_inicial.pdf" -o peticao_inicial_tarjado.pdf

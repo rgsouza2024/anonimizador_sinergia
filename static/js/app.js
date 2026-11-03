@@ -374,7 +374,10 @@
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      mostrarToast('PDF tarjado gerado. O texto sob as tarjas foi removido do arquivo.', 'success');
+      mostrarToast(
+        'PDF tarjado gerado. O texto sob as tarjas foi removido do arquivo. ' +
+        'Texto dentro de imagens (logotipo, marca d\'água, página digitalizada) não é tarjado: confira o PDF.',
+        'success', 7000);
     } catch (err) {
       console.error(err);
       let msg = err.message || 'Erro inesperado.';

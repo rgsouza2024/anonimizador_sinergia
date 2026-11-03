@@ -1146,6 +1146,8 @@ body::after {
   display: flex;
   align-items: center;
   gap: 10px;
+  max-width: 440px;
+  line-height: 1.4;
   box-shadow: var(--shadow-lg);
   animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   background: var(--color-bg-surface);
