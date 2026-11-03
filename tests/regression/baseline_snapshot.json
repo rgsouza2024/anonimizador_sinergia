@@ -213,10 +213,6 @@
         "text": "1004207-64.2023.4.01.4200"
       },
       {
-        "entity": "SIAPE",
-        "text": "1004207"
-      },
-      {
         "entity": "DATE_TIME",
         "text": "4.01.4200"
       }
@@ -392,6 +388,173 @@
       {
         "entity": "TERMO_COMUM",
         "text": "petição"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "contexto_papel_seguido_de_minuscula",
+    "input": "O réu foi condenado a pena de 5 anos. O réu Carlos Eduardo Pereira recorreu.",
+    "output": "O réu foi condenado a pena de 5 anos. O réu <NOME> <NOME> <NOME> recorreu.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "anos"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "lista_nomes_ignora_minuscula",
+    "input": "a rosa e a pena foram citadas por Maria Rosa.",
+    "output": "a rosa e a pena foram citadas por <NOME> <NOME>.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "registro_stj_e_cnj_quebrado_nao_sao_siape",
+    "input": "REsp 2024/0123456-7 distribuído. Processo 5046512-\n94.2016.4.04.7000 em trâmite. SIAPE 1234567.",
+    "output": "REsp 2024/0123456-7 distribuído. Processo 5046512-\n94.2016.4.04.7000 em trâmite. ***.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "REsp"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Processo"
+      },
+      {
+        "entity": "DATE_TIME",
+        "text": "4.04.7000"
+      },
+      {
+        "entity": "SIAPE",
+        "text": "SIAPE 1234567"
+      },
+      {
+        "entity": "MATRICULA_SIAPE",
+        "text": "SIAPE"
+      }
+    ]
+  },
+  {
+    "id": "maria_da_penha_orgao_julgador_capitais",
+    "input": "Aplica-se a Lei Maria da Penha. Julgado pela Quinta Turma em São Paulo e Porto Alegre. A testemunha João Pessoa depôs.",
+    "output": "Aplica-se a Lei Maria da Penha. Julgado pela Quinta Turma em São Paulo e Porto Alegre. A testemunha <NOME> Pessoa depôs.",
+    "entities": [
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "se"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Lei"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Lei Maria da Penha"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Julgado"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Quinta Turma"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Turma"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Turma"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "São Paulo"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "São Paulo"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Porto Alegre"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Porto Alegre"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "testemunha"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Pessoa"
+      }
+    ]
+  },
+  {
+    "id": "comum_caixa_alta_isolada",
+    "input": "DENUNCIADO POR 7 (SETE) FATOS\nJOSÉ SETE FOI OUVIDO\na vítima ROSA compareceu",
+    "output": "DENUNCIADO POR 7 (SETE) FATOS\n<NOME> <NOME> FOI OUVIDO\na vítima <NOME> compareceu",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "FATOS"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
       },
       {
         "entity": "TERMO_COMUM",

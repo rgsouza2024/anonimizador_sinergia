@@ -5,6 +5,8 @@ import unicodedata
 
 from core.config import (
     BLOQUEIO_SEMANTICO_NOME,
+    CAPITAIS_COMPOSTAS_NAO_PROTEGIDAS,
+    PALAVRAS_COMUNS_CAIXA_ALTA,
     PALAVRAS_NAO_NOME_GENERICAS,
     PAPEIS_ALVO_NOME_PARTE,
     PLACEHOLDER_NOME_PARTE_EXTERNO,
@@ -12,6 +14,7 @@ from core.config import (
     TERMOS_EXCLUSAO_NOME_PARTE,
     TERMOS_INDICADORES_PJ,
 )
+from core.resources import LISTA_ESTADOS_CAPITAIS_BR
 
 
 def _normalizar_texto_para_filtro(texto):
@@ -148,6 +151,74 @@ def _extrair_spans_pessoa_juridica(texto):
     return _mesclar_spans(spans)
 
 
+# Trechos que a varredura pela lista de nomes comuns nao deve tarjar.
+_REGEX_MARIA_DA_PENHA = re.compile(r"(?i)\bMaria\s+da\s+Penha\b")
+_REGEX_ORGAO_JULGADOR = re.compile(
+    r"(?i)\b(?:Primeir|Segund|Terceir|Quart|Quint|Sext|S[ée]tim|Oitav|Non|D[ée]cim)[ao]"
+    r"(?:\s+Primeir[ao]|\s+Segund[ao])?\s+(?:Turma\s+Recursal|Turma|Se[çc][ãa]o|C[âa]mara|Vara|Regi[ãa]o)\b"
+)
+
+
+def _spans_protegidos_lista_nomes(texto):
+    """Lei Maria da Penha, orgao julgador ("Quinta Turma") e capital de nome composto ("Sao Paulo")."""
+    spans = [m.span() for m in _REGEX_MARIA_DA_PENHA.finditer(texto)]
+    spans += [m.span() for m in _REGEX_ORGAO_JULGADOR.finditer(texto)]
+    for lugar in LISTA_ESTADOS_CAPITAIS_BR:
+        if " " not in lugar or lugar in CAPITAIS_COMPOSTAS_NAO_PROTEGIDAS:
+            continue
+        spans += [m.span() for m in _compilar_regex_nome_flexivel(lugar).finditer(texto)]
+    return spans
+
+
+_PALAVRAS_COMUNS_CAIXA_ALTA_NORMALIZADAS = {_normalizar_token_nome(t) for t in PALAVRAS_COMUNS_CAIXA_ALTA}
+_REGEX_VIZINHO_DEPOIS = re.compile(r"[ \t ]+(?:(?:de|da|do|dos|das|e|DE|DA|DO|DOS|DAS|E)[ \t ]+)?")
+_REGEX_VIZINHO_ANTES = re.compile(r"(?:[ \t ]+(?:de|da|do|dos|das|e|DE|DA|DO|DOS|DAS|E))?[ \t ]+$")
+_PLACEHOLDERS_NOME = ("<NOME>", PLACEHOLDER_NOME_PARTE_INTERNO)
+
+
+def _remover_comum_isolada_caixa_alta(texto, spans):
+    """Em linha toda em maiusculas, palavra comum da lista so e tarjada se colada a outro nome."""
+    inicios = {inicio for inicio, _ in spans}
+    fins = {fim for _, fim in spans}
+
+    def tem_nome_vizinho(inicio, fim):
+        depois = _REGEX_VIZINHO_DEPOIS.match(texto, fim, min(len(texto), fim + 12))
+        if depois and (depois.end() in inicios or texto.startswith(_PLACEHOLDERS_NOME, depois.end())):
+            return True
+        antes = _REGEX_VIZINHO_ANTES.search(texto[max(0, inicio - 12):inicio])
+        if antes:
+            fim_vizinho = inicio - len(antes.group(0))
+            if fim_vizinho in fins or texto[:fim_vizinho].endswith(_PLACEHOLDERS_NOME):
+                return True
+        return False
+
+    def linha_toda_em_maiusculas(inicio, fim):
+        inicio_linha = texto.rfind("\n", 0, inicio) + 1
+        fim_linha = texto.find("\n", fim)
+        linha = texto[inicio_linha:fim_linha if fim_linha >= 0 else len(texto)]
+        return not any(c.islower() for c in linha)
+
+    resultado = []
+    for inicio, fim in spans:
+        palavra = texto[inicio:fim]
+        comum_em_caixa_alta = (
+            len(palavra) >= 2
+            and palavra == palavra.upper()
+            and _normalizar_token_nome(palavra) in _PALAVRAS_COMUNS_CAIXA_ALTA_NORMALIZADAS
+            and linha_toda_em_maiusculas(inicio, fim)
+        )
+        if comum_em_caixa_alta and not tem_nome_vizinho(inicio, fim):
+            continue
+        resultado.append((inicio, fim))
+    return resultado
+
+
+def _todas_palavras_com_maiuscula(nome):
+    """Cada palavra do nome comeca com maiuscula, exceto os conectores (de, da, do, das, dos, e)."""
+    tokens = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", nome or "")
+    return all(token.upper() in _CONECTORES_NOME or token[0].isupper() for token in tokens)
+
+
 def _token_esta_em_contexto_endereco(texto, inicio, fim, alcance=40):
     inicio_contexto = max(0, inicio - alcance)
     fim_contexto = min(len(texto), fim + alcance)
@@ -247,6 +318,10 @@ def extrair_nomes_pessoais_contextuais(texto_original):
     for padrao in padroes:
         for match in padrao.finditer(texto_original):
             nome_limpo = _limpar_nome_extraido(match.group("nome"))
+            # Os padroes rodam sem distinguir maiuscula (por causa do papel: "o reu"), o que fazia
+            # "o reu foi condenado" virar nome; o nome em si precisa ter maiuscula em cada palavra.
+            if not _todas_palavras_com_maiuscula(nome_limpo):
+                continue
             if _nome_generico_passa_filtros(nome_limpo):
                 nomes_encontrados.add(nome_limpo)
 
@@ -293,10 +368,13 @@ def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<N
     if not nomes_normalizados:
         return texto
 
-    spans_pj = _extrair_spans_pessoa_juridica(texto)
+    spans_pj = _mesclar_spans(_extrair_spans_pessoa_juridica(texto) + _spans_protegidos_lista_nomes(texto))
     spans_substituicao = []
     for match in re.finditer(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", texto):
         inicio, fim = match.span()
+        # Palavra que comeca com minuscula nao e nome ("a pena", "a rosa").
+        if not match.group(0)[0].isupper():
+            continue
         if _intervalo_esta_em_spans(inicio, fim, spans_pj):
             continue
         if _token_esta_em_contexto_endereco(texto, inicio, fim):
@@ -309,6 +387,7 @@ def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<N
         if token_normalizado in nomes_normalizados:
             spans_substituicao.append((inicio, fim))
 
+    spans_substituicao = _remover_comum_isolada_caixa_alta(texto, spans_substituicao)
     if not spans_substituicao:
         return texto
 
@@ -371,9 +450,22 @@ def trecho_tem_contexto_oab(texto_analise, inicio, fim, alcance=96):
     )
 
 
+# Registro do STJ (2024/0123456-7) e numero CNJ, inclusive partido em duas linhas
+# ("5046512-\n94.2016.4.04.7000"): os sete digitos nao sao SIAPE.
+_REGEX_NUMEROS_PROCESSO = [
+    re.compile(r"\b\d{4}/\d{7}-\d\b"),
+    re.compile(r"\d{7}-\s*\d{2}\.\d{4}\.\d\.\d{2}\.\d{4}"),
+]
+
+
 def filtrar_resultados_analise(resultados_analise, texto_analise):
+    spans_numero_processo = [m.span() for regex in _REGEX_NUMEROS_PROCESSO for m in regex.finditer(texto_analise)]
     resultados_filtrados = []
     for resultado in resultados_analise:
+        if resultado.entity_type == "SIAPE" and any(
+            resultado.start < fim and resultado.end > inicio for inicio, fim in spans_numero_processo
+        ):
+            continue
         trecho_detectado = texto_analise[resultado.start:resultado.end]
         if resultado.entity_type in {"CPF", "CIN"}:
             cpf_valido = cpf_tem_digitos_validos(trecho_detectado)

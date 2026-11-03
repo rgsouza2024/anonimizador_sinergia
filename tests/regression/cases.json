@@ -61,5 +61,25 @@
       "Antônio de Souza Santos"
     ],
     "input": "No relatório consta ANTÔNIO DE SOUZA SANTOS. Em outro trecho: Antônio de Souza protocolou petição. Por fim, Sr. Antônio compareceu."
+  },
+  {
+    "id": "contexto_papel_seguido_de_minuscula",
+    "input": "O réu foi condenado a pena de 5 anos. O réu Carlos Eduardo Pereira recorreu."
+  },
+  {
+    "id": "lista_nomes_ignora_minuscula",
+    "input": "a rosa e a pena foram citadas por Maria Rosa."
+  },
+  {
+    "id": "registro_stj_e_cnj_quebrado_nao_sao_siape",
+    "input": "REsp 2024/0123456-7 distribuído. Processo 5046512-\n94.2016.4.04.7000 em trâmite. SIAPE 1234567."
+  },
+  {
+    "id": "maria_da_penha_orgao_julgador_capitais",
+    "input": "Aplica-se a Lei Maria da Penha. Julgado pela Quinta Turma em São Paulo e Porto Alegre. A testemunha João Pessoa depôs."
+  },
+  {
+    "id": "comum_caixa_alta_isolada",
+    "input": "DENUNCIADO POR 7 (SETE) FATOS\nJOSÉ SETE FOI OUVIDO\na vítima ROSA compareceu"
   }
 ]

@@ -99,3 +99,16 @@ BLOQUEIO_SEMANTICO_NOME = [
     "TIPO", "LAUDO", "PERICIAL", "ESTUDO", "SOCIOECONOMICO", "QUESITOS",
 ]
 REGEX_UF_BR = r"(?:AC|AL|AP|AM|BA|CE|DF|ES|GO|MA|MT|MS|MG|PA|PB|PR|PE|PI|RJ|RN|RS|RO|RR|SC|SP|SE|TO)"
+# Palavras de uso comum que tambem sao sobrenomes: em bloco todo em maiusculas so sao
+# tarjadas se estiverem coladas a outro nome ("7 (SETE) FATOS" fica; "JOSE SETE" sai).
+PALAVRAS_COMUNS_CAIXA_ALTA = [
+    "SETE", "ROSA", "LEAO", "PENA", "PRACA", "PORTO", "TERRA", "GUERRA", "LUZ", "PAZ", "PRADO", "MONTE", "MONTES",
+    "PONTE", "ROCHA", "CRUZ", "FORTE", "NOBRE", "BRANCO", "CAMPOS", "SERRA", "LAGO", "LAGOA", "MATA", "MATO", "REIS",
+    "NEVES", "BRASIL", "FONTES", "MINAS", "PARIS", "GATO", "LOBO", "HOMEM", "CABO", "BELO", "CASTELO", "CABECA",
+    "GRILO", "MESTRE", "PASSOS", "QUINTA", "OURO", "ESTRELA", "FRADE", "FERRO", "FIGUEIRA", "MADEIRA", "VELHO",
+    "VIEIRA", "SALES", "PEDROSA", "PEDROSO", "FRANCA", "BARATA", "CHAVES", "GUEDES", "MOURA", "PAIS", "PAES", "SA",
+    "TORRES", "PRATES", "VARGAS", "VEIGA", "VENTURA", "BRAGA", "BANDEIRA", "LEAL", "COSTA", "MOTA", "PINTO",
+    "MACHADO", "AMADO", "BENTO", "JARDIM", "LIMA", "SOUTO", "SANTOS",
+]
+# Capital de nome composto que tambem e nome de pessoa: nao e protegida como lugar.
+CAPITAIS_COMPOSTAS_NAO_PROTEGIDAS = ["João Pessoa"]
