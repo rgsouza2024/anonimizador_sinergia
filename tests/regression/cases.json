@@ -81,5 +81,17 @@
   {
     "id": "comum_caixa_alta_isolada",
     "input": "DENUNCIADO POR 7 (SETE) FATOS\nJOSÉ SETE FOI OUVIDO\na vítima ROSA compareceu"
+  },
+  {
+    "id": "sobrenome_raro_da_parte_propagado",
+    "input": "AUTOR: JOSE KOWALCZYK DA SILVA\nO autor Kowalczyk recorreu. Segundo KOWALCZYK, houve erro."
+  },
+  {
+    "id": "sobrenome_raro_do_reu_pelo_contexto",
+    "input": "REQUERIDO: Antonio Marcos Zwirtes apresentou defesa. O requerido Zwirtes contestou."
+  },
+  {
+    "id": "propagacao_so_com_maiuscula",
+    "input": "AUTOR: JOSE PEREIRA FILHO\nO filho do autor juntou documentos. Filho e pai compareceram."
   }
 ]

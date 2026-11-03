@@ -213,10 +213,19 @@ def _remover_comum_isolada_caixa_alta(texto, spans):
     return resultado
 
 
-def _todas_palavras_com_maiuscula(nome):
-    """Cada palavra do nome comeca com maiuscula, exceto os conectores (de, da, do, das, dos, e)."""
-    tokens = re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", nome or "")
-    return all(token.upper() in _CONECTORES_NOME or token[0].isupper() for token in tokens)
+def _cortar_na_primeira_minuscula(nome):
+    """Corta o nome antes da primeira palavra minuscula que nao e conector (de, da, do, das, dos, e).
+
+    "Antonio Marcos Zwirtes apresentou defesa" vira "Antonio Marcos Zwirtes"; "foi condenado" vira "".
+    """
+    nome = nome or ""
+    for match in re.finditer(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", nome):
+        token = match.group(0)
+        if token.upper() not in _CONECTORES_NOME and not token[0].isupper():
+            nome = nome[:match.start()]
+            break
+    # Sem conector solto no fim ("Maria da").
+    return re.sub(r"(?:\s+(?:de|da|do|das|dos|e|DE|DA|DO|DAS|DOS|E))+\s*$", "", nome).strip()
 
 
 def _token_esta_em_contexto_endereco(texto, inicio, fim, alcance=40):
@@ -317,11 +326,9 @@ def extrair_nomes_pessoais_contextuais(texto_original):
 
     for padrao in padroes:
         for match in padrao.finditer(texto_original):
-            nome_limpo = _limpar_nome_extraido(match.group("nome"))
             # Os padroes rodam sem distinguir maiuscula (por causa do papel: "o reu"), o que fazia
-            # "o reu foi condenado" virar nome; o nome em si precisa ter maiuscula em cada palavra.
-            if not _todas_palavras_com_maiuscula(nome_limpo):
-                continue
+            # "o reu foi condenado" virar nome; o nome termina na primeira palavra minuscula.
+            nome_limpo = _limpar_nome_extraido(_cortar_na_primeira_minuscula(match.group("nome")))
             if _nome_generico_passa_filtros(nome_limpo):
                 nomes_encontrados.add(nome_limpo)
 
@@ -345,10 +352,7 @@ def anonimizar_nomes_extraidos(texto, nomes_extraidos, placeholder):
     return texto_resultado
 
 
-def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<NOME>"):
-    if not texto or not lista_nomes_comuns:
-        return texto
-
+def _nomes_comuns_normalizados(lista_nomes_comuns):
     conectores = {"DE", "DA", "DO", "DAS", "DOS", "E"}
     termos_bloqueados = {
         _normalizar_token_nome(termo)
@@ -356,7 +360,7 @@ def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<N
         if termo and " " not in termo
     }
     nomes_normalizados = set()
-    for item in lista_nomes_comuns:
+    for item in lista_nomes_comuns or []:
         for token in re.findall(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", item or ""):
             token_normalizado = _normalizar_token_nome(token)
             if len(token_normalizado) < 3:
@@ -364,7 +368,70 @@ def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<N
             if token_normalizado in conectores or token_normalizado in termos_bloqueados:
                 continue
             nomes_normalizados.add(token_normalizado)
+    return nomes_normalizados
 
+
+# Palavras de um nome extraido que nunca sao propagadas sozinhas pelo documento.
+_NAO_PROPAGAR_SOZINHA = _BLOQUEIO_SEMANTICO_NOME_NORMALIZADO | {
+    _normalizar_texto_para_filtro(termo)
+    for termo in TERMOS_EXCLUSAO_NOME_PARTE + PAPEIS_ALVO_NOME_PARTE
+    + ["FILHO", "FILHA", "NETO", "NETA", "JUNIOR", "SOBRINHO", "SOBRINHA", "OUTRO", "OUTROS", "OUTRA", "OUTRAS"]
+}
+
+
+def anonimizar_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns, placeholder):
+    """Tarja, onde aparecer sozinho, o sobrenome raro de um nome ja extraido.
+
+    "AUTOR: JOSE KOWALCZYK DA SILVA" e depois "o autor Kowalczyk": a lista de nomes comuns nao
+    conhece "Kowalczyk", que ficava a mostra. Vale para palavra com 4 letras ou mais, fora da lista
+    de nomes comuns, e so quando escrita com maiuscula (o nome "Filho" nao leva "o filho" junto).
+    """
+    if not texto or not nomes_extraidos:
+        return texto
+
+    nomes_comuns = _nomes_comuns_normalizados(lista_nomes_comuns)
+    raros = set()
+    for nome in nomes_extraidos:
+        for token in re.findall(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", nome or ""):
+            token_normalizado = _normalizar_token_nome(token)
+            if len(token_normalizado) < 4 or token_normalizado in _CONECTORES_NOME:
+                continue
+            if token_normalizado in nomes_comuns or token_normalizado in _NAO_PROPAGAR_SOZINHA:
+                continue
+            raros.add(token_normalizado)
+    if not raros:
+        return texto
+
+    spans_substituicao = []
+    for match in re.finditer(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", texto):
+        inicio, fim = match.span()
+        if not match.group(0)[0].isupper():
+            continue
+        # Nao mexer dentro de marcadores ja aplicados (<NOME>, __NOME_PARTE_AUTORA__).
+        if inicio > 0 and texto[inicio - 1] in "<_":
+            continue
+        if fim < len(texto) and texto[fim] in ">_":
+            continue
+        if _normalizar_token_nome(match.group(0)) in raros:
+            spans_substituicao.append((inicio, fim))
+    if not spans_substituicao:
+        return texto
+
+    partes = []
+    cursor = 0
+    for inicio, fim in spans_substituicao:
+        partes.append(texto[cursor:inicio])
+        partes.append(placeholder)
+        cursor = fim
+    partes.append(texto[cursor:])
+    return "".join(partes)
+
+
+def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<NOME>"):
+    if not texto or not lista_nomes_comuns:
+        return texto
+
+    nomes_normalizados = _nomes_comuns_normalizados(lista_nomes_comuns)
     if not nomes_normalizados:
         return texto
 

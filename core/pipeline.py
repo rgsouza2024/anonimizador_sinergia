@@ -13,6 +13,7 @@ def executar_pipeline_anonimizacao(
     extrair_nomes_parte_alvo_fn,
     extrair_nomes_pessoais_contextuais_fn,
     anonimizar_nomes_extraidos_fn,
+    anonimizar_sobrenomes_raros_fn,
     anonimizar_por_lista_nomes_comuns_fn,
     lista_nomes_comuns,
     filtrar_resultados_analise_fn,
@@ -41,10 +42,22 @@ def executar_pipeline_anonimizacao(
         nomes_parte_alvo,
         placeholder_nome_parte_interno,
     )
+    texto_para_anonimizar = anonimizar_sobrenomes_raros_fn(
+        texto_para_anonimizar,
+        nomes_parte_alvo,
+        lista_nomes_comuns,
+        placeholder_nome_parte_interno,
+    )
     nomes_contextuais = extrair_nomes_pessoais_contextuais_fn(texto_para_anonimizar)
     texto_para_anonimizar = anonimizar_nomes_extraidos_fn(
         texto_para_anonimizar,
         nomes_contextuais,
+        "<NOME>",
+    )
+    texto_para_anonimizar = anonimizar_sobrenomes_raros_fn(
+        texto_para_anonimizar,
+        nomes_contextuais,
+        lista_nomes_comuns,
         "<NOME>",
     )
     texto_para_anonimizar = anonimizar_por_lista_nomes_comuns_fn(

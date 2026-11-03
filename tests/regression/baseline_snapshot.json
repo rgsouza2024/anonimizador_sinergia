@@ -398,7 +398,7 @@
   {
     "id": "contexto_papel_seguido_de_minuscula",
     "input": "O réu foi condenado a pena de 5 anos. O réu Carlos Eduardo Pereira recorreu.",
-    "output": "O réu foi condenado a pena de 5 anos. O réu <NOME> <NOME> <NOME> recorreu.",
+    "output": "O réu foi condenado a pena de 5 anos. O réu <NOME> recorreu.",
     "entities": [
       {
         "entity": "LEGAL_TITLE",
@@ -419,14 +419,6 @@
       {
         "entity": "TERMO_COMUM",
         "text": "réu"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
       },
       {
         "entity": "TERMO_COMUM",
@@ -559,6 +551,103 @@
       {
         "entity": "TERMO_COMUM",
         "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "sobrenome_raro_da_parte_propagado",
+    "input": "AUTOR: JOSE KOWALCZYK DA SILVA\nO autor Kowalczyk recorreu. Segundo KOWALCZYK, houve erro.",
+    "output": "AUTOR: <NOME_PARTE_AUTORA>\nO autor <NOME_PARTE_AUTORA> recorreu. Segundo <NOME_PARTE_AUTORA>, houve erro.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Segundo"
+      }
+    ]
+  },
+  {
+    "id": "sobrenome_raro_do_reu_pelo_contexto",
+    "input": "REQUERIDO: Antonio Marcos Zwirtes apresentou defesa. O requerido Zwirtes contestou.",
+    "output": "REQUERIDO: <NOME> apresentou defesa. O requerido <NOME> contestou.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "REQUERIDO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "REQUERIDO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "defesa"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "requerido"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requerido"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "propagacao_so_com_maiuscula",
+    "input": "AUTOR: JOSE PEREIRA FILHO\nO filho do autor juntou documentos. Filho e pai compareceram.",
+    "output": "AUTOR: <NOME_PARTE_AUTORA>\nO filho do autor juntou documentos. Filho e pai compareceram.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "filho"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "documentos"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Filho"
       }
     ]
   }
