@@ -105,5 +105,21 @@
   {
     "id": "papel_penal_sem_nome",
     "input": "O acusado foi absolvido. O paciente está preso. A vítima pediu proteção. Interposto Recurso Especial pelo réu."
+  },
+  {
+    "id": "nome_inteiro_sobrenome_raro_no_meio",
+    "input": "Rel. Min. Rogerio Schietti Cruz votou. Depois, o Ministro Schietti divergiu."
+  },
+  {
+    "id": "nome_inteiro_pontas",
+    "input": "Compareceu Heliofar de Almeida Villar, que mora com Ana Wosniak Ferreira Brzezinski."
+  },
+  {
+    "id": "nome_inteiro_caixa_alta",
+    "input": "TESTEMUNHA OUVIDA EM JUÍZO: MARIA SILVA KRAUSE.\nJOSE SILVA DECLAROU QUE ESTAVA EM CASA"
+  },
+  {
+    "id": "nome_inteiro_nao_absorve_organizacao_nem_lugar",
+    "input": "Pedro Rocha trabalhou na Rocha Engenharia e na Silva Transportes. Ele mora em Goiânia, onde José Costa Goiânia nasceu. A Corte Especial decidiu."
   }
 ]

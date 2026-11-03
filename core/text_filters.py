@@ -8,6 +8,7 @@ from core.config import (
     CAPITAIS_COMPOSTAS_NAO_PROTEGIDAS,
     PALAVRAS_COMUNS_CAIXA_ALTA,
     PALAVRAS_NAO_NOME_GENERICAS,
+    PALAVRAS_NUNCA_NOME,
     PAPEIS_ALVO_NOME_PARTE,
     PAPEIS_PROCESSO_PENAL,
     PLACEHOLDER_NOME_PARTE_EXTERNO,
@@ -15,7 +16,7 @@ from core.config import (
     TERMOS_EXCLUSAO_NOME_PARTE,
     TERMOS_INDICADORES_PJ,
 )
-from core.resources import LISTA_ESTADOS_CAPITAIS_BR
+from core.resources import LISTA_ESTADOS_CAPITAIS_BR, LISTA_NOMES_COMUNS, LISTA_TERMOS_COMUNS, LISTA_TITULOS_LEGAIS
 
 
 def _normalizar_texto_para_filtro(texto):
@@ -313,6 +314,16 @@ def _nome_generico_passa_filtros(nome_candidato):
     return True
 
 
+_CACHE_NOMES_COMUNS = {}
+
+
+def _tem_nome_comum(trecho):
+    if "nomes" not in _CACHE_NOMES_COMUNS:
+        _CACHE_NOMES_COMUNS["nomes"] = _nomes_comuns_normalizados(LISTA_NOMES_COMUNS)
+    nomes = _CACHE_NOMES_COMUNS["nomes"]
+    return any(_normalizar_token_nome(t) in nomes for t in re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", trecho))
+
+
 def extrair_nomes_pessoais_contextuais(texto_original):
     nomes_encontrados = set()
     if not texto_original or not texto_original.strip():
@@ -342,6 +353,10 @@ def extrair_nomes_pessoais_contextuais(texto_original):
             # Os padroes rodam sem distinguir maiuscula (por causa do papel: "o reu"), o que fazia
             # "o reu foi condenado" virar nome; o nome termina na primeira palavra minuscula.
             nome_limpo = _limpar_nome_extraido(_cortar_na_primeira_minuscula(match.group("nome")))
+            # Em caixa alta o corte acima nao funciona ("TESTEMUNHA OUVIDA EM JUIZO"): ali o nome
+            # precisa ter ao menos uma palavra da lista de nomes comuns.
+            if nome_limpo == nome_limpo.upper() and not _tem_nome_comum(nome_limpo):
+                continue
             if _nome_generico_passa_filtros(nome_limpo):
                 nomes_encontrados.add(nome_limpo)
 
@@ -440,6 +455,136 @@ def anonimizar_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns, plac
     return "".join(partes)
 
 
+_REGEX_PALAVRA = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ]+")
+_REGEX_SEPARADOR_NOME = re.compile(r"[ \t ]*\n?[ \t ]*")
+_REGEX_FIM_DE_NOME_EM_CAIXA_ALTA = re.compile(r"\s*(?:[,.;:)\]]|\n|$)")
+
+
+def _palavras_unicas_normalizadas(itens):
+    resultado = set()
+    for item in itens:
+        tokens = _REGEX_PALAVRA.findall(item or "")
+        if len(tokens) == 1:
+            resultado.add(_normalizar_token_nome(tokens[0]))
+    return resultado
+
+
+# Palavras que a extensao de "nome inteiro" nunca absorve.
+_NAO_ABSORVER_NO_NOME = (
+    _NAO_PROPAGAR_SOZINHA
+    | {_normalizar_token_nome(t) for t in PALAVRAS_NUNCA_NOME}
+    | _palavras_unicas_normalizadas(LISTA_TERMOS_COMUNS)
+    | _palavras_unicas_normalizadas(LISTA_TITULOS_LEGAIS)
+    | {_normalizar_token_nome(t) for lugar in LISTA_ESTADOS_CAPITAIS_BR for t in _REGEX_PALAVRA.findall(lugar)}
+)
+
+
+def _estender_nome_inteiro(texto, spans, spans_protegidos):
+    """Estende a tarja da lista de nomes comuns ao nome inteiro.
+
+    A lista marca palavra por palavra, e o sobrenome que nao esta nela ficava a mostra no meio do
+    nome ("<NOME> Schietti <NOME>"). Aqui:
+    (1) palavra com maiuscula entre duas palavras da lista, na mesma sequencia de nome, entra na tarja;
+    (2) nas pontas, ate duas palavras com maiuscula coladas ao nome entram tambem; em sequencia toda
+        em maiusculas, so a ultima palavra antes de pontuacao ou fim de linha, porque ali a maiuscula
+        nao indica nome;
+    (3) a palavra recolhida assim (4 letras ou mais) e tarjada no documento inteiro.
+    Cargos, tratamentos, termos do processo, lugares e palavras de organizacao nunca entram.
+    """
+    inicios_lista = {inicio for inicio, _ in spans}
+    # Palavra que aparece com minuscula em outro ponto do texto e palavra comum ("compareceu"), nao nome.
+    usadas_em_minuscula = {
+        _normalizar_token_nome(m.group(0)) for m in _REGEX_PALAVRA.finditer(texto) if m.group(0)[0].islower()
+    }
+    palavras = []
+    for match in _REGEX_PALAVRA.finditer(texto):
+        inicio, fim = match.span()
+        palavra = match.group(0)
+        normalizada = _normalizar_token_nome(palavra)
+        dentro_de_marcador = (inicio > 0 and texto[inicio - 1] in "<_") or (fim < len(texto) and texto[fim] in ">_")
+        anterior = texto[max(0, inicio - 40):inicio].rstrip(" \t ")
+        if inicio in inicios_lista:
+            classe = "lista"
+        elif normalizada in _CONECTORES_NOME:
+            classe = "conector"
+        elif (
+            palavra[0].isupper()
+            and len(normalizada) >= 3
+            and normalizada not in _NAO_ABSORVER_NO_NOME
+            and normalizada not in usadas_em_minuscula
+            and not dentro_de_marcador
+            and not _intervalo_esta_em_spans(inicio, fim, spans_protegidos)
+            and not _token_esta_em_contexto_endereco(texto, inicio, fim)
+        ):
+            classe = "maiuscula"
+        else:
+            classe = "outra"
+        palavras.append(
+            {
+                "inicio": inicio,
+                "fim": fim,
+                "norm": normalizada,
+                "classe": classe,
+                "caixa_alta": len(palavra) > 1 and palavra == palavra.upper(),
+                # Maiuscula de inicio de frase nao indica nome: a palavra e tarjada ali, mas nao propagada.
+                "inicio_de_frase": not anterior or anterior[-1] in ".!?:;\n",
+            }
+        )
+
+    # Sequencias de nome: palavras separadas so por espaco (no maximo uma quebra de linha).
+    sequencias, atual = [], []
+    for i, palavra in enumerate(palavras):
+        separador = texto[palavras[i - 1]["fim"]:palavra["inicio"]] if i > 0 else ""
+        colada = bool(separador) and _REGEX_SEPARADOR_NOME.fullmatch(separador) is not None
+        if palavra["classe"] == "outra" or not colada:
+            if atual:
+                sequencias.append(atual)
+            atual = []
+        if palavra["classe"] != "outra":
+            atual.append(palavra)
+    if atual:
+        sequencias.append(atual)
+
+    novos, recolhidas = [], set()
+    for sequencia in sequencias:
+        indices_lista = [k for k, p in enumerate(sequencia) if p["classe"] == "lista"]
+        if not indices_lista:
+            continue
+        primeiro, ultimo = indices_lista[0], indices_lista[-1]
+        for p in sequencia[primeiro:ultimo + 1]:
+            if p["classe"] == "maiuscula":
+                novos.append((p["inicio"], p["fim"]))
+                if not p["inicio_de_frase"]:
+                    recolhidas.add(p["norm"])
+        toda_em_caixa_alta = all(p["classe"] == "conector" or p["caixa_alta"] for p in sequencia)
+        for direcao, partida in ((-1, primeiro), (1, ultimo)):
+            k, pegou = partida + direcao, 0
+            while 0 <= k < len(sequencia) and pegou < 2:
+                p = sequencia[k]
+                if p["classe"] == "conector":
+                    k += direcao
+                    continue
+                if p["classe"] != "maiuscula":
+                    break
+                if toda_em_caixa_alta:
+                    depois = texto[p["fim"]:p["fim"] + 3]
+                    if direcao < 0 or k != len(sequencia) - 1 or not _REGEX_FIM_DE_NOME_EM_CAIXA_ALTA.match(depois):
+                        break
+                novos.append((p["inicio"], p["fim"]))
+                if not p["inicio_de_frase"]:
+                    recolhidas.add(p["norm"])
+                pegou += 1
+                k += direcao
+
+    # A palavra recolhida vale para o documento inteiro.
+    if recolhidas:
+        for p in palavras:
+            if p["classe"] == "maiuscula" and p["norm"] in recolhidas and len(p["norm"]) >= 4:
+                novos.append((p["inicio"], p["fim"]))
+
+    return sorted(set(spans) | set(novos))
+
+
 def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<NOME>"):
     if not texto or not lista_nomes_comuns:
         return texto
@@ -468,6 +613,7 @@ def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<N
             spans_substituicao.append((inicio, fim))
 
     spans_substituicao = _remover_comum_isolada_caixa_alta(texto, spans_substituicao)
+    spans_substituicao = _estender_nome_inteiro(texto, spans_substituicao, spans_pj)
     if not spans_substituicao:
         return texto
 

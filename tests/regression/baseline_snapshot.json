@@ -751,5 +751,193 @@
         "text": "réu"
       }
     ]
+  },
+  {
+    "id": "nome_inteiro_sobrenome_raro_no_meio",
+    "input": "Rel. Min. Rogerio Schietti Cruz votou. Depois, o Ministro Schietti divergiu.",
+    "output": "Rel. Min. <NOME> <NOME> <NOME> votou. Depois, o Ministro <NOME> divergiu.",
+    "entities": [
+      {
+        "entity": "LOCATION",
+        "text": "Rel"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Min."
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Min"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Ministro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Ministro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "nome_inteiro_pontas",
+    "input": "Compareceu Heliofar de Almeida Villar, que mora com Ana Wosniak Ferreira Brzezinski.",
+    "output": "<NOME> <NOME> de <NOME> <NOME>, que mora com <NOME> <NOME> <NOME> <NOME>.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "mora"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "nome_inteiro_caixa_alta",
+    "input": "TESTEMUNHA OUVIDA EM JUÍZO: MARIA SILVA KRAUSE.\nJOSE SILVA DECLAROU QUE ESTAVA EM CASA",
+    "output": "TESTEMUNHA OUVIDA EM JUÍZO: <NOME> <NOME> <NOME>.\n<NOME> <NOME> DECLAROU QUE ESTAVA EM CASA",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "TESTEMUNHA"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "JUÍZO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "nome_inteiro_nao_absorve_organizacao_nem_lugar",
+    "input": "Pedro Rocha trabalhou na Rocha Engenharia e na Silva Transportes. Ele mora em Goiânia, onde José Costa Goiânia nasceu. A Corte Especial decidiu.",
+    "output": "<NOME> <NOME> trabalhou na <NOME> Engenharia e na <NOME> Transportes. Ele mora em Goiânia, onde <NOME> <NOME> Goiânia nasceu. A <NOME> Especial decidiu.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Engenharia"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "mora"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Goiânia"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Goiânia"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Goiânia"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Goiânia"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Especial"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Especial"
+      }
+    ]
   }
 ]
