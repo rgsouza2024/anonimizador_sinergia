@@ -506,6 +506,8 @@ Os endpoints de texto, de arquivo e de PDF tarjado (e o microserviço `api_anoni
 - `nomes_manuais`: nomes, ou palavras soltas, a tarjar onde aparecerem, além do que o motor encontra (sem diferença de maiúscula ou acento, inclusive perto de endereço ou dentro de nome de empresa);
 - `nao_tarjar`: trechos que não devem ser tarjados em nenhuma passagem do documento. Valem mais que `nomes_manuais`. Se o trecho liberado for parte de um nome maior ("Lima" em "João Lima"), só ele fica: o resto do nome continua tarjado.
 
+Na Interface Web Nativa, o painel **Revisão da Anonimização** traz a caixa "Faltou algum nome?" e a lista do que foi liberado; cada linha de dado tarjado na auditoria tem o botão **Retirar tarja**. Cada ação reprocessa o documento, e o PDF tarjado segue as mesmas escolhas.
+
 No JSON, são listas (`"nomes_manuais": ["Schietti"]`); em `multipart/form-data`, campos repetidos (`-F "nomes_manuais=Schietti" -F "nao_tarjar=926.511.422-72"`).
 
 ##### 5. Rota de Compatibilidade Retroativa (`POST /anonimizar`)

@@ -14,8 +14,13 @@
     activeFile: null, // Objeto File (.pdf ou .docx) se carregado
     resultados: null, // { texto_anonimizado, texto_original, entidades_detectadas, tempo_processamento }
     highlightMode: true,
-    filtroEntidadeAtual: 'ALL'
+    filtroEntidadeAtual: 'ALL',
+    naoTarjar: [] // trechos que a pessoa mandou não tarjar ("Retirar tarja")
   };
+
+  // Tipos de entidade que o motor troca ou mascara (os demais só são registrados na auditoria)
+  const TIPOS_TARJADOS = new Set(['NOME', 'NOME_PARTE_AUTORA', 'CPF', 'OAB_NUMBER', 'CEP_NUMBER', 'ENDERECO_LOGRADOURO',
+    'EMAIL_ADDRESS', 'PHONE_NUMBER', 'PHONE_NUMBER_BR', 'CNH', 'SIAPE', 'RG_NUMBER', 'MATRICULA_SIAPE']);
 
   // ── ELEMENTOS DO DOM ───────────────────────────────────────────────────────
   const dom = {
@@ -56,6 +61,11 @@
     statTotalEntidades: document.getElementById('stat-total-entidades'),
     statTiposEntidades: document.getElementById('stat-tipos-entidades'),
     auditSection: document.getElementById('audit-section'),
+    reviewSection: document.getElementById('review-section'),
+    reviewNomes: document.getElementById('review-nomes'),
+    btnRevisaoNomes: document.getElementById('btn-revisao-nomes'),
+    reviewLiberados: document.getElementById('review-liberados'),
+    reviewLiberadosChips: document.getElementById('review-liberados-chips'),
     auditFilterChips: document.getElementById('audit-filter-chips'),
     auditTableBody: document.getElementById('audit-table-body'),
     toastContainer: document.getElementById('toast-container')
@@ -188,6 +198,8 @@
 
     state.activeFile = file;
     dom.btnDownloadPdf.style.display = 'none'; // o resultado na tela é de outro arquivo
+    state.naoTarjar = []; // a revisão anterior era de outro documento
+    dom.reviewNomes.value = '';
     dom.fileBadgeName.textContent = file.name;
     dom.fileBadgeSize.textContent = `${(file.size / 1024).toFixed(1)} KB`;
     dom.fileBadge.style.display = 'flex';
@@ -210,6 +222,20 @@
     ? 'http://127.0.0.1:7860'
     : '';
 
+  // Revisão humana: nomes escritos à mão e trechos liberados, enviados em toda anonimização
+  function parametrosRevisao() {
+    return {
+      nomes_manuais: dom.reviewNomes.value.split('\n').map(n => n.trim()).filter(Boolean),
+      nao_tarjar: state.naoTarjar.slice()
+    };
+  }
+
+  function anexarRevisao(formData) {
+    const revisao = parametrosRevisao();
+    revisao.nomes_manuais.forEach(n => formData.append('nomes_manuais', n));
+    revisao.nao_tarjar.forEach(t => formData.append('nao_tarjar', t));
+  }
+
   // ── 5. PROCESSAMENTO UNIVERSAL (TEXTO, PDF E DOCX) COM AUTO-COPY ───────────
   async function processarUniversal() {
     const texto = dom.inputTexto.value.trim();
@@ -231,6 +257,7 @@
         // Envio via endpoint de arquivo
         const formData = new FormData();
         formData.append('file', arquivo);
+        anexarRevisao(formData);
 
         const response = await fetch(`${API_BASE}/api/v1/anonimizar-arquivo`, {
           method: 'POST',
@@ -259,7 +286,7 @@
         const response = await fetch(`${API_BASE}/api/v1/anonimizar`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ texto, nomes_metadados: [] })
+          body: JSON.stringify({ texto, nomes_metadados: [], ...parametrosRevisao() })
         });
 
         try {
@@ -326,6 +353,7 @@
     try {
       const formData = new FormData();
       formData.append('file', arquivo);
+      anexarRevisao(formData);
       const response = await fetch(`${API_BASE}/api/v1/pdf-tarjado`, { method: 'POST', body: formData });
 
       if (!response.ok) {
@@ -397,6 +425,9 @@
     state.resultados = null;
     dom.statsSection.style.display = 'none';
     dom.auditSection.style.display = 'none';
+    dom.reviewSection.style.display = 'none';
+    dom.reviewNomes.value = '';
+    state.naoTarjar = [];
   }
 
   // ── 6. ESTATÍSTICAS E AUDITORIA (SEM EMOJIS) ───────────────────────────────
@@ -433,6 +464,31 @@
 
     renderizarLinhasTabela(entidades, state.filtroEntidadeAtual);
     dom.auditSection.style.display = 'block';
+    renderizarRevisao();
+  }
+
+  function renderizarRevisao() {
+    dom.reviewSection.style.display = 'block';
+    dom.reviewLiberadosChips.innerHTML = '';
+    state.naoTarjar.forEach((trecho, indice) => {
+      const chip = document.createElement('button');
+      chip.className = 'filter-chip';
+      chip.dataset.indice = indice;
+      chip.title = 'Voltar a tarjar este trecho';
+      chip.textContent = `${trecho}  ×`;
+      dom.reviewLiberadosChips.appendChild(chip);
+    });
+    dom.reviewLiberados.style.display = state.naoTarjar.length ? 'flex' : 'none';
+  }
+
+  function retirarTarja(trecho) {
+    const normalizado = (trecho || '').replace(/\s+/g, ' ').trim();
+    if (!normalizado) return;
+    if (!state.naoTarjar.some(t => t.toLowerCase() === normalizado.toLowerCase())) state.naoTarjar.push(normalizado);
+    // o trecho liberado sai também da caixa de nomes, se estiver lá
+    dom.reviewNomes.value = dom.reviewNomes.value.split('\n')
+      .filter(n => n.trim().toLowerCase() !== normalizado.toLowerCase()).join('\n');
+    processarUniversal();
   }
 
   function renderizarLinhasTabela(entidades, filtro) {
@@ -443,7 +499,7 @@
       : entidades.filter(e => e.Entidade === filtro);
 
     if (filtradas.length === 0) {
-      dom.auditTableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--color-text-muted); padding: 24px;">Nenhuma entidade encontrada para este filtro.</td></tr>';
+      dom.auditTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 24px;">Nenhuma entidade encontrada para este filtro.</td></tr>';
       return;
     }
 
@@ -456,7 +512,16 @@
         <td>${e['Início'] !== undefined ? e['Início'] : '-'}</td>
         <td>${e['Fim'] !== undefined ? e['Fim'] : '-'}</td>
         <td>${e['Score'] || '1.00'}</td>
+        <td></td>
       `;
+      if (TIPOS_TARJADOS.has(e.Entidade) && e['Texto Detectado']) {
+        const botao = document.createElement('button');
+        botao.className = 'btn-secondary btn-row-action';
+        botao.title = 'Tira a tarja deste trecho em todo o documento';
+        botao.textContent = 'Retirar tarja';
+        botao.dataset.trecho = e['Texto Detectado'];
+        tr.lastElementChild.appendChild(botao);
+      }
       dom.auditTableBody.appendChild(tr);
     });
   }
@@ -531,6 +596,19 @@
     });
 
     dom.btnDownloadPdf.addEventListener('click', baixarPdfTarjado);
+
+    // Revisão humana
+    dom.btnRevisaoNomes.addEventListener('click', processarUniversal);
+    dom.auditTableBody.addEventListener('click', (e) => {
+      const botao = e.target.closest('.btn-row-action');
+      if (botao) retirarTarja(botao.dataset.trecho);
+    });
+    dom.reviewLiberadosChips.addEventListener('click', (e) => {
+      const chip = e.target.closest('.filter-chip');
+      if (!chip) return;
+      state.naoTarjar.splice(Number(chip.dataset.indice), 1);
+      processarUniversal();
+    });
 
     // Anexar Arquivo via Botão
     dom.btnAnexarArquivo.addEventListener('click', () => dom.fileInputUniversal.click());

@@ -246,6 +246,37 @@
       </div>
     </section>
 
+    <!-- ── 4b. REVISÃO HUMANA (INCLUIR NOMES / RETIRAR TARJA) ──────────────── -->
+    <section class="audit-panel" id="review-section" style="display: none;">
+      <div class="audit-header">
+        <div class="panel-title">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M12 20h9"></path>
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+          </svg>
+          Revisão da Anonimização
+        </div>
+      </div>
+      <div class="review-body">
+        <label class="review-label" for="review-nomes">Faltou algum nome? Escreva um por linha (nome completo ou só o sobrenome, como aparece na peça).</label>
+        <textarea id="review-nomes" class="text-input-area review-textarea" spellcheck="false" placeholder="Ex.: Kowalczyk"></textarea>
+        <div class="review-row">
+          <button id="btn-revisao-nomes" class="btn-secondary" title="Procura os nomes acima no documento inteiro e tarja onde aparecerem">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Tarjar estes nomes
+          </button>
+          <span class="review-hint">Para tirar a tarja de um trecho, use "Retirar tarja" na tabela de auditoria abaixo.</span>
+        </div>
+        <div class="review-row" id="review-liberados" style="display: none;">
+          <span class="review-label">Sem tarja, a seu pedido:</span>
+          <div class="audit-filter-chips" id="review-liberados-chips"></div>
+        </div>
+      </div>
+    </section>
+
     <!-- ── 5. PAINEL DE AUDITORIA E TABELA DE ENTIDADES ──────────────────── -->
     <section class="audit-panel" id="audit-section" style="display: none;">
       <div class="audit-header">
@@ -271,6 +302,7 @@
               <th>Posição Inicial</th>
               <th>Posição Final</th>
               <th>Score / Confiança</th>
+              <th>Ação</th>
             </tr>
           </thead>
           <tbody id="audit-table-body">

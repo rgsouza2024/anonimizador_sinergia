@@ -1088,6 +1088,45 @@ body::after {
   background-color: #0c2547;
 }
 
+/* ── 12b. REVISÃO HUMANA (INCLUIR NOMES / RETIRAR TARJA) ─────────────────── */
+.review-body {
+  padding: 14px 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.review-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.review-textarea {
+  flex: none;
+  height: auto;
+  min-height: 72px;
+  resize: vertical;
+}
+
+.review-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.review-hint {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.btn-row-action {
+  padding: 3px 9px;
+  font-size: 0.76rem;
+  white-space: nowrap;
+}
+
 /* ── 13. NOTIFICAÇÕES TOAST (SEM EMOJIS, APENAS ÍCONES VETORIAIS) ────────── */
 .toast-container {
   position: fixed;
