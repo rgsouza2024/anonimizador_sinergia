@@ -60,6 +60,7 @@ Anonimizar conteúdo jurídico em múltiplos formatos (texto livre, PDF com text
 - **API HTTP RESTful dedicada:**
   - `POST /api/v1/anonimizar`: Endpoint JSON para anonimização de textos livres e metadados.
   - `POST /api/v1/anonimizar-arquivo`: Endpoint universal para upload de arquivos PDF e DOCX via `multipart/form-data`.
+  - `POST /api/v1/pdf-tarjado`: Devolve o próprio PDF com tarja preta sobre os dados retirados.
   - `POST /anonimizar`: Rota de compatibilidade retroativa para clientes legados.
 - **Saídas estruturadas:**
   - Texto anonimizado com substituições parametrizadas (`<CPF/CIN>`, `<ENDERECO>`, `<NOME>`, etc.).
@@ -81,6 +82,7 @@ A aplicação oferece dois pontos de entrada independentes para atender a difere
    - Expõe a API RESTful universal com suporte a CORS:
      - `POST /api/v1/anonimizar` (texto livre via JSON)
      - `POST /api/v1/anonimizar-arquivo` (PDF e Word `.docx` via upload multipart)
+     - `POST /api/v1/pdf-tarjado` (PDF original com tarja preta sobre os dados retirados)
      - `POST /anonimizar` (compatibilidade retroativa)
 
 2. **Microserviço REST Isolado (`api_anonimizador.py` - Porta 8000):**
@@ -489,7 +491,16 @@ Endpoint universal que aceita documentos PDF e Word via `multipart/form-data`:
   }
   ```
 
-##### 3. Rota de Compatibilidade Retroativa (`POST /anonimizar`)
+##### 3. PDF Tarjado (`POST /api/v1/pdf-tarjado`)
+Recebe o mesmo PDF (`multipart/form-data`) e devolve o arquivo com tarja preta sobre cada dado retirado. Usa a redação do PyMuPDF: o texto sob a tarja é removido do arquivo (não fica apenas encoberto), o restante continua pesquisável e os metadados (autor, título, assunto) são apagados. Na Interface Web Nativa, o botão **Baixar PDF tarjado** aparece quando o documento processado é um PDF.
+
+```bash
+curl -X POST "http://localhost:7860/api/v1/pdf-tarjado" -F "file=@peticao_inicial.pdf" -o peticao_inicial_tarjado.pdf
+```
+
+Limites: texto dentro de imagem (PDF digitalizado sem OCR) não é lido nem tarjado; anotações e comentários do PDF não são tratados; em PDF que justifica o texto com o operador `Tw`, o texto restante pode se deslocar visualmente para baixo de uma tarja (o conteúdo removido continua correto).
+
+##### 4. Rota de Compatibilidade Retroativa (`POST /anonimizar`)
 Mantida para garantir compatibilidade com sistemas legados que consumiam a versão inicial da API.
 
 ---
@@ -506,6 +517,7 @@ Mantida para garantir compatibilidade com sistemas legados que consumiam a vers�
 | **Interface Gradio** | ❌ Não | ✔️ Sim (`/ui`) |
 | **API Texto JSON** | ✔️ Sim (`/api/v1/anonimizar`) | ✔️ Sim (`/api/v1/anonimizar`) |
 | **Upload PDF / DOCX** | ❌ Não | ✔️ Sim (`/api/v1/anonimizar-arquivo`) |
+| **PDF tarjado** | ❌ Não | ✔️ Sim (`/api/v1/pdf-tarjado`) |
 | **Healthcheck** | ✔️ Sim (`/health`) | Embutido no FastAPI |
 | **Consumo de Memória** | Mais enxuto (~700 MB a 1 GB) | Completo (~1 GB a 1.4 GB) |
 | **Público Alvo** | Sistemas externos, integrações, microsserviços | Usuários finais, servidores, analistas |
@@ -529,6 +541,7 @@ Mantida para garantir compatibilidade com sistemas legados que consumiam a vers�
 - **Web UI Gradio:** `https://[seu-space].hf.space/ui/`
 - **API Texto:** `POST https://[seu-space].hf.space/api/v1/anonimizar`
 - **API Arquivo (PDF/DOCX):** `POST https://[seu-space].hf.space/api/v1/anonimizar-arquivo`
+- **API PDF tarjado:** `POST https://[seu-space].hf.space/api/v1/pdf-tarjado`
 
 ## 9. Testes e Validação
 
@@ -539,6 +552,12 @@ Testa a integridade do microserviço REST, validação de esquemas Pydantic, hea
 
 ```bash
 python tests/smoke_test_api.py
+```
+
+O PDF tarjado tem um smoke test próprio, que gera um PDF de teste, chama `/api/v1/pdf-tarjado` e confere que os dados saíram do arquivo, que o texto público ficou e que os metadados foram apagados:
+
+```bash
+python tests/smoke_test_pdf_tarjado.py
 ```
 
 ### 9.2 Teste de Regressão por Baseline (Snapshot)

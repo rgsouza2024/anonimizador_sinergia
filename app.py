@@ -7,7 +7,8 @@ import time
 import gradio as gr
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, File, UploadFile, HTTPException
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import RedirectResponse, FileResponse, Response
+from urllib.parse import quote
 from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
 from pydantic import BaseModel
@@ -29,6 +30,7 @@ from core.app_services import (
     gerar_resumo_processamento as service_gerar_resumo_processamento,
 )
 from core.engine_setup import carregar_analyzer_engine, carregar_anonymizer_engine
+from core.pdf_tarjado import gerar_pdf_tarjado
 from core.pipeline import executar_pipeline_anonimizacao
 from core.resources import (
     LISTA_ESTADO_CIVIL,
@@ -236,6 +238,37 @@ async def anonimizar_arquivo_endpoint(file: UploadFile = File(...)):
 @fastapi_app.post("/api/v1/anonimizar-pdf")
 async def anonimizar_pdf_endpoint(file: UploadFile = File(...)):
     return await anonimizar_arquivo_endpoint(file)
+
+@fastapi_app.post("/api/v1/pdf-tarjado")
+async def pdf_tarjado_endpoint(file: UploadFile = File(...)):
+    """Devolve o PDF com tarja preta sobre os dados retirados (o texto sob a tarja é removido)."""
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="O PDF tarjado só pode ser gerado a partir de um arquivo PDF (.pdf).")
+    conteudo = await file.read()
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        tmp.write(conteudo)
+        tmp_path = tmp.name
+    try:
+        texto_extraido, erro, nomes_pf_metadados = extrair_texto_de_pdf(tmp_path)
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+    if erro:
+        raise HTTPException(status_code=422, detail=erro)
+
+    _, _, metricas = _anonimizar_logica(
+        texto_extraido,
+        nomes_pf_metadados=nomes_pf_metadados,
+        retornar_metricas=True,
+    )
+    pdf_bytes = gerar_pdf_tarjado(conteudo, metricas.get("trechos_tarjados", []))
+    nome_base = os.path.splitext(os.path.basename(file.filename))[0]
+    nome_saida = quote(f"{nome_base}_tarjado.pdf")
+    return Response(
+        content=pdf_bytes,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{nome_saida}"},
+    )
 
 # Rota de compatibilidade para clientes legados
 @fastapi_app.post("/anonimizar")

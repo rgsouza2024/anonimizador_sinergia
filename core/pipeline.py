@@ -5,6 +5,51 @@ import pandas as pd
 from core.rastreio import TextoRastreado
 
 
+def _trechos_trocados_presidio(texto, resultado_anonimizado_obj, resultados_analise, operadores):
+    """Trechos do texto de entrada que o Presidio de fato alterou (depois de resolver conflitos).
+
+    O Presidio informa as trocas com posicoes no texto de SAIDA. Aqui elas sao convertidas para a
+    entrada e a conversao e conferida; se nao fechar, devolve todas as deteccoes que alteram texto
+    (tarja a mais, nunca a menos).
+    """
+    saida = resultado_anonimizado_obj.text
+    itens = sorted(resultado_anonimizado_obj.items, key=lambda item: item.start)
+    trechos, pos_entrada, pos_saida = [], 0, 0
+    for k, item in enumerate(itens):
+        inicio = pos_entrada + (item.start - pos_saida)
+        if texto[pos_entrada:inicio] != saida[pos_saida:item.start]:
+            break
+        if item.operator in ("keep", "mask"):
+            fim = inicio + (item.end - item.start)
+        else:
+            proximo = itens[k + 1].start if k + 1 < len(itens) else len(saida)
+            intervalo = saida[item.end:proximo]
+            candidatos = sorted(
+                {r.end for r in resultados_analise if r.entity_type == item.entity_type and r.start >= inicio and r.end > inicio},
+                reverse=True,
+            )
+            fim = next((e for e in candidatos if texto[e:e + len(intervalo)] == intervalo), None)
+            if fim is None:
+                break
+        if item.operator == "mask":
+            trechos += [
+                (inicio + i, inicio + i + 1)
+                for i in range(fim - inicio)
+                if texto[inicio + i] != saida[item.start + i]
+            ]
+        elif item.operator != "keep":
+            trechos.append((inicio, fim))
+        pos_entrada, pos_saida = fim, item.end
+    else:
+        if texto[pos_entrada:] == saida[pos_saida:]:
+            return trechos
+    return [
+        (r.start, r.end)
+        for r in resultados_analise
+        if operadores.get(r.entity_type, operadores.get("DEFAULT")).operator_name != "keep"
+    ]
+
+
 def executar_pipeline_anonimizacao(
     texto_original,
     analyzer_engine,
@@ -97,5 +142,14 @@ def executar_pipeline_anonimizacao(
         )
     dados_resultados.sort(key=lambda linha: (linha["Início"], -linha["Fim"]))
     if retornar_metricas:
+        # Trechos do texto original efetivamente trocados: base do PDF tarjado.
+        trechos = [(troca["inicio"], troca["fim"]) for troca in rastreado.trocas]
+        trechos += [
+            rastreado.origem(inicio, fim)
+            for inicio, fim in _trechos_trocados_presidio(
+                texto_para_anonimizar, resultado_anonimizado_obj, resultados_analise, operadores
+            )
+        ]
+        metricas_pipeline["trechos_tarjados"] = sorted(set(trechos))
         return texto_anonimizado, pd.DataFrame(dados_resultados), metricas_pipeline
     return texto_anonimizado, pd.DataFrame(dados_resultados)

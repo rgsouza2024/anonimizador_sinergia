@@ -48,6 +48,7 @@
     btnToggleHighlight: document.getElementById('btn-toggle-highlight'),
     btnCopiar: document.getElementById('btn-copiar'),
     btnDownload: document.getElementById('btn-download'),
+    btnDownloadPdf: document.getElementById('btn-download-pdf'),
 
     // Estatísticas & Auditoria (Sem Emojis)
     statsSection: document.getElementById('stats-section'),
@@ -186,6 +187,7 @@
     }
 
     state.activeFile = file;
+    dom.btnDownloadPdf.style.display = 'none'; // o resultado na tela é de outro arquivo
     dom.fileBadgeName.textContent = file.name;
     dom.fileBadgeSize.textContent = `${(file.size / 1024).toFixed(1)} KB`;
     dom.fileBadge.style.display = 'flex';
@@ -196,6 +198,7 @@
 
   function removerArquivo() {
     state.activeFile = null;
+    dom.btnDownloadPdf.style.display = 'none';
     dom.fileInputUniversal.value = '';
     dom.fileBadge.style.display = 'none';
     dom.inputTexto.placeholder = 'Cole o texto da peça jurídica aqui, ou arraste e solte arquivos PDF e Word (.docx)...';
@@ -308,6 +311,53 @@
     dom.btnCopiar.disabled = false;
     dom.btnDownload.disabled = false;
     dom.btnToggleHighlight.style.display = 'inline-flex';
+    // PDF tarjado só faz sentido quando o resultado veio de um PDF ainda anexado
+    dom.btnDownloadPdf.style.display = (data.tipo_arquivo === 'pdf' && state.activeFile) ? 'inline-flex' : 'none';
+  }
+
+  async function baixarPdfTarjado() {
+    const arquivo = state.activeFile;
+    if (!arquivo) return;
+
+    const htmlOriginal = dom.btnDownloadPdf.innerHTML;
+    dom.btnDownloadPdf.disabled = true;
+    dom.btnDownloadPdf.textContent = 'Gerando PDF...';
+
+    try {
+      const formData = new FormData();
+      formData.append('file', arquivo);
+      const response = await fetch(`${API_BASE}/api/v1/pdf-tarjado`, { method: 'POST', body: formData });
+
+      if (!response.ok) {
+        let detalhe = `Erro ao gerar o PDF tarjado (${response.status})`;
+        try {
+          const erro = await response.json();
+          if (erro.detail) detalhe = erro.detail;
+        } catch (e) { /* resposta sem JSON */ }
+        throw new Error(detalhe);
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${arquivo.name.replace(/\.pdf$/i, '')}_tarjado.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      mostrarToast('PDF tarjado gerado. O texto sob as tarjas foi removido do arquivo.', 'success');
+    } catch (err) {
+      console.error(err);
+      let msg = err.message || 'Erro inesperado.';
+      if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
+        msg = 'Não foi possível conectar ao servidor backend (http://127.0.0.1:7860). Certifique-se de que o backend Python está em execução.';
+      }
+      mostrarToast(msg, 'error', 4500);
+    } finally {
+      dom.btnDownloadPdf.disabled = false;
+      dom.btnDownloadPdf.innerHTML = htmlOriginal;
+    }
   }
 
   function alternarHighlight() {
@@ -324,6 +374,7 @@
     dom.btnCopiar.disabled = true;
     dom.btnDownload.disabled = true;
     dom.btnToggleHighlight.style.display = 'none';
+    dom.btnDownloadPdf.style.display = 'none';
     removerArquivo();
 
     dom.viewerTexto.innerHTML = `
@@ -478,6 +529,8 @@
         baixarArquivoTexto(state.resultados.texto_anonimizado, 'documento_anonimizado_sinergia.txt');
       }
     });
+
+    dom.btnDownloadPdf.addEventListener('click', baixarPdfTarjado);
 
     // Anexar Arquivo via Botão
     dom.btnAnexarArquivo.addEventListener('click', () => dom.fileInputUniversal.click());
