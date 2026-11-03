@@ -366,6 +366,13 @@ def extrair_nomes_pessoais_contextuais(texto_original):
             rf"APENAD[OA]S?|SENTENCIAD[OA]S?|CONDENAD[OA]S?|QUERELANTES?|QUERELAD[OA]S?|TESTEMUNHAS?)\b"
             rf"\s*[:\-]?\s*(?P<nome>{bloco_nome})"
         ),
+        # Parentes e representantes ("representado por sua genitora FULANA"). Filho/neto ficam
+        # de fora porque tambem sao sobrenomes ("JOSE PEREIRA FILHO").
+        re.compile(
+            rf"(?im)\b(?:GENITOR(?:A|ES)?|M[ÃA]E|PAI|C[ÔO]NJUGE|COMPANHEIR[OA]|ESPOS[OA]|"
+            rf"CURADOR(?:A)?|TUTOR(?:A)?|INSTITUIDOR(?:A)?|FALECID[OA]|DE\s+CUJUS)\b"
+            rf"\s*[:\-]?\s*(?P<nome>{bloco_nome})"
+        ),
     ]
 
     for padrao in padroes:

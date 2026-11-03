@@ -159,5 +159,9 @@
   {
     "id": "siape_so_com_rotulo_e_rotulo_mantido",
     "input": "Pagou 2500000 reais, art. 1234567 do código. Servidor, matrícula SIAPE nº 1234567; SIAPE: 7654321; mat. 2345678. A matrícula do imóvel foi averbada."
+  },
+  {
+    "id": "nome_de_parente_pelo_contexto",
+    "input": "O menor, neste ato representado por sua genitora LUZINETE FERREIRA DE OLIVEIRA DA SILVA, brasileira. A companheira Josilene Kraus e o falecido Edivaldo Bragança. A mãe da autora compareceu. O pai trabalha. JOSE PEREIRA FILHO requer."
   }
 ]

@@ -1291,5 +1291,60 @@
         "text": "matrícula do imóvel"
       }
     ]
+  },
+  {
+    "id": "nome_de_parente_pelo_contexto",
+    "input": "O menor, neste ato representado por sua genitora LUZINETE FERREIRA DE OLIVEIRA DA SILVA, brasileira. A companheira Josilene Kraus e o falecido Edivaldo Bragança. A mãe da autora compareceu. O pai trabalha. JOSE PEREIRA FILHO requer.",
+    "output": "O menor, neste ato representado por sua genitora <NOME>, brasileira. A companheira <NOME> e o falecido <NOME>. A mãe da autora compareceu. O pai trabalha. <NOME> <NOME> FILHO requer.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "ato"
+      },
+      {
+        "entity": "NOME",
+        "text": "LUZINETE FERREIRA DE OLIVEIRA DA SILVA"
+      },
+      {
+        "entity": "ESTADO_CIVIL",
+        "text": "companheira"
+      },
+      {
+        "entity": "NOME",
+        "text": "Josilene Kraus"
+      },
+      {
+        "entity": "NOME",
+        "text": "Edivaldo Bragança"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "mãe"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autora"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autora"
+      },
+      {
+        "entity": "NOME",
+        "text": "JOSE"
+      },
+      {
+        "entity": "NOME",
+        "text": "PEREIRA"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "FILHO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requer"
+      }
+    ]
   }
 ]
