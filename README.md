@@ -179,7 +179,7 @@ Pipeline principal em `core/pipeline.py`:
 - `LOCATION`: `keep`
 - `ENDERECO_LOGRADOURO`: `replace` -> `<ENDERECO>`
 - `EMAIL_ADDRESS`: `replace` -> `<EMAIL>`
-- `PHONE_NUMBER`: `mask` (4 caracteres finais)
+- `PHONE_NUMBER_BR`: `mask` (4 caracteres finais). O reconhecedor genérico de telefone do Presidio (`PHONE_NUMBER`) é removido do registro, porque confundia valores em reais (`R$ 334.837,00`) com telefone.
 - `CPF`: `replace` -> `<CPF/CIN>`
 - `DATE_TIME`: `keep`
 - `OAB_NUMBER`: `replace` -> `<OAB>`

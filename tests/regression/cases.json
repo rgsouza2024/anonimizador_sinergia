@@ -151,5 +151,9 @@
     "nomes_manuais": ["Wosniak"],
     "nao_tarjar": ["Lima", "926.511.422-72", "Ana Wosniak"],
     "input": "AUTOR: JOAO LIMA\nO autor João Lima, CPF 926.511.422-72, citou Lima (2017). Pedro Wosniak e Ana Wosniak depuseram."
+  },
+  {
+    "id": "valor_em_reais_nao_e_telefone",
+    "input": "Condeno ao pagamento de R$ 334.837,00, R$ 1.250,50 e R$ 98.765.432,10. Contato (62) 98765-4321, 3201-4455 ou +55 62 3201-4455."
   }
 ]

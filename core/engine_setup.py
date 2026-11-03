@@ -28,6 +28,9 @@ def carregar_analyzer_engine(
 
     spacy_engine_obj = SpacyNlpEngine(models=[{"lang_code": "pt", "model_name": "pt_core_news_lg"}])
     analyzer = AnalyzerEngine(nlp_engine=spacy_engine_obj, supported_languages=["pt"], default_score_threshold=0.4)
+    # O reconhecedor genérico de telefone do Presidio confunde valores em reais
+    # ("R$ 334.837,00") com telefone; os telefones brasileiros ficam com o PHONE_NUMBER_BR.
+    analyzer.registry.remove_recognizer("PhoneRecognizer")
 
     if termos_safe_location:
         analyzer.registry.add_recognizer(

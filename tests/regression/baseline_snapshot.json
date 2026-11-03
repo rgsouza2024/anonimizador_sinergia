@@ -19,10 +19,6 @@
       {
         "entity": "ID_DOCUMENTO",
         "text": "12345678909"
-      },
-      {
-        "entity": "PHONE_NUMBER",
-        "text": "12345678909"
       }
     ]
   },
@@ -198,10 +194,6 @@
       },
       {
         "entity": "ID_DOCUMENTO",
-        "text": "7107032446"
-      },
-      {
-        "entity": "PHONE_NUMBER",
         "text": "7107032446"
       },
       {
@@ -1243,6 +1235,29 @@
       {
         "entity": "NOME",
         "text": "Wosniak"
+      }
+    ]
+  },
+  {
+    "id": "valor_em_reais_nao_e_telefone",
+    "input": "Condeno ao pagamento de R$ 334.837,00, R$ 1.250,50 e R$ 98.765.432,10. Contato (62) 98765-4321, 3201-4455 ou +55 62 3201-4455.",
+    "output": "Condeno ao pagamento de R$ 334.837,00, R$ 1.250,50 e R$ 98.765.432,10. Contato (62) 98765-****, 3201-**** ou +55 62 3201-****.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "pagamento"
+      },
+      {
+        "entity": "PHONE_NUMBER_BR",
+        "text": "(62) 98765-4321"
+      },
+      {
+        "entity": "PHONE_NUMBER_BR",
+        "text": "3201-4455"
+      },
+      {
+        "entity": "PHONE_NUMBER_BR",
+        "text": "62 3201-4455"
       }
     ]
   }
