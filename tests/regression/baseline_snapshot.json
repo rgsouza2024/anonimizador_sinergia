@@ -471,7 +471,7 @@
   {
     "id": "maria_da_penha_orgao_julgador_capitais",
     "input": "Aplica-se a Lei Maria da Penha. Julgado pela Quinta Turma em São Paulo e Porto Alegre. A testemunha João Pessoa depôs.",
-    "output": "Aplica-se a Lei Maria da Penha. Julgado pela Quinta Turma em São Paulo e Porto Alegre. A testemunha <NOME> Pessoa depôs.",
+    "output": "Aplica-se a Lei Maria da Penha. Julgado pela Quinta Turma em São Paulo e Porto Alegre. A testemunha <NOME> depôs.",
     "entities": [
       {
         "entity": "SAFE_LOCATION",
@@ -524,10 +524,6 @@
       {
         "entity": "TERMO_COMUM",
         "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "Pessoa"
       }
     ]
   },
@@ -648,6 +644,111 @@
       {
         "entity": "TERMO_COMUM",
         "text": "Filho"
+      }
+    ]
+  },
+  {
+    "id": "papel_penal_em_linha_propria",
+    "input": "AGRAVANTE: JOSE KOWALCZYK DA SILVA\nAGRAVADO: MINISTÉRIO PÚBLICO FEDERAL\nJOANA ZWIRTES (VÍTIMA)\nO agravante Kowalczyk recorreu; a vítima Zwirtes foi ouvida.",
+    "output": "AGRAVANTE: <NOME>\nAGRAVADO: MINISTÉRIO PÚBLICO FEDERAL\n<NOME> (VÍTIMA)\nO agravante <NOME> recorreu; a vítima <NOME> foi ouvida.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AGRAVANTE"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AGRAVADO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "MINISTÉRIO PÚBLICO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "agravante"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "papel_penal_pelo_contexto",
+    "input": "A testemunha Pedro Henrique Wosniak afirmou que a vítima Ana Kowalski e o paciente Joao Brzezinski estavam no local.",
+    "output": "A testemunha <NOME> afirmou que a vítima <NOME> e o paciente <NOME> estavam no local.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "testemunha"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "paciente"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      }
+    ]
+  },
+  {
+    "id": "papel_penal_sem_nome",
+    "input": "O acusado foi absolvido. O paciente está preso. A vítima pediu proteção. Interposto Recurso Especial pelo réu.",
+    "output": "O acusado foi absolvido. O paciente está preso. A vítima pediu proteção. Interposto Recurso Especial pelo réu.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "paciente"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Recurso"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Especial"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Especial"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "réu"
       }
     ]
   }

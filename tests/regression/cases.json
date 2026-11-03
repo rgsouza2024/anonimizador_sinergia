@@ -93,5 +93,17 @@
   {
     "id": "propagacao_so_com_maiuscula",
     "input": "AUTOR: JOSE PEREIRA FILHO\nO filho do autor juntou documentos. Filho e pai compareceram."
+  },
+  {
+    "id": "papel_penal_em_linha_propria",
+    "input": "AGRAVANTE: JOSE KOWALCZYK DA SILVA\nAGRAVADO: MINISTÉRIO PÚBLICO FEDERAL\nJOANA ZWIRTES (VÍTIMA)\nO agravante Kowalczyk recorreu; a vítima Zwirtes foi ouvida."
+  },
+  {
+    "id": "papel_penal_pelo_contexto",
+    "input": "A testemunha Pedro Henrique Wosniak afirmou que a vítima Ana Kowalski e o paciente Joao Brzezinski estavam no local."
+  },
+  {
+    "id": "papel_penal_sem_nome",
+    "input": "O acusado foi absolvido. O paciente está preso. A vítima pediu proteção. Interposto Recurso Especial pelo réu."
   }
 ]

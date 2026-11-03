@@ -9,6 +9,7 @@ from core.config import (
     PALAVRAS_COMUNS_CAIXA_ALTA,
     PALAVRAS_NAO_NOME_GENERICAS,
     PAPEIS_ALVO_NOME_PARTE,
+    PAPEIS_PROCESSO_PENAL,
     PLACEHOLDER_NOME_PARTE_EXTERNO,
     PLACEHOLDER_NOME_PARTE_INTERNO,
     TERMOS_EXCLUSAO_NOME_PARTE,
@@ -272,12 +273,12 @@ def _nome_parte_passa_filtros(nome_candidato):
     return True
 
 
-def extrair_nomes_parte_alvo(texto_original):
+def extrair_nomes_parte_alvo(texto_original, papeis=PAPEIS_ALVO_NOME_PARTE):
     nomes_encontrados = set()
     if not texto_original or not texto_original.strip():
         return nomes_encontrados
 
-    papeis_regex = "|".join(re.escape(papel) for papel in PAPEIS_ALVO_NOME_PARTE)
+    papeis_regex = "|".join(re.escape(papel) for papel in papeis)
 
     padrao_linha_rotulo = re.compile(rf"(?im)^\s*({papeis_regex})\s*:\s*(.+?)\s*$")
     for match in padrao_linha_rotulo.finditer(texto_original):
@@ -292,6 +293,11 @@ def extrair_nomes_parte_alvo(texto_original):
             nomes_encontrados.add(nome_limpo)
 
     return nomes_encontrados
+
+
+def extrair_nomes_papel_penal(texto_original):
+    """Nome em linha propria com papel do processo penal ("AGRAVANTE: ...", "... (PACIENTE)")."""
+    return extrair_nomes_parte_alvo(texto_original, PAPEIS_PROCESSO_PENAL)
 
 
 def _nome_generico_passa_filtros(nome_candidato):
@@ -322,6 +328,13 @@ def extrair_nomes_pessoais_contextuais(texto_original):
         ),
         re.compile(rf"(?im)^\s*(?P<nome>{bloco_nome})\s*\(\s*(?:R[ÉE]U(?:S)?|REQUERID[OA]S?)\s*\)\s*$"),
         re.compile(rf"(?im)\(\s*[IVXLC]+\s*\)\s*(?P<nome>{bloco_nome})"),
+        # Papeis do processo penal ("a vitima Fulana", "o paciente Fulano", "AGRAVANTE - Fulano").
+        re.compile(
+            rf"(?im)\b(?:PACIENTES?|IMPETRANTES?|AGRAVANTES?|AGRAVAD[OA]S?|EMBARGANTES?|EMBARGAD[OA]S?|"
+            rf"ACUSAD[OA]S?|DENUNCIAD[OA]S?|R[ÉE]|CORR[ÉE]US?|INVESTIGAD[OA]S?|V[ÍI]TIMAS?|OFENDID[OA]S?|"
+            rf"APENAD[OA]S?|SENTENCIAD[OA]S?|CONDENAD[OA]S?|QUERELANTES?|QUERELAD[OA]S?|TESTEMUNHAS?)\b"
+            rf"\s*[:\-]?\s*(?P<nome>{bloco_nome})"
+        ),
     ]
 
     for padrao in padroes:
@@ -374,7 +387,7 @@ def _nomes_comuns_normalizados(lista_nomes_comuns):
 # Palavras de um nome extraido que nunca sao propagadas sozinhas pelo documento.
 _NAO_PROPAGAR_SOZINHA = _BLOQUEIO_SEMANTICO_NOME_NORMALIZADO | {
     _normalizar_texto_para_filtro(termo)
-    for termo in TERMOS_EXCLUSAO_NOME_PARTE + PAPEIS_ALVO_NOME_PARTE
+    for termo in TERMOS_EXCLUSAO_NOME_PARTE + PAPEIS_ALVO_NOME_PARTE + PAPEIS_PROCESSO_PENAL
     + ["FILHO", "FILHA", "NETO", "NETA", "JUNIOR", "SOBRINHO", "SOBRINHA", "OUTRO", "OUTROS", "OUTRA", "OUTRAS"]
 }
 
