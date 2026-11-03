@@ -2,20 +2,22 @@
 
 import pandas as pd
 
+from core.rastreio import TextoRastreado
+
 
 def executar_pipeline_anonimizacao(
     texto_original,
     analyzer_engine,
     anonymizer_engine,
     operadores,
-    anonimizar_nomes_pf_metadados_fn,
+    aplicar_nomes_pf_metadados_fn,
     nomes_pf_metadados,
     extrair_nomes_parte_alvo_fn,
     extrair_nomes_papel_penal_fn,
     extrair_nomes_pessoais_contextuais_fn,
-    anonimizar_nomes_extraidos_fn,
-    anonimizar_sobrenomes_raros_fn,
-    anonimizar_por_lista_nomes_comuns_fn,
+    aplicar_nomes_extraidos_fn,
+    aplicar_sobrenomes_raros_fn,
+    aplicar_lista_nomes_comuns_fn,
     lista_nomes_comuns,
     filtrar_resultados_analise_fn,
     normalizar_placeholders_nome_parte_fn,
@@ -23,61 +25,27 @@ def executar_pipeline_anonimizacao(
     retornar_metricas=False,
 ):
     metricas_pipeline = {}
+    # Cada fase de nome troca trechos do texto; o rastreio guarda a posicao de cada troca no original.
+    rastreado = TextoRastreado(texto_original)
+    metricas_metadado = aplicar_nomes_pf_metadados_fn(rastreado, nomes_pf_metadados, "<NOME>")
     if retornar_metricas:
-        texto_preprocessado, metricas_metadado = anonimizar_nomes_pf_metadados_fn(
-            texto_original,
-            nomes_pf_metadados,
-            "<NOME>",
-            retornar_metricas=True,
-        )
         metricas_pipeline["metadado"] = metricas_metadado
-    else:
-        texto_preprocessado = anonimizar_nomes_pf_metadados_fn(
-            texto_original,
-            nomes_pf_metadados,
-            "<NOME>",
-        )
+
     nomes_parte_alvo = extrair_nomes_parte_alvo_fn(texto_original)
-    texto_para_anonimizar = anonimizar_nomes_extraidos_fn(
-        texto_preprocessado,
-        nomes_parte_alvo,
-        placeholder_nome_parte_interno,
-    )
-    texto_para_anonimizar = anonimizar_sobrenomes_raros_fn(
-        texto_para_anonimizar,
-        nomes_parte_alvo,
-        lista_nomes_comuns,
-        placeholder_nome_parte_interno,
-    )
+    aplicar_nomes_extraidos_fn(rastreado, nomes_parte_alvo, placeholder_nome_parte_interno)
+    aplicar_sobrenomes_raros_fn(rastreado, nomes_parte_alvo, lista_nomes_comuns, placeholder_nome_parte_interno)
+
     nomes_papel_penal = extrair_nomes_papel_penal_fn(texto_original)
-    texto_para_anonimizar = anonimizar_nomes_extraidos_fn(
-        texto_para_anonimizar,
-        nomes_papel_penal,
-        "<NOME>",
-    )
-    texto_para_anonimizar = anonimizar_sobrenomes_raros_fn(
-        texto_para_anonimizar,
-        nomes_papel_penal,
-        lista_nomes_comuns,
-        "<NOME>",
-    )
-    nomes_contextuais =extrair_nomes_pessoais_contextuais_fn(texto_para_anonimizar)
-    texto_para_anonimizar = anonimizar_nomes_extraidos_fn(
-        texto_para_anonimizar,
-        nomes_contextuais,
-        "<NOME>",
-    )
-    texto_para_anonimizar = anonimizar_sobrenomes_raros_fn(
-        texto_para_anonimizar,
-        nomes_contextuais,
-        lista_nomes_comuns,
-        "<NOME>",
-    )
-    texto_para_anonimizar = anonimizar_por_lista_nomes_comuns_fn(
-        texto_para_anonimizar,
-        lista_nomes_comuns,
-        "<NOME>",
-    )
+    aplicar_nomes_extraidos_fn(rastreado, nomes_papel_penal, "<NOME>")
+    aplicar_sobrenomes_raros_fn(rastreado, nomes_papel_penal, lista_nomes_comuns, "<NOME>")
+
+    nomes_contextuais = extrair_nomes_pessoais_contextuais_fn(rastreado.texto)
+    aplicar_nomes_extraidos_fn(rastreado, nomes_contextuais, "<NOME>")
+    aplicar_sobrenomes_raros_fn(rastreado, nomes_contextuais, lista_nomes_comuns, "<NOME>")
+
+    aplicar_lista_nomes_comuns_fn(rastreado, lista_nomes_comuns, "<NOME>")
+
+    texto_para_anonimizar = rastreado.texto
     entidades_para_analise = list(operadores.keys()) + [
         "SAFE_LOCATION",
         "LEGAL_HEADER",
@@ -96,22 +64,38 @@ def executar_pipeline_anonimizacao(
         return_decision_process=False,
     )
     resultados_analise = filtrar_resultados_analise_fn(resultados_analise_brutos, texto_para_anonimizar)
+    # Deteccao inteira dentro de um marcador ja aplicado ("NOME" em <NOME>) e ruido.
+    resultados_analise = [r for r in resultados_analise if not rastreado.dentro_de_marcador(r.start, r.end)]
     resultado_anonimizado_obj = anonymizer_engine.anonymize(
         text=texto_para_anonimizar,
         analyzer_results=resultados_analise,
         operators=operadores,
     )
     texto_anonimizado = normalizar_placeholders_nome_parte_fn(resultado_anonimizado_obj.text)
+
+    # Auditoria com posicoes no texto original: trocas de nome e deteccoes do Presidio.
     dados_resultados = [
         {
-            "Entidade": res.entity_type,
-            "Texto Detectado": normalizar_placeholders_nome_parte_fn(texto_para_anonimizar[res.start:res.end]),
-            "Início": res.start,
-            "Fim": res.end,
-            "Score": f"{res.score:.2f}",
+            "Entidade": troca["valor"].strip("<>_"),
+            "Texto Detectado": texto_original[troca["inicio"]:troca["fim"]],
+            "Início": troca["inicio"],
+            "Fim": troca["fim"],
+            "Score": "1.00",
         }
-        for res in sorted(resultados_analise, key=lambda x: x.start)
+        for troca in rastreado.trocas
     ]
+    for res in resultados_analise:
+        inicio, fim = rastreado.origem(res.start, res.end)
+        dados_resultados.append(
+            {
+                "Entidade": res.entity_type,
+                "Texto Detectado": texto_original[inicio:fim],
+                "Início": inicio,
+                "Fim": fim,
+                "Score": f"{res.score:.2f}",
+            }
+        )
+    dados_resultados.sort(key=lambda linha: (linha["Início"], -linha["Fim"]))
     if retornar_metricas:
         return texto_anonimizado, pd.DataFrame(dados_resultados), metricas_pipeline
     return texto_anonimizado, pd.DataFrame(dados_resultados)

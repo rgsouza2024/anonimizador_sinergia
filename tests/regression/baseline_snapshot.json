@@ -232,10 +232,6 @@
         "text": "autor"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
         "entity": "ESTADO_CIVIL",
         "text": "solteiro"
       },
@@ -250,6 +246,10 @@
       {
         "entity": "LOCATION",
         "text": "Justiça"
+      },
+      {
+        "entity": "NOME",
+        "text": "Ejohnson Rodrigues Souza"
       }
     ]
   },
@@ -258,10 +258,6 @@
     "input": "ANTONIO MARCOS MACIEL FERNANDES (REU)\nINSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS (AUTOR)",
     "output": "<NOME> (REU)\nINSTITUTO BRASILEIRO DO MEIO AMBIENTE E DOS RECURSOS NATURAIS RENOVAVEIS (AUTOR)",
     "entities": [
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
       {
         "entity": "TERMO_COMUM",
         "text": "REU"
@@ -277,6 +273,10 @@
       {
         "entity": "TERMO_COMUM",
         "text": "AUTOR"
+      },
+      {
+        "entity": "NOME",
+        "text": "ANTONIO MARCOS MACIEL FERNANDES"
       }
     ]
   },
@@ -295,10 +295,6 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "réu"
       },
       {
@@ -307,11 +303,15 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "text": "contestação"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "contestação"
+        "entity": "NOME",
+        "text": "ANTONIO MARCOS MACIEL FERNANDES"
+      },
+      {
+        "entity": "NOME",
+        "text": "ANTÔNIO MARCOS MACIEL FERNANDES"
       }
     ]
   },
@@ -349,11 +349,11 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "text": "audiência"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "audiência"
+        "entity": "NOME",
+        "text": "SEBASTIÃO"
       }
     ]
   },
@@ -379,19 +379,19 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "petição"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "ANTÔNIO DE SOUZA SANTOS"
+      },
+      {
+        "entity": "NOME",
+        "text": "Antônio de Souza"
+      },
+      {
+        "entity": "NOME",
+        "text": "Sr. Antônio"
       }
     ]
   },
@@ -421,8 +421,8 @@
         "text": "réu"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Carlos Eduardo Pereira"
       }
     ]
   },
@@ -432,12 +432,12 @@
     "output": "a rosa e a pena foram citadas por <NOME> <NOME>.",
     "entities": [
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Maria"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Rosa"
       }
     ]
   },
@@ -522,8 +522,8 @@
         "text": "testemunha"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "João Pessoa"
       }
     ]
   },
@@ -537,16 +537,16 @@
         "text": "FATOS"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "JOSÉ"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "SETE"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "ROSA"
       }
     ]
   },
@@ -574,6 +574,18 @@
       {
         "entity": "TERMO_COMUM",
         "text": "Segundo"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "JOSE KOWALCZYK DA SILVA"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "Kowalczyk"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "KOWALCZYK"
       }
     ]
   },
@@ -592,10 +604,6 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "defesa"
       },
       {
@@ -607,8 +615,12 @@
         "text": "requerido"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Antonio Marcos Zwirtes"
+      },
+      {
+        "entity": "NOME",
+        "text": "Zwirtes"
       }
     ]
   },
@@ -644,6 +656,10 @@
       {
         "entity": "TERMO_COMUM",
         "text": "Filho"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "JOSE PEREIRA FILHO"
       }
     ]
   },
@@ -655,10 +671,6 @@
       {
         "entity": "TERMO_COMUM",
         "text": "AGRAVANTE"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
       },
       {
         "entity": "TERMO_COMUM",
@@ -678,19 +690,23 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "agravante"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "JOSE KOWALCZYK DA SILVA"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "JOANA ZWIRTES"
+      },
+      {
+        "entity": "NOME",
+        "text": "Kowalczyk"
+      },
+      {
+        "entity": "NOME",
+        "text": "Zwirtes"
       }
     ]
   },
@@ -705,19 +721,19 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "paciente"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Pedro Henrique Wosniak"
+      },
+      {
+        "entity": "NOME",
+        "text": "Ana Kowalski"
+      },
+      {
+        "entity": "NOME",
+        "text": "Joao Brzezinski"
       }
     ]
   },
@@ -770,18 +786,6 @@
         "text": "Min"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
         "entity": "LEGAL_TITLE",
         "text": "Ministro"
       },
@@ -790,8 +794,20 @@
         "text": "Ministro"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Rogerio"
+      },
+      {
+        "entity": "NOME",
+        "text": "Schietti"
+      },
+      {
+        "entity": "NOME",
+        "text": "Schietti"
+      },
+      {
+        "entity": "NOME",
+        "text": "Cruz"
       }
     ]
   },
@@ -802,39 +818,39 @@
     "entities": [
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "mora"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Compareceu"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Heliofar"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Almeida"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "Villar"
+      },
+      {
+        "entity": "NOME",
+        "text": "Ana"
+      },
+      {
+        "entity": "NOME",
+        "text": "Wosniak"
+      },
+      {
+        "entity": "NOME",
+        "text": "Ferreira"
+      },
+      {
+        "entity": "NOME",
+        "text": "Brzezinski"
       }
     ]
   },
@@ -852,24 +868,24 @@
         "text": "JUÍZO"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "MARIA"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "SILVA"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "SILVA"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "KRAUSE"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
+        "entity": "NOME",
+        "text": "JOSE"
       }
     ]
   },
@@ -880,23 +896,7 @@
     "entities": [
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "Engenharia"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
       },
       {
         "entity": "TERMO_COMUM",
@@ -911,14 +911,6 @@
         "text": "Goiânia"
       },
       {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
         "entity": "SAFE_LOCATION",
         "text": "Goiânia"
       },
@@ -928,15 +920,39 @@
       },
       {
         "entity": "TERMO_COMUM",
-        "text": "NOME"
-      },
-      {
-        "entity": "TERMO_COMUM",
         "text": "Especial"
       },
       {
         "entity": "ORGANIZACAO_CONHECIDA",
         "text": "Especial"
+      },
+      {
+        "entity": "NOME",
+        "text": "Pedro"
+      },
+      {
+        "entity": "NOME",
+        "text": "Rocha"
+      },
+      {
+        "entity": "NOME",
+        "text": "Rocha"
+      },
+      {
+        "entity": "NOME",
+        "text": "Silva"
+      },
+      {
+        "entity": "NOME",
+        "text": "José"
+      },
+      {
+        "entity": "NOME",
+        "text": "Costa"
+      },
+      {
+        "entity": "NOME",
+        "text": "Corte"
       }
     ]
   }

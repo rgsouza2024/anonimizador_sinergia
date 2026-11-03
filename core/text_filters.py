@@ -16,6 +16,7 @@ from core.config import (
     TERMOS_EXCLUSAO_NOME_PARTE,
     TERMOS_INDICADORES_PJ,
 )
+from core.rastreio import TextoRastreado
 from core.resources import LISTA_ESTADOS_CAPITAIS_BR, LISTA_NOMES_COMUNS, LISTA_TERMOS_COMUNS, LISTA_TITULOS_LEGAIS
 
 
@@ -363,10 +364,9 @@ def extrair_nomes_pessoais_contextuais(texto_original):
     return nomes_encontrados
 
 
-def anonimizar_nomes_extraidos(texto, nomes_extraidos, placeholder):
-    if not texto or not nomes_extraidos:
-        return texto
-    texto_resultado = texto
+def aplicar_nomes_extraidos(rastreado, nomes_extraidos, placeholder):
+    if not rastreado.texto or not nomes_extraidos:
+        return
     for nome in sorted(nomes_extraidos, key=len, reverse=True):
         if not nome:
             continue
@@ -376,8 +376,13 @@ def anonimizar_nomes_extraidos(texto, nomes_extraidos, placeholder):
             continue
         padrao_nome_flexivel = r"\s+".join(_token_para_regex_acento_flexivel(token) for token in tokens_nome)
         regex_nome = re.compile(rf"(?i)(?<!\w){padrao_nome_flexivel}(?!\w)")
-        texto_resultado = regex_nome.sub(placeholder, texto_resultado)
-    return texto_resultado
+        rastreado.substituir([m.span() for m in regex_nome.finditer(rastreado.texto)], placeholder)
+
+
+def anonimizar_nomes_extraidos(texto, nomes_extraidos, placeholder):
+    rastreado = TextoRastreado(texto)
+    aplicar_nomes_extraidos(rastreado, nomes_extraidos, placeholder)
+    return rastreado.texto if texto else texto
 
 
 def _nomes_comuns_normalizados(lista_nomes_comuns):
@@ -407,7 +412,17 @@ _NAO_PROPAGAR_SOZINHA = _BLOQUEIO_SEMANTICO_NOME_NORMALIZADO | {
 }
 
 
+def aplicar_sobrenomes_raros(rastreado, nomes_extraidos, lista_nomes_comuns, placeholder):
+    rastreado.substituir(_spans_sobrenomes_raros(rastreado.texto, nomes_extraidos, lista_nomes_comuns), placeholder)
+
+
 def anonimizar_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns, placeholder):
+    rastreado = TextoRastreado(texto)
+    aplicar_sobrenomes_raros(rastreado, nomes_extraidos, lista_nomes_comuns, placeholder)
+    return rastreado.texto if texto else texto
+
+
+def _spans_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns):
     """Tarja, onde aparecer sozinho, o sobrenome raro de um nome ja extraido.
 
     "AUTOR: JOSE KOWALCZYK DA SILVA" e depois "o autor Kowalczyk": a lista de nomes comuns nao
@@ -415,7 +430,7 @@ def anonimizar_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns, plac
     de nomes comuns, e so quando escrita com maiuscula (o nome "Filho" nao leva "o filho" junto).
     """
     if not texto or not nomes_extraidos:
-        return texto
+        return []
 
     nomes_comuns = _nomes_comuns_normalizados(lista_nomes_comuns)
     raros = set()
@@ -428,7 +443,7 @@ def anonimizar_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns, plac
                 continue
             raros.add(token_normalizado)
     if not raros:
-        return texto
+        return []
 
     spans_substituicao = []
     for match in re.finditer(r"[A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+", texto):
@@ -442,17 +457,7 @@ def anonimizar_sobrenomes_raros(texto, nomes_extraidos, lista_nomes_comuns, plac
             continue
         if _normalizar_token_nome(match.group(0)) in raros:
             spans_substituicao.append((inicio, fim))
-    if not spans_substituicao:
-        return texto
-
-    partes = []
-    cursor = 0
-    for inicio, fim in spans_substituicao:
-        partes.append(texto[cursor:inicio])
-        partes.append(placeholder)
-        cursor = fim
-    partes.append(texto[cursor:])
-    return "".join(partes)
+    return spans_substituicao
 
 
 _REGEX_PALAVRA = re.compile(r"[A-Za-zÀ-ÖØ-öø-ÿ]+")
@@ -585,13 +590,23 @@ def _estender_nome_inteiro(texto, spans, spans_protegidos):
     return sorted(set(spans) | set(novos))
 
 
+def aplicar_lista_nomes_comuns(rastreado, lista_nomes_comuns, placeholder="<NOME>"):
+    rastreado.substituir(_spans_lista_nomes_comuns(rastreado.texto, lista_nomes_comuns), placeholder)
+
+
 def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<NOME>"):
+    rastreado = TextoRastreado(texto)
+    aplicar_lista_nomes_comuns(rastreado, lista_nomes_comuns, placeholder)
+    return rastreado.texto if texto else texto
+
+
+def _spans_lista_nomes_comuns(texto, lista_nomes_comuns):
     if not texto or not lista_nomes_comuns:
-        return texto
+        return []
 
     nomes_normalizados = _nomes_comuns_normalizados(lista_nomes_comuns)
     if not nomes_normalizados:
-        return texto
+        return []
 
     spans_pj = _mesclar_spans(_extrair_spans_pessoa_juridica(texto) + _spans_protegidos_lista_nomes(texto))
     spans_substituicao = []
@@ -613,20 +628,7 @@ def anonimizar_por_lista_nomes_comuns(texto, lista_nomes_comuns, placeholder="<N
             spans_substituicao.append((inicio, fim))
 
     spans_substituicao = _remover_comum_isolada_caixa_alta(texto, spans_substituicao)
-    spans_substituicao = _estender_nome_inteiro(texto, spans_substituicao, spans_pj)
-    if not spans_substituicao:
-        return texto
-
-    partes = []
-    cursor = 0
-    for inicio, fim in spans_substituicao:
-        if inicio < cursor:
-            continue
-        partes.append(texto[cursor:inicio])
-        partes.append(placeholder)
-        cursor = fim
-    partes.append(texto[cursor:])
-    return "".join(partes)
+    return _estender_nome_inteiro(texto, spans_substituicao, spans_pj)
 
 
 def normalizar_placeholders_nome_parte(texto):
@@ -835,6 +837,22 @@ def _coletar_spans_para_regex(texto, regex, spans_pj, exigir_contexto_processual
 
 
 def anonimizar_nomes_pf_metadados(texto, nomes_pf_metadados, placeholder="<NOME>", retornar_metricas=False):
+    rastreado = TextoRastreado(texto)
+    metricas = aplicar_nomes_pf_metadados(rastreado, nomes_pf_metadados, placeholder)
+    texto_resultado = rastreado.texto if texto else texto
+    if retornar_metricas:
+        return texto_resultado, metricas
+    return texto_resultado
+
+
+def aplicar_nomes_pf_metadados(rastreado, nomes_pf_metadados, placeholder="<NOME>"):
+    """Tarja os nomes de pessoa fisica vindos dos metadados do PDF; devolve as metricas da fase."""
+    spans, metricas = _spans_nomes_pf_metadados(rastreado.texto, nomes_pf_metadados)
+    rastreado.substituir(spans, placeholder)
+    return metricas
+
+
+def _spans_nomes_pf_metadados(texto, nomes_pf_metadados):
     metricas = {
         "metadado_nome_identificado": False,
         "metadado_nomes_pf_total": 0,
@@ -842,9 +860,7 @@ def anonimizar_nomes_pf_metadados(texto, nomes_pf_metadados, placeholder="<NOME>
     }
 
     if not texto or not nomes_pf_metadados:
-        if retornar_metricas:
-            return texto, metricas
-        return texto
+        return [], metricas
 
     nomes_filtrados = sorted(
         {_limpar_candidato_nome_metadado(nome) for nome in nomes_pf_metadados if _nome_parece_pessoa_fisica(nome)},
@@ -852,9 +868,7 @@ def anonimizar_nomes_pf_metadados(texto, nomes_pf_metadados, placeholder="<NOME>
         reverse=True,
     )
     if not nomes_filtrados:
-        if retornar_metricas:
-            return texto, metricas
-        return texto
+        return [], metricas
 
     metricas["metadado_nome_identificado"] = True
     metricas["metadado_nomes_pf_total"] = len(nomes_filtrados)
@@ -882,23 +896,5 @@ def anonimizar_nomes_pf_metadados(texto, nomes_pf_metadados, placeholder="<NOME>
             )
 
     spans_substituicao = _mesclar_spans(spans_candidatos)
-    if not spans_substituicao:
-        if retornar_metricas:
-            return texto, metricas
-        return texto
-
     metricas["metadado_ocorrencias_forcadas"] = len(spans_substituicao)
-
-    partes = []
-    cursor = 0
-    for inicio, fim in spans_substituicao:
-        if inicio < cursor:
-            continue
-        partes.append(texto[cursor:inicio])
-        partes.append(placeholder)
-        cursor = fim
-    partes.append(texto[cursor:])
-    texto_resultado = "".join(partes)
-    if retornar_metricas:
-        return texto_resultado, metricas
-    return texto_resultado
+    return spans_substituicao, metricas
