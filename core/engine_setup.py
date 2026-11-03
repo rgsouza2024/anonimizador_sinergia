@@ -239,17 +239,17 @@ def carregar_analyzer_engine(
             patterns=[
                 Pattern(
                     name="rg_com_rotulo",
-                    regex=r"(?i)\bRG\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*-\s*\dª\s*VIA)?(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
+                    regex=r"(?i)\bRG(?:\s+(?:sob\s+o|de|com\s+o)(?=\s*n[ºo°.]))?\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*-\s*\dª\s*VIA)?(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
                     score=0.99,
                 ),
                 Pattern(
                     name="registro_geral_com_numero",
-                    regex=r"(?i)\bRegistro\s+Geral\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
+                    regex=r"(?i)\bRegistro\s+Geral(?:\s+(?:sob\s+o|de|com\s+o)(?=\s*n[ºo°.]))?\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
                     score=0.98,
                 ),
                 Pattern(
                     name="cedula_ou_carteira_identidade_com_numero",
-                    regex=r"(?i)\b(?:C[ÉE]DULA\s+DE\s+IDENTIDADE|CARTEIRA\s+DE\s+IDENTIDADE(?!\s+NACIONAL))\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
+                    regex=r"(?i)\b(?:C[ÉE]DULA\s+DE\s+IDENTIDADE|CARTEIRA\s+DE\s+IDENTIDADE(?!\s+NACIONAL))(?:\s+(?:sob\s+o|de|com\s+o)(?=\s*n[ºo°.]))?\s*(?:n[ºo°.]?\s*)?[:\-]?\s*(?=[A-Z0-9.\-X]{3,20}\b)(?=[A-Z0-9.\-X]*\d)[A-Z0-9.\-X]{3,20}(?:\s*[-,]?\s*(?:SSP|SESP|PC|IFP|DGPC|SJS|SJTC|SSDS|POL[ÍI]CIA\s+CIVIL)\s*\/\s*[A-Z]{2})?\b",
                     score=0.95,
                 ),
             ],

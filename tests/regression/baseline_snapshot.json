@@ -1425,5 +1425,40 @@
         "text": "Silva Kowalski"
       }
     ]
+  },
+  {
+    "id": "rg_com_sob_o_numero",
+    "input": "portadora da cédula \nde identidade sob o nº 13.416.880-11, do RG de nº 03.035.471-46 SSP/BA e do Registro Geral com o nº 5544332. A cédula de identidade de 1990 expirou.",
+    "output": "portadora da <NUMERO RG>, do <NUMERO RG> e do <NUMERO RG>. A cédula de identidade de 1990 expirou.",
+    "entities": [
+      {
+        "entity": "RG_NUMBER",
+        "text": "cédula \nde identidade sob o nº 13.416.880-11"
+      },
+      {
+        "entity": "RG_NUMBER",
+        "text": "RG de nº 03.035.471-46 SSP/BA"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "BA"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "BA"
+      },
+      {
+        "entity": "RG_NUMBER",
+        "text": "Registro Geral com o nº 5544332"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Registro Geral"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Registro"
+      }
+    ]
   }
 ]
