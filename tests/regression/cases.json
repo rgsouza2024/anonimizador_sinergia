@@ -121,5 +121,24 @@
   {
     "id": "nome_inteiro_nao_absorve_organizacao_nem_lugar",
     "input": "Pedro Rocha trabalhou na Rocha Engenharia e na Silva Transportes. Ele mora em Goiânia, onde José Costa Goiânia nasceu. A Corte Especial decidiu."
+  },
+  {
+    "id": "nome_antes_do_endereco_qualificacao",
+    "input": "Maria Aparecida Souza, residente na Rua Goiás, 45, requer o benefício."
+  },
+  {
+    "id": "nome_depois_do_endereco",
+    "input": "O autor mora na Rua das Flores, 12, Centro, com Maria Silva. Mora na Rua Bahia, 7. Pedro Souza compareceu. Informou o endereço de Ana Costa."
+  },
+  {
+    "id": "metadado_perto_do_endereco",
+    "metadata_pf_names": [
+      "Joana Kowalski"
+    ],
+    "input": "Endereço: Rua das Flores, 12, Centro, com Joana Kowalski."
+  },
+  {
+    "id": "nome_de_rua_e_bairro_preservado",
+    "input": "Residente na Rua José Silva, 12, Setor Pedro Ludovico, Goiânia. Mora na Av. Presidente Juscelino Kubitschek, 100, Bairro Santa Maria."
   }
 ]

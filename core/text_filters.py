@@ -231,16 +231,35 @@ def _cortar_na_primeira_minuscula(nome):
     return re.sub(r"(?:\s+(?:de|da|do|das|dos|e|DE|DA|DO|DAS|DOS|E))+\s*$", "", nome).strip()
 
 
-def _token_esta_em_contexto_endereco(texto, inicio, fim, alcance=40):
-    inicio_contexto = max(0, inicio - alcance)
-    fim_contexto = min(len(texto), fim + alcance)
-    contexto = texto[inicio_contexto:fim_contexto]
-    return bool(
-        re.search(
-            r"(?i)\b(?:endere[cç]o|rua|ra|avenida|av\.?|travessa|trav\.?|alameda|rodovia|estrada|vicinal|bairro|lote|quadra|qd\.?|cep|fazenda|s[ií]tio|ch[aá]cara)\b",
-            contexto,
-        )
-    )
+_REGEX_TIPO_LOGRADOURO = re.compile(
+    r"(?i)\b(?:rua|ra|avenida|av|travessa|trav|alameda|pra[cç]a|rodovia|estrada|vicinal|bairro|setor|lote|quadra|qd"
+    r"|cep|fazenda|s[ií]tio|ch[aá]cara)\b\.?"
+)
+_REGEX_FIM_DE_ENDERECO = re.compile(r"[;:!?\n()]|\.\s")
+_MINUSCULAS_DE_ENDERECO = {"n", "s", "no", "km"}  # "nº 12", "s/n", "km 5"
+
+
+def _token_esta_em_contexto_endereco(texto, inicio, fim, alcance=60):
+    """A palavra faz parte de um endereco ("Rua Jose Silva", "Bairro Santa Maria").
+
+    So conta o tipo de logradouro que vem ANTES da palavra, no mesmo trecho de endereco: entre os dois
+    pode haver nomes, numeros, virgulas e conectores, mas palavra minuscula comum ("com", "requer"),
+    ponto final ou ponto e virgula encerram o endereco. Antes, qualquer palavra a 40 caracteres de
+    "Rua", para frente ou para tras, era poupada, e "Maria Silva, residente na Rua X" ficava a mostra.
+    """
+    trecho = texto[max(0, inicio - alcance):inicio]
+    ultimo_tipo = None
+    for ultimo_tipo in _REGEX_TIPO_LOGRADOURO.finditer(trecho):
+        pass
+    if ultimo_tipo is None:
+        return False
+    entre = trecho[ultimo_tipo.end():]
+    if _REGEX_FIM_DE_ENDERECO.search(entre):
+        return False
+    for palavra in re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", entre):
+        if palavra[0].islower() and palavra.upper() not in _CONECTORES_NOME and palavra not in _MINUSCULAS_DE_ENDERECO:
+            return False
+    return True
 
 
 def _nome_parece_pessoa_fisica(nome_candidato):
@@ -821,8 +840,7 @@ def _coletar_spans_para_regex(texto, regex, spans_pj, exigir_contexto_processual
         trecho_encontrado = match.group(0)
         if _intervalo_esta_em_spans(inicio, fim, spans_pj):
             continue
-        if _token_esta_em_contexto_endereco(texto, inicio, fim):
-            continue
+        # Nome informado nos metadados vale sempre, inclusive perto de endereco.
         if _trecho_bloqueado_semantico_para_nome(trecho_encontrado):
             continue
         if inicio > 0 and texto[inicio - 1] == "<":

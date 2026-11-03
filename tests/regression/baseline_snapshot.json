@@ -955,5 +955,221 @@
         "text": "Corte"
       }
     ]
+  },
+  {
+    "id": "nome_antes_do_endereco_qualificacao",
+    "input": "Maria Aparecida Souza, residente na Rua Goiás, 45, requer o benefício.",
+    "output": "<NOME> <NOME> <NOME>, residente na <ENDERECO> o benefício.",
+    "entities": [
+      {
+        "entity": "NOME",
+        "text": "Maria"
+      },
+      {
+        "entity": "NOME",
+        "text": "Aparecida"
+      },
+      {
+        "entity": "NOME",
+        "text": "Souza"
+      },
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Rua Goiás, 45, requer"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Rua Goiás"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Rua"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Goiás"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requer"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "benefício"
+      }
+    ]
+  },
+  {
+    "id": "nome_depois_do_endereco",
+    "input": "O autor mora na Rua das Flores, 12, Centro, com Maria Silva. Mora na Rua Bahia, 7. Pedro Souza compareceu. Informou o endereço de Ana Costa.",
+    "output": "O autor mora na <ENDERECO>, com <NOME> <NOME>. Mora na <ENDERECO>. <NOME> <NOME> compareceu. Informou o endereço de <NOME> <NOME>.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "mora"
+      },
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Rua das Flores, 12, Centro"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Rua das Flores"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Rua"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Centro"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Centro"
+      },
+      {
+        "entity": "NOME",
+        "text": "Maria"
+      },
+      {
+        "entity": "NOME",
+        "text": "Silva"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Mora"
+      },
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Rua Bahia, 7"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Rua Bahia"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Rua"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Bahia"
+      },
+      {
+        "entity": "NOME",
+        "text": "Pedro"
+      },
+      {
+        "entity": "NOME",
+        "text": "Souza"
+      },
+      {
+        "entity": "NOME",
+        "text": "Ana"
+      },
+      {
+        "entity": "NOME",
+        "text": "Costa"
+      }
+    ]
+  },
+  {
+    "id": "metadado_perto_do_endereco",
+    "input": "Endereço: Rua das Flores, 12, Centro, com Joana Kowalski.",
+    "output": "Endereço: <ENDERECO>, com <NOME>.",
+    "entities": [
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Rua das Flores, 12, Centro"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Rua das Flores"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Rua"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Centro"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Centro"
+      },
+      {
+        "entity": "NOME",
+        "text": "Joana Kowalski"
+      }
+    ]
+  },
+  {
+    "id": "nome_de_rua_e_bairro_preservado",
+    "input": "Residente na Rua José Silva, 12, Setor Pedro Ludovico, Goiânia. Mora na Av. Presidente Juscelino Kubitschek, 100, Bairro Santa Maria.",
+    "output": "Residente na <ENDERECO>, Goiânia. Mora na <ENDERECO>",
+    "entities": [
+      {
+        "entity": "LOCATION",
+        "text": "Residente"
+      },
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Rua José Silva, 12, Setor Pedro Ludovico"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Rua José Silva"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Rua"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Setor"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Goiânia"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Goiânia"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Mora"
+      },
+      {
+        "entity": "ENDERECO_LOGRADOURO",
+        "text": "Av. Presidente Juscelino Kubitschek, 100, Bairro Santa Maria."
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Av. Presidente Juscelino Kubitschek"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Presidente"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Bairro Santa Maria"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Bairro"
+      }
+    ]
   }
 ]
