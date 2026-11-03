@@ -23,13 +23,18 @@ def _pdf_de_teste():
     pagina.insert_textbox(
         fitz.Rect(72, 110, 420, 300),
         "Maria Aparecida Souza, residente na Rua Goiás, 45, Centro, requer o benefício assistencial "
-        "em face do INSS, conforme a Lei 8.742/93. O autor Kowalczyk junta documentos.",
+        "à pessoa com deficiência em face do INSS, conforme a Lei 8.742/93. O autor Kowalczyk junta documentos.",
         fontsize=11,
         align=fitz.TEXT_ALIGN_JUSTIFY,
     )
     segunda = documento.new_page()
     segunda.insert_text((72, 72), "Página dois: testemunha Joana Wosniak compareceu.", fontsize=11)
-    documento.set_metadata({"author": "JOAO PEDRO KOWALCZYK", "title": "Processo de Joao Pedro Kowalczyk"})
+    documento.set_metadata({
+        "author": "JOAO PEDRO KOWALCZYK",
+        "title": "Processo de Joao Pedro Kowalczyk",
+        # Assuntos do PJe vêm no campo keywords e não são nomes de pessoa.
+        "keywords": "DIREITO ASSISTENCIAL (12734) | Pessoa com Deficiência (11946)",
+    })
     conteudo = documento.tobytes()
     documento.close()
     return conteudo
@@ -52,7 +57,7 @@ def test_pdf_tarjado():
     print("Texto que restou no PDF tarjado:\n" + texto)
     for sigiloso in ["KOWALCZYK", "Kowalczyk", "926.511.422-72", "5432", "Maria", "Aparecida", "Souza", "Goiás, 45", "Wosniak"]:
         assert sigiloso not in texto, f"'{sigiloso}' continua no PDF tarjado"
-    for publico in ["AUTOR:", "residente na", "benefício assistencial", "INSS", "Lei 8.742/93", "Página dois", "compareceu"]:
+    for publico in ["AUTOR:", "residente na", "benefício assistencial", "pessoa com deficiência", "INSS", "Lei 8.742/93", "Página dois", "compareceu"]:
         assert publico in texto, f"'{publico}' foi tarjado sem necessidade"
     assert not metadados.get("author") and not metadados.get("title"), metadados
     print("[OK] PDF tarjado: dados retirados, texto público preservado, metadados apagados.")

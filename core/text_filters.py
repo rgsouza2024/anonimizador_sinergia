@@ -783,6 +783,19 @@ def _limpar_candidato_nome_metadado(valor):
     return nome_limpo
 
 
+def _candidato_metadado_e_pessoa(candidato):
+    # Assuntos do PJe ("Pessoa com Deficiência (11946)", "Aposentadoria por
+    # Incapacidade Permanente") têm código numérico ou palavra minúscula que
+    # não é conector; nome de pessoa não tem.
+    if re.search(r"\d", candidato):
+        return False
+    conectores = {"de", "da", "do", "das", "dos", "e"}
+    for palavra in re.findall(r"[A-Za-zÀ-ÖØ-öø-ÿ]+", candidato):
+        if palavra.islower() and palavra not in conectores:
+            return False
+    return _nome_parece_pessoa_fisica(candidato)
+
+
 def extrair_nomes_pf_metadados_pdf(metadados_pdf):
     if not isinstance(metadados_pdf, dict) or not metadados_pdf:
         return set()
@@ -799,12 +812,12 @@ def extrair_nomes_pf_metadados_pdf(metadados_pdf):
         padrao_papel = re.compile(rf"(?i)\b(?:{papel_regex})\s*:\s*([^;\n|]+)")
         for match in padrao_papel.finditer(valor_campo):
             candidato = _limpar_candidato_nome_metadado(match.group(1))
-            if _nome_parece_pessoa_fisica(candidato):
+            if _candidato_metadado_e_pessoa(candidato):
                 nomes.add(candidato)
 
         for segmento in re.split(r"[;\n|]", valor_campo):
             candidato = _limpar_candidato_nome_metadado(segmento)
-            if _nome_parece_pessoa_fisica(candidato):
+            if _candidato_metadado_e_pessoa(candidato):
                 nomes.add(candidato)
 
     return nomes
