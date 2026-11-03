@@ -140,5 +140,16 @@
   {
     "id": "nome_de_rua_e_bairro_preservado",
     "input": "Residente na Rua José Silva, 12, Setor Pedro Ludovico, Goiânia. Mora na Av. Presidente Juscelino Kubitschek, 100, Bairro Santa Maria."
+  },
+  {
+    "id": "revisao_nomes_manuais",
+    "nomes_manuais": ["Schietti", "jose antonio kerber"],
+    "input": "O Ministro SCHIETTI votou. Depois, Schietti divergiu. Kowalski Engenharia Ltda contratou José Antônio Kerber."
+  },
+  {
+    "id": "revisao_nao_tarjar",
+    "nomes_manuais": ["Wosniak"],
+    "nao_tarjar": ["Lima", "926.511.422-72", "Ana Wosniak"],
+    "input": "AUTOR: JOAO LIMA\nO autor João Lima, CPF 926.511.422-72, citou Lima (2017). Pedro Wosniak e Ana Wosniak depuseram."
   }
 ]

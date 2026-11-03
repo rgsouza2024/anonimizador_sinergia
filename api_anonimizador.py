@@ -37,6 +37,14 @@ class TextoRequest(BaseModel):
         default_factory=list,
         description="Lista opcional de nomes para anonimização forçada",
     )
+    nomes_manuais: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Nomes (ou palavras soltas) a tarjar onde aparecerem, além do que o motor encontra",
+    )
+    nao_tarjar: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Trechos que não devem ser tarjados em nenhuma passagem; valem mais que nomes_manuais",
+    )
 
 
 class AnonimizacaoResponse(BaseModel):
@@ -71,6 +79,8 @@ async def api_anonimizar(request: TextoRequest):
             texto_original=request.texto,
             nomes_pf_metadados=nomes_set,
             retornar_metricas=True,
+            nomes_manuais=request.nomes_manuais or [],
+            nao_tarjar=request.nao_tarjar or [],
         )
 
         entidades = df_entidades.to_dict("records") if not df_entidades.empty else []

@@ -6,7 +6,7 @@ import tempfile
 import time
 import gradio as gr
 from dotenv import load_dotenv
-from fastapi import FastAPI, Request, File, UploadFile, HTTPException
+from fastapi import FastAPI, Request, File, Form, UploadFile, HTTPException
 from fastapi.responses import RedirectResponse, FileResponse, Response
 from urllib.parse import quote
 from fastapi.staticfiles import StaticFiles
@@ -161,13 +161,17 @@ fastapi_app.add_middleware(
 class AnonimizarRequest(BaseModel):
     texto: str
     nomes_metadados: List[str] = []
+    nomes_manuais: List[str] = []  # nomes a tarjar além do que o motor encontra
+    nao_tarjar: List[str] = []  # trechos que não devem ser tarjados (valem mais que nomes_manuais)
 
 @fastapi_app.post("/api/v1/anonimizar")
 async def anonimizar_endpoint(req: AnonimizarRequest):
     inicio = time.time()
     texto_anon, df_entidades = _anonimizar_logica(
         req.texto,
-        nomes_pf_metadados=set(req.nomes_metadados)
+        nomes_pf_metadados=set(req.nomes_metadados),
+        nomes_manuais=req.nomes_manuais,
+        nao_tarjar=req.nao_tarjar,
     )
     entidades = df_entidades.to_dict(orient="records") if not df_entidades.empty else []
     return {
@@ -177,7 +181,11 @@ async def anonimizar_endpoint(req: AnonimizarRequest):
     }
 
 @fastapi_app.post("/api/v1/anonimizar-arquivo")
-async def anonimizar_arquivo_endpoint(file: UploadFile = File(...)):
+async def anonimizar_arquivo_endpoint(
+    file: UploadFile = File(...),
+    nomes_manuais: List[str] = Form([]),
+    nao_tarjar: List[str] = Form([]),
+):
     """Endpoint Universal para processamento de arquivos PDF e Word (.docx)."""
     inicio = time.time()
     nome_lower = file.filename.lower()
@@ -217,7 +225,9 @@ async def anonimizar_arquivo_endpoint(file: UploadFile = File(...)):
     texto_anon, df_entidades, metricas = _anonimizar_logica(
         texto_extraido,
         nomes_pf_metadados=nomes_pf_metadados,
-        retornar_metricas=True
+        retornar_metricas=True,
+        nomes_manuais=nomes_manuais,
+        nao_tarjar=nao_tarjar,
     )
     entidades = df_entidades.to_dict(orient="records") if not df_entidades.empty else []
     if isinstance(metricas, dict) and "metadado" in metricas:
@@ -236,11 +246,19 @@ async def anonimizar_arquivo_endpoint(file: UploadFile = File(...)):
     }
 
 @fastapi_app.post("/api/v1/anonimizar-pdf")
-async def anonimizar_pdf_endpoint(file: UploadFile = File(...)):
-    return await anonimizar_arquivo_endpoint(file)
+async def anonimizar_pdf_endpoint(
+    file: UploadFile = File(...),
+    nomes_manuais: List[str] = Form([]),
+    nao_tarjar: List[str] = Form([]),
+):
+    return await anonimizar_arquivo_endpoint(file, nomes_manuais, nao_tarjar)
 
 @fastapi_app.post("/api/v1/pdf-tarjado")
-async def pdf_tarjado_endpoint(file: UploadFile = File(...)):
+async def pdf_tarjado_endpoint(
+    file: UploadFile = File(...),
+    nomes_manuais: List[str] = Form([]),
+    nao_tarjar: List[str] = Form([]),
+):
     """Devolve o PDF com tarja preta sobre os dados retirados (o texto sob a tarja é removido)."""
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="O PDF tarjado só pode ser gerado a partir de um arquivo PDF (.pdf).")
@@ -260,6 +278,8 @@ async def pdf_tarjado_endpoint(file: UploadFile = File(...)):
         texto_extraido,
         nomes_pf_metadados=nomes_pf_metadados,
         retornar_metricas=True,
+        nomes_manuais=nomes_manuais,
+        nao_tarjar=nao_tarjar,
     )
     pdf_bytes = gerar_pdf_tarjado(conteudo, metricas.get("trechos_tarjados", []))
     nome_base = os.path.splitext(os.path.basename(file.filename))[0]

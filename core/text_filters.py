@@ -650,6 +650,40 @@ def _spans_lista_nomes_comuns(texto, lista_nomes_comuns):
     return _estender_nome_inteiro(texto, spans_substituicao, spans_pj)
 
 
+def spans_nomes_manuais(texto, nomes_manuais):
+    """Ocorrencias dos nomes informados a mao ("Faltou algum nome?"), inteiros ou palavra solta.
+
+    Valem em qualquer contexto (inclusive perto de endereco ou dentro de nome de pessoa juridica),
+    sem diferenca de maiuscula ou acento.
+    """
+    spans = []
+    for nome in nomes_manuais or []:
+        regex = _compilar_regex_nome_flexivel(str(nome or "").strip())
+        if regex is not None:
+            spans.extend(m.span() for m in regex.finditer(texto or ""))
+    return _mesclar_spans(spans)
+
+
+def spans_nao_tarjar(texto, trechos_nao_tarjar):
+    """Ocorrencias dos trechos que a pessoa mandou nao tarjar ("Retirar tarja"), em todo o documento.
+
+    Trecho so com letras casa sem diferenca de maiuscula ou acento; trecho com digitos ("926.511.422-72")
+    casa literalmente, com espacos flexiveis.
+    """
+    spans = []
+    for trecho in trechos_nao_tarjar or []:
+        trecho = re.sub(r"\s+", " ", str(trecho or "")).strip()
+        if not trecho:
+            continue
+        if re.search(r"\d", trecho) or not re.search(r"[A-Za-zÀ-ÖØ-öø-ÿ]", trecho):
+            regex = re.compile(r"\s+".join(re.escape(parte) for parte in trecho.split(" ")))
+        else:
+            regex = _compilar_regex_nome_flexivel(trecho)
+        if regex is not None:
+            spans.extend(m.span() for m in regex.finditer(texto or ""))
+    return _mesclar_spans(spans)
+
+
 def normalizar_placeholders_nome_parte(texto):
     if not texto:
         return texto

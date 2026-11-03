@@ -68,10 +68,19 @@ def executar_pipeline_anonimizacao(
     normalizar_placeholders_nome_parte_fn,
     placeholder_nome_parte_interno,
     retornar_metricas=False,
+    spans_nao_tarjar_fn=None,
+    nao_tarjar=None,
+    spans_nomes_manuais_fn=None,
+    nomes_manuais=None,
 ):
     metricas_pipeline = {}
     # Cada fase de nome troca trechos do texto; o rastreio guarda a posicao de cada troca no original.
     rastreado = TextoRastreado(texto_original)
+    # Revisao humana: "nao tarjar" vale mais que tudo; os nomes escritos a mao vem logo depois.
+    if spans_nao_tarjar_fn and nao_tarjar:
+        rastreado.proteger(spans_nao_tarjar_fn(texto_original, nao_tarjar))
+    if spans_nomes_manuais_fn and nomes_manuais:
+        rastreado.substituir(spans_nomes_manuais_fn(rastreado.texto, nomes_manuais), "<NOME>")
     metricas_metadado = aplicar_nomes_pf_metadados_fn(rastreado, nomes_pf_metadados, "<NOME>")
     if retornar_metricas:
         metricas_pipeline["metadado"] = metricas_metadado
@@ -111,6 +120,8 @@ def executar_pipeline_anonimizacao(
     resultados_analise = filtrar_resultados_analise_fn(resultados_analise_brutos, texto_para_anonimizar)
     # Deteccao inteira dentro de um marcador ja aplicado ("NOME" em <NOME>) e ruido.
     resultados_analise = [r for r in resultados_analise if not rastreado.dentro_de_marcador(r.start, r.end)]
+    # Deteccao que toca trecho marcado como "nao tarjar" e descartada.
+    resultados_analise = [r for r in resultados_analise if not rastreado.toca_protegido(r.start, r.end)]
     resultado_anonimizado_obj = anonymizer_engine.anonymize(
         text=texto_para_anonimizar,
         analyzer_results=resultados_analise,

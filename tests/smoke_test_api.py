@@ -65,6 +65,23 @@ def test_smoke():
     assert "Roberto Alencar de Lima" not in data_2["texto_anonimizado"]
     print("  [OK] Anonimização forçada por metadados passou com sucesso!")
 
+    # 3b. Revisão humana: nomes escritos à mão e trechos que não devem ser tarjados
+    print("\n[3b/5] Testando 'nomes_manuais' e 'nao_tarjar'...")
+    payload_revisao = {
+        "texto": "O Ministro SCHIETTI votou. O autor João Lima, CPF 926.511.422-72, citou Lima (2017).",
+        "nomes_manuais": ["Schietti"],
+        "nao_tarjar": ["Lima", "926.511.422-72"],
+    }
+    resp_revisao = client.post("/api/v1/anonimizar", json=payload_revisao)
+    assert resp_revisao.status_code == 200, f"Erro: {resp_revisao.text}"
+    texto_revisao = resp_revisao.json()["texto_anonimizado"]
+    print(f"  -> Texto anonimizado: {texto_revisao}")
+    assert "SCHIETTI" not in texto_revisao, "Nome manual não foi tarjado!"
+    assert "João" not in texto_revisao, "O nome ao lado do trecho liberado ficou à mostra!"
+    assert texto_revisao.count("Lima") == 2, "Trecho marcado como 'nao_tarjar' foi tarjado!"
+    assert "926.511.422-72" in texto_revisao, "CPF marcado como 'nao_tarjar' foi tarjado!"
+    print("  [OK] Revisão humana (nomes_manuais e nao_tarjar) passou com sucesso!")
+
     # 4. Teste de validação de erro (payload inválido)
     print("\n[4/5] Testando validação de entrada inválida...")
     resp_invalid = client.post("/api/v1/anonimizar", json={"campo_errado": 123})

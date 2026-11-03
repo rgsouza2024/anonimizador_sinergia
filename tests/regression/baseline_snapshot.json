@@ -1171,5 +1171,79 @@
         "text": "Bairro"
       }
     ]
+  },
+  {
+    "id": "revisao_nomes_manuais",
+    "input": "O Ministro SCHIETTI votou. Depois, Schietti divergiu. Kowalski Engenharia Ltda contratou José Antônio Kerber.",
+    "output": "O Ministro <NOME> votou. Depois, <NOME> divergiu. Kowalski Engenharia Ltda contratou <NOME>.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Ministro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Ministro"
+      },
+      {
+        "entity": "NOME",
+        "text": "SCHIETTI"
+      },
+      {
+        "entity": "NOME",
+        "text": "Schietti"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Engenharia"
+      },
+      {
+        "entity": "NOME",
+        "text": "José Antônio Kerber"
+      }
+    ]
+  },
+  {
+    "id": "revisao_nao_tarjar",
+    "input": "AUTOR: JOAO LIMA\nO autor João Lima, CPF 926.511.422-72, citou Lima (2017). Pedro Wosniak e Ana Wosniak depuseram.",
+    "output": "AUTOR: <NOME_PARTE_AUTORA> LIMA\nO autor <NOME_PARTE_AUTORA> Lima, CPF 926.511.422-72, citou Lima (2017). <NOME> <NOME> e Ana Wosniak depuseram.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "JOAO"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autor"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "João"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CPF"
+      },
+      {
+        "entity": "NOME",
+        "text": "Pedro"
+      },
+      {
+        "entity": "NOME",
+        "text": "Wosniak"
+      }
+    ]
   }
 ]

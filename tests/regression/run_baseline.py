@@ -26,7 +26,12 @@ def run_cases(cases):
     results = []
     for case in cases:
         metadata_pf_names = case.get("metadata_pf_names", [])
-        output_text, df = app._anonimizar_logica(case["input"], set(metadata_pf_names))
+        output_text, df = app._anonimizar_logica(
+            case["input"],
+            set(metadata_pf_names),
+            nomes_manuais=case.get("nomes_manuais", []),
+            nao_tarjar=case.get("nao_tarjar", []),
+        )
         entities = []
         if hasattr(df, "empty") and not df.empty:
             for _, row in df.iterrows():

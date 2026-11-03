@@ -58,6 +58,21 @@ def test_pdf_tarjado():
     print("[OK] PDF tarjado: dados retirados, texto público preservado, metadados apagados.")
 
 
+def test_pdf_tarjado_com_revisao():
+    resposta = client.post(
+        "/api/v1/pdf-tarjado",
+        files={"file": ("peticao.pdf", _pdf_de_teste(), "application/pdf")},
+        data={"nomes_manuais": ["INSS"], "nao_tarjar": ["Wosniak", "926.511.422-72"]},
+    )
+    assert resposta.status_code == 200, resposta.text
+    with fitz.open(stream=resposta.content, filetype="pdf") as tarjado:
+        texto = "".join(pagina.get_text() for pagina in tarjado)
+    assert "INSS" not in texto, "Nome manual continua no PDF tarjado"
+    assert "Wosniak" in texto and "926.511.422-72" in texto, "Trecho marcado como 'nao_tarjar' foi tarjado"
+    assert "KOWALCZYK" not in texto, "O restante deixou de ser tarjado"
+    print("[OK] PDF tarjado respeita nomes_manuais e nao_tarjar.")
+
+
 def test_pdf_tarjado_recusa_outro_formato():
     resposta = client.post("/api/v1/pdf-tarjado", files={"file": ("peca.docx", b"x", "application/octet-stream")})
     assert resposta.status_code == 400
@@ -66,5 +81,6 @@ def test_pdf_tarjado_recusa_outro_formato():
 
 if __name__ == "__main__":
     test_pdf_tarjado()
+    test_pdf_tarjado_com_revisao()
     test_pdf_tarjado_recusa_outro_formato()
     print("TODOS OS TESTES DO PDF TARJADO PASSARAM COM SUCESSO!")

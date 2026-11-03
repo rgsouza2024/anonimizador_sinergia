@@ -23,6 +23,8 @@ from core.text_filters import (
     extrair_nomes_pessoais_contextuais,
     filtrar_resultados_analise,
     normalizar_placeholders_nome_parte,
+    spans_nao_tarjar,
+    spans_nomes_manuais,
 )
 
 # Inicialização única dos motores de NLP e analisadores
@@ -39,8 +41,18 @@ anonymizer_engine = carregar_anonymizer_engine()
 operadores = obter_operadores_anonimizacao()
 
 
-def executar_anonimizacao(texto_original, nomes_pf_metadados=None, retornar_metricas=False):
-    """Executa o pipeline de anonimização no texto fornecido."""
+def executar_anonimizacao(
+    texto_original,
+    nomes_pf_metadados=None,
+    retornar_metricas=False,
+    nomes_manuais=None,
+    nao_tarjar=None,
+):
+    """Executa o pipeline de anonimização no texto fornecido.
+
+    nomes_manuais: nomes (ou palavras soltas) a tarjar onde aparecerem, além do que o motor encontra.
+    nao_tarjar: trechos que não devem ser tarjados em nenhuma passagem; valem mais que nomes_manuais.
+    """
     return executar_pipeline_anonimizacao(
         texto_original=texto_original,
         analyzer_engine=analyzer_engine,
@@ -59,4 +71,8 @@ def executar_anonimizacao(texto_original, nomes_pf_metadados=None, retornar_metr
         normalizar_placeholders_nome_parte_fn=normalizar_placeholders_nome_parte,
         placeholder_nome_parte_interno=PLACEHOLDER_NOME_PARTE_INTERNO,
         retornar_metricas=retornar_metricas,
+        spans_nao_tarjar_fn=spans_nao_tarjar,
+        nao_tarjar=nao_tarjar or [],
+        spans_nomes_manuais_fn=spans_nomes_manuais,
+        nomes_manuais=nomes_manuais or [],
     )

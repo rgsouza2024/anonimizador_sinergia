@@ -500,7 +500,15 @@ curl -X POST "http://localhost:7860/api/v1/pdf-tarjado" -F "file=@peticao_inicia
 
 Limites: texto dentro de imagem (PDF digitalizado sem OCR) não é lido nem tarjado; anotações e comentários do PDF não são tratados; em PDF que justifica o texto com o operador `Tw`, o texto restante pode se deslocar visualmente para baixo de uma tarja (o conteúdo removido continua correto).
 
-##### 4. Rota de Compatibilidade Retroativa (`POST /anonimizar`)
+##### 4. Revisão humana: `nomes_manuais` e `nao_tarjar`
+Os endpoints de texto, de arquivo e de PDF tarjado (e o microserviço `api_anonimizador.py`) aceitam dois campos opcionais:
+
+- `nomes_manuais`: nomes, ou palavras soltas, a tarjar onde aparecerem, além do que o motor encontra (sem diferença de maiúscula ou acento, inclusive perto de endereço ou dentro de nome de empresa);
+- `nao_tarjar`: trechos que não devem ser tarjados em nenhuma passagem do documento. Valem mais que `nomes_manuais`. Se o trecho liberado for parte de um nome maior ("Lima" em "João Lima"), só ele fica: o resto do nome continua tarjado.
+
+No JSON, são listas (`"nomes_manuais": ["Schietti"]`); em `multipart/form-data`, campos repetidos (`-F "nomes_manuais=Schietti" -F "nao_tarjar=926.511.422-72"`).
+
+##### 5. Rota de Compatibilidade Retroativa (`POST /anonimizar`)
 Mantida para garantir compatibilidade com sistemas legados que consumiam a versão inicial da API.
 
 ---
