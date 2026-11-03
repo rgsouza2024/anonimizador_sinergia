@@ -227,7 +227,8 @@ def _cortar_na_primeira_minuscula(nome):
         if token.upper() not in _CONECTORES_NOME and not token[0].isupper():
             nome = nome[:match.start()]
             break
-    # Sem conector solto no fim ("Maria da").
+    # Sem conector solto no fim ("Maria da") nem no comeco ("perito do Juízo" daria "do Juízo").
+    nome = re.sub(r"^\s*(?:(?:de|da|do|das|dos|e|DE|DA|DO|DAS|DOS|E)\s+)+", "", nome)
     return re.sub(r"(?:\s+(?:de|da|do|das|dos|e|DE|DA|DO|DAS|DOS|E))+\s*$", "", nome).strip()
 
 

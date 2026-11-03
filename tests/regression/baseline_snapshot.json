@@ -1346,5 +1346,84 @@
         "text": "requer"
       }
     ]
+  },
+  {
+    "id": "juizo_nao_vira_nome",
+    "input": "AO JUÍZO DE DIREITO DO JUIZADO ESPECIAL FEDERAL. Requer a nomeação de perito do Juízo e que este Juízo conceda a tutela. O perito da Silva Kowalski respondeu.",
+    "output": "AO JUÍZO DE DIREITO DO JUIZADO ESPECIAL FEDERAL. Requer a nomeação de perito do Juízo e que este Juízo conceda a tutela. O perito da <NOME> respondeu.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "JUÍZO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "DIREITO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "JUIZADO ESPECIAL FEDERAL"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "JUIZADO ESPECIAL FEDERAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "JUIZADO"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "ESPECIAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Requer"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "perito do Juízo"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "perito"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "perito"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Juízo"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Juízo"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Juízo"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "tutela"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "perito"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "perito"
+      },
+      {
+        "entity": "NOME",
+        "text": "Silva Kowalski"
+      }
+    ]
   }
 ]
