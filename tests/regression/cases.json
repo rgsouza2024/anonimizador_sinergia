@@ -171,5 +171,9 @@
   {
     "id": "rg_com_sob_o_numero",
     "input": "portadora da cédula \nde identidade sob o nº 13.416.880-11, do RG de nº 03.035.471-46 SSP/BA e do Registro Geral com o nº 5544332. A cédula de identidade de 1990 expirou."
+  },
+  {
+    "id": "estado_sozinho_nao_e_nome",
+    "input": "Jequié-Bahia, 09 de agosto de 2024. SEÇÃO JUDICIÁRIA DA BAHIA. A testemunha Maria Bahia depôs e Vitória compareceu."
   }
 ]

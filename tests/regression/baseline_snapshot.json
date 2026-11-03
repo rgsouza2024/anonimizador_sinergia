@@ -1460,5 +1460,48 @@
         "text": "Registro"
       }
     ]
+  },
+  {
+    "id": "estado_sozinho_nao_e_nome",
+    "input": "Jequié-Bahia, 09 de agosto de 2024. SEÇÃO JUDICIÁRIA DA BAHIA. A testemunha Maria Bahia depôs e Vitória compareceu.",
+    "output": "Jequié-Bahia, 09 de agosto de 2024. SEÇÃO JUDICIÁRIA DA BAHIA. A testemunha <NOME> depôs e <NOME> compareceu.",
+    "entities": [
+      {
+        "entity": "LOCATION",
+        "text": "Jequié-Bahia"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "Bahia"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "SEÇÃO JUDICIÁRIA"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "SEÇÃO JUDICIÁRIA"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "SEÇÃO"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "BAHIA"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "testemunha"
+      },
+      {
+        "entity": "NOME",
+        "text": "Maria Bahia"
+      },
+      {
+        "entity": "NOME",
+        "text": "Vitória"
+      }
+    ]
   }
 ]

@@ -174,13 +174,20 @@ def _spans_protegidos_lista_nomes(texto):
 
 
 _PALAVRAS_COMUNS_CAIXA_ALTA_NORMALIZADAS = {_normalizar_token_nome(t) for t in PALAVRAS_COMUNS_CAIXA_ALTA}
+# Estado de uma palavra so ("Bahia"): na lista, cada estado vem seguido da sigla ("Bahia", "BA").
+_ESTADOS_UMA_PALAVRA_NORMALIZADOS = {
+    _normalizar_token_nome(lugar)
+    for lugar, seguinte in zip(LISTA_ESTADOS_CAPITAIS_BR, LISTA_ESTADOS_CAPITAIS_BR[1:])
+    if " " not in lugar and len(lugar) > 2 and len(seguinte) == 2 and seguinte.isupper()
+}
 _REGEX_VIZINHO_DEPOIS = re.compile(r"[ \t ]+(?:(?:de|da|do|dos|das|e|DE|DA|DO|DOS|DAS|E)[ \t ]+)?")
 _REGEX_VIZINHO_ANTES = re.compile(r"(?:[ \t ]+(?:de|da|do|dos|das|e|DE|DA|DO|DOS|DAS|E))?[ \t ]+$")
 _PLACEHOLDERS_NOME = ("<NOME>", PLACEHOLDER_NOME_PARTE_INTERNO)
 
 
 def _remover_comum_isolada_caixa_alta(texto, spans):
-    """Em linha toda em maiusculas, palavra comum da lista so e tarjada se colada a outro nome."""
+    """Palavra comum em linha toda em maiusculas, e nome de estado ("Jequié-Bahia"), so sao tarjados
+    se colados a outro nome ("Maria Bahia")."""
     inicios = {inicio for inicio, _ in spans}
     fins = {fim for _, fim in spans}
 
@@ -210,7 +217,8 @@ def _remover_comum_isolada_caixa_alta(texto, spans):
             and _normalizar_token_nome(palavra) in _PALAVRAS_COMUNS_CAIXA_ALTA_NORMALIZADAS
             and linha_toda_em_maiusculas(inicio, fim)
         )
-        if comum_em_caixa_alta and not tem_nome_vizinho(inicio, fim):
+        estado = _normalizar_token_nome(palavra) in _ESTADOS_UMA_PALAVRA_NORMALIZADOS
+        if (comum_em_caixa_alta or estado) and not tem_nome_vizinho(inicio, fim):
             continue
         resultado.append((inicio, fim))
     return resultado
