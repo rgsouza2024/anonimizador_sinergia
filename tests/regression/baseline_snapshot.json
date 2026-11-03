@@ -1538,5 +1538,24 @@
         "text": "Valor"
       }
     ]
+  },
+  {
+    "id": "cpf_colado_ao_numero_ordinal",
+    "input": "inscrito no CPF sob o nº346.765.385-53, residente. CNPJ 16.727.230.0001-97 e número 12.346.765.385-53.",
+    "output": "inscrito no CPF sob o nº<CPF/CIN>, residente. CNPJ 16.727.230.0001-97 e número 12.346.765.385-53.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CPF"
+      },
+      {
+        "entity": "CPF",
+        "text": "346.765.385-53"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "número"
+      }
+    ]
   }
 ]

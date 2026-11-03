@@ -179,5 +179,9 @@
   {
     "id": "telefone_digitado_fora_do_padrao",
     "input": "Telefone: (73) 98869 – 98833 | (71) 9917-7805. Fone (62) 3201.4455. Valor R$ 334.837,00."
+  },
+  {
+    "id": "cpf_colado_ao_numero_ordinal",
+    "input": "inscrito no CPF sob o nº346.765.385-53, residente. CNPJ 16.727.230.0001-97 e número 12.346.765.385-53."
   }
 ]

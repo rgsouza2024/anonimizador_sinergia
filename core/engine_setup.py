@@ -73,8 +73,8 @@ def carregar_analyzer_engine(
             supported_entity="CPF",
             name="CustomCpfRecognizer",
             patterns=[
-                Pattern(name="cpf_formatado", regex=r"\b\d{3}\.\d{3}\.\d{3}-\d{2}\b", score=1.0),
-                Pattern(name="cpf_com_separadores", regex=r"\b\d{3}[.\s]\d{3}[.\s]\d{3}[-\s]\d{2}\b", score=0.99),
+                Pattern(name="cpf_formatado", regex=r"(?<!\d)(?<!\d\.)\d{3}\.\d{3}\.\d{3}-\d{2}\b", score=1.0),
+                Pattern(name="cpf_com_separadores", regex=r"(?<!\d)(?<!\d\.)\d{3}[.\s]\d{3}[.\s]\d{3}[-\s]\d{2}\b", score=0.99),
                 Pattern(name="cpf_com_rotulo", regex=r"(?i)\bCPF\s*(?:n[ºo°.]?\s*)?:?\s*\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b", score=1.0),
                 Pattern(name="cin_com_rotulo", regex=r"(?i)\bCIN\s*(?:n[ºo°.]?\s*)?:?\s*\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b", score=1.0),
                 Pattern(
