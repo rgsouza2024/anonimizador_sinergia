@@ -108,7 +108,6 @@ def executar_pipeline_anonimizacao(
         "ID_DOCUMENTO",
         "CNH",
         "SIAPE",
-        "MATRICULA_SIAPE",
     ]
     entidades_para_analise = list(set(entidades_para_analise) - {"DEFAULT", "PERSON"})
     resultados_analise_brutos = analyzer_engine.analyze(

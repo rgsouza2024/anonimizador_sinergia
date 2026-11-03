@@ -747,6 +747,9 @@ def filtrar_resultados_analise(resultados_analise, texto_analise):
             resultado.start < fim and resultado.end > inicio for inicio, fim in spans_numero_processo
         ):
             continue
+        if resultado.entity_type == "SIAPE":
+            # A detecção inclui o rótulo ("matrícula SIAPE nº"); só o número é tarjado.
+            resultado.start = resultado.end - 7
         trecho_detectado = texto_analise[resultado.start:resultado.end]
         if resultado.entity_type in {"CPF", "CIN"}:
             cpf_valido = cpf_tem_digitos_validos(trecho_detectado)

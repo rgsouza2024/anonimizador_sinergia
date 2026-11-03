@@ -190,9 +190,8 @@ Pipeline principal em `core/pipeline.py`:
 - `LEGAL_TITLE`: `keep`
 - `LEGAL_OR_COMMON_TERM`: `keep`
 - `CNH`: `replace` -> `***********`
-- `SIAPE`: `replace` -> `***`
+- `SIAPE`: `replace` -> `***` (só os 7 dígitos, e só com o rótulo `SIAPE`, `matrícula` ou `mat.` antes; o rótulo é mantido)
 - `RG_NUMBER`: `replace` -> `<NUMERO RG>`
-- `MATRICULA_SIAPE`: `replace` -> `***`
 - `TERMO_COMUM`: `keep`
 
 ### 4.2 Recognizers customizados (`core/engine_setup.py`)
@@ -212,7 +211,6 @@ Entidades custom registradas:
 - `CNH`
 - `SIAPE`
 - `RG_NUMBER`
-- `MATRICULA_SIAPE`
 - `ID_DOCUMENTO`
 
 ## 5. Estratégia de Nomes (PF x PJ)

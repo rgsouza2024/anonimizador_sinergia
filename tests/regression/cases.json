@@ -155,5 +155,9 @@
   {
     "id": "valor_em_reais_nao_e_telefone",
     "input": "Condeno ao pagamento de R$ 334.837,00, R$ 1.250,50 e R$ 98.765.432,10. Contato (62) 98765-4321, 3201-4455 ou +55 62 3201-4455."
+  },
+  {
+    "id": "siape_so_com_rotulo_e_rotulo_mantido",
+    "input": "Pagou 2500000 reais, art. 1234567 do código. Servidor, matrícula SIAPE nº 1234567; SIAPE: 7654321; mat. 2345678. A matrícula do imóvel foi averbada."
   }
 ]

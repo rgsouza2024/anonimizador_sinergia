@@ -221,9 +221,13 @@ def carregar_analyzer_engine(
         PatternRecognizer(
             supported_entity="SIAPE",
             name="SIAPERecognizer",
+            # Exige o rótulo; filtrar_resultados_analise recorta a detecção para os 7 dígitos.
             patterns=[
-                Pattern(name="siape_formatado", regex=r"\bSIAPE\s*(?:nº|n\.)?\s*\d{7}\b", score=0.98),
-                Pattern(name="siape_apenas_numeros", regex=r"\b(?<![\w])\d{7}(?![\w])\b", score=0.85),
+                Pattern(
+                    name="siape_com_rotulo",
+                    regex=r"(?i)\b(?:(?:matr[íi]cula|mat\.)(?:\s+(?:funcional|siape))?|siape)\s*(?:n[ºo°.]?\s*)?[:\-]?\s*\d{7}(?!\d)",
+                    score=0.98,
+                ),
             ],
             supported_language="pt",
         )
@@ -249,14 +253,6 @@ def carregar_analyzer_engine(
                     score=0.95,
                 ),
             ],
-            supported_language="pt",
-        )
-    )
-    analyzer.registry.add_recognizer(
-        PatternRecognizer(
-            supported_entity="MATRICULA_SIAPE",
-            name="MatriculaSiapeRecognizer",
-            patterns=[Pattern(name="matricula_siape", regex=r"(?i)\b(matr[íi]cula|siape)\b", score=0.95)],
             supported_language="pt",
         )
     )

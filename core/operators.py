@@ -24,7 +24,6 @@ def obter_operadores_anonimizacao():
         "CNH": OperatorConfig("replace", {"new_value": "***********"}),
         "SIAPE": OperatorConfig("replace", {"new_value": "***"}),
         "RG_NUMBER": OperatorConfig("replace", {"new_value": "<NUMERO RG>"}),
-        "MATRICULA_SIAPE": OperatorConfig("replace", {"new_value": "***"}),
         "TERMO_COMUM": OperatorConfig("keep"),
     }
 

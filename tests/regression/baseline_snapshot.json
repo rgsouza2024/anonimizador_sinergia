@@ -436,7 +436,7 @@
   {
     "id": "registro_stj_e_cnj_quebrado_nao_sao_siape",
     "input": "REsp 2024/0123456-7 distribuído. Processo 5046512-\n94.2016.4.04.7000 em trâmite. SIAPE 1234567.",
-    "output": "REsp 2024/0123456-7 distribuído. Processo 5046512-\n94.2016.4.04.7000 em trâmite. ***.",
+    "output": "REsp 2024/0123456-7 distribuído. Processo 5046512-\n94.2016.4.04.7000 em trâmite. SIAPE ***.",
     "entities": [
       {
         "entity": "TERMO_COMUM",
@@ -452,11 +452,7 @@
       },
       {
         "entity": "SIAPE",
-        "text": "SIAPE 1234567"
-      },
-      {
-        "entity": "MATRICULA_SIAPE",
-        "text": "SIAPE"
+        "text": "1234567"
       }
     ]
   },
@@ -1258,6 +1254,41 @@
       {
         "entity": "PHONE_NUMBER_BR",
         "text": "62 3201-4455"
+      }
+    ]
+  },
+  {
+    "id": "siape_so_com_rotulo_e_rotulo_mantido",
+    "input": "Pagou 2500000 reais, art. 1234567 do código. Servidor, matrícula SIAPE nº 1234567; SIAPE: 7654321; mat. 2345678. A matrícula do imóvel foi averbada.",
+    "output": "Pagou 2500000 reais, art. 1234567 do código. Servidor, matrícula SIAPE nº ***; SIAPE: ***; mat. ***. A matrícula do imóvel foi averbada.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "art."
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "código"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "SIAPE"
+      },
+      {
+        "entity": "SIAPE",
+        "text": "1234567"
+      },
+      {
+        "entity": "SIAPE",
+        "text": "7654321"
+      },
+      {
+        "entity": "SIAPE",
+        "text": "2345678"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "matrícula do imóvel"
       }
     ]
   }
