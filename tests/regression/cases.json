@@ -183,5 +183,9 @@
   {
     "id": "cpf_colado_ao_numero_ordinal",
     "input": "inscrito no CPF sob o nº346.765.385-53, residente. CNPJ 16.727.230.0001-97 e número 12.346.765.385-53."
+  },
+  {
+    "id": "rg_com_espaco_no_meio",
+    "input": "portador do RG nº 03.035.4 71-46 SSP/BA e da cédula de identidade 1234 567-8. Testemunha com RG 5544332 23-05-1990 compareceu; RG 7788990 em 2 vias."
   }
 ]

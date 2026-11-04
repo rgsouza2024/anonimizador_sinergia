@@ -1557,5 +1557,48 @@
         "text": "número"
       }
     ]
+  },
+  {
+    "id": "rg_com_espaco_no_meio",
+    "input": "portador do RG nº 03.035.4 71-46 SSP/BA e da cédula de identidade 1234 567-8. Testemunha com RG 5544332 23-05-1990 compareceu; RG 7788990 em 2 vias.",
+    "output": "portador do <NUMERO RG> e da <NUMERO RG>. Testemunha com <NUMERO RG> 23-05-1990 compareceu; <NUMERO RG> em 2 vias.",
+    "entities": [
+      {
+        "entity": "RG_NUMBER",
+        "text": "RG nº 03.035.4 71-46 SSP/BA"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "RG"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "BA"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "BA"
+      },
+      {
+        "entity": "RG_NUMBER",
+        "text": "cédula de identidade 1234 567-8"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Testemunha"
+      },
+      {
+        "entity": "RG_NUMBER",
+        "text": "RG 5544332"
+      },
+      {
+        "entity": "DATE_TIME",
+        "text": "23-05-1990"
+      },
+      {
+        "entity": "RG_NUMBER",
+        "text": "RG 7788990"
+      }
+    ]
   }
 ]
