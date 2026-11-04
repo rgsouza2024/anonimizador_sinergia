@@ -4,3 +4,5 @@ __pycache__/
 .claude/
 .env
 .env.*
+# Documentos reais de teste (dados pessoais): nunca versionar
+*.pdf
