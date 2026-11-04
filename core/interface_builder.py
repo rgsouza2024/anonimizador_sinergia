@@ -407,7 +407,7 @@ def criar_interface_gradio(
             with gr.TabItem("📄 Anonimizar arquivo PDF"):
                 gr.Markdown("Selecione um arquivo PDF com texto pesquisável (até 40MB e 500 páginas).", elem_classes=["step-instruction"])
                 upload_pdf = gr.File(
-                    label="Upload do arquivo PDF",
+                    label="Arquivo PDF",
                     file_types=[".pdf"],
                     height=130,
                 )
