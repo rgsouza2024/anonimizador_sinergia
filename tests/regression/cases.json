@@ -203,5 +203,9 @@
   {
     "id": "nome_inteiro_sobrenome_raro_no_meio_testemunha",
     "input": "A testemunha Rogerio Schietti Cruz depôs. Depois, a testemunha Schietti saiu."
+  },
+  {
+    "id": "cabecalho_de_tabela_nao_vira_empresa",
+    "input": "Grupo Familiar:\nNOME\nCPF\nESTADO CIVIL\nPARENTESCO\nJOSE SILVA DUARTE\n542.253.022-53\nSolteiro\nIrmão(ã)\nRéu: INSTITUTO NACIONAL DO SEGURO SOCIAL"
   }
 ]

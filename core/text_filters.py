@@ -138,10 +138,10 @@ def _extrair_spans_pessoa_juridica(texto):
 
     padroes_pj = [
         re.compile(
-            r"(?<!\w)[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD0-9.&/\-]*(?:\s+(?:DE|DA|DO|DAS|DOS|E|[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD0-9.&/\-]*)){1,14}(?!\w)"
+            r"(?<!\w)[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD0-9.&/\-]*(?:[^\S\n]+(?:DE|DA|DO|DAS|DOS|E|[A-Z\u00C0-\u00DD][A-Z\u00C0-\u00DD0-9.&/\-]*)){1,14}(?!\w)"
         ),
         re.compile(
-            r"(?<!\w)[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9.&/\-]*(?:\s+(?:de|da|do|das|dos|e|[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9.&/\-]*)){1,14}(?!\w)"
+            r"(?<!\w)[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9.&/\-]*(?:[^\S\n]+(?:de|da|do|das|dos|e|[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF0-9.&/\-]*)){1,14}(?!\w)"
         ),
     ]
     termos_pj_normalizados = [_normalizar_texto_para_filtro(termo) for termo in TERMOS_INDICADORES_PJ if termo]

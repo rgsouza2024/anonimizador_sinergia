@@ -1992,5 +1992,76 @@
         "text": "Schietti"
       }
     ]
+  },
+  {
+    "id": "cabecalho_de_tabela_nao_vira_empresa",
+    "input": "Grupo Familiar:\nNOME\nCPF\nESTADO CIVIL\nPARENTESCO\nJOSE SILVA DUARTE\n542.253.022-53\nSolteiro\nIrmão(ã)\nRéu: INSTITUTO NACIONAL DO SEGURO SOCIAL",
+    "output": "Grupo Familiar:\nNOME\nCPF\nESTADO CIVIL\nPARENTESCO\n<NOME> <NOME> <NOME>\n<CPF/CIN>\nSolteiro\nIrmão(ã)\nRéu: INSTITUTO NACIONAL DO SEGURO SOCIAL",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Grupo"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Familiar"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NOME"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CPF"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "ESTADO"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CIVIL"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "PARENTESCO"
+      },
+      {
+        "entity": "NOME",
+        "text": "JOSE"
+      },
+      {
+        "entity": "NOME",
+        "text": "SILVA"
+      },
+      {
+        "entity": "NOME",
+        "text": "DUARTE"
+      },
+      {
+        "entity": "CPF",
+        "text": "542.253.022-53"
+      },
+      {
+        "entity": "ESTADO_CIVIL",
+        "text": "Solteiro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Irmão"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Réu"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "INSTITUTO NACIONAL DO SEGURO SOCIAL"
+      }
+    ]
   }
 ]
