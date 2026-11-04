@@ -496,7 +496,9 @@ Recebe o mesmo PDF (`multipart/form-data`) e devolve o arquivo com tarja preta s
 curl -X POST "http://localhost:7860/api/v1/pdf-tarjado" -F "file=@peticao_inicial.pdf" -o peticao_inicial_tarjado.pdf
 ```
 
-Limites: texto dentro de imagem (PDF digitalizado sem OCR) não é lido nem tarjado; anotações e comentários do PDF não são tratados; em PDF que justifica o texto com o operador `Tw`, o texto restante pode se deslocar visualmente para baixo de uma tarja (o conteúdo removido continua correto).
+Páginas que o motor não consegue ler são identificadas por `core/pdf_texto.py`: página digitalizada ou captura de tela (uma imagem com mais de 25% da página e quase nenhum texto sobre ela) e página de **texto ilegível** (fonte sem tabela de caracteres: na tela o texto se lê, mas a extração devolve códigos de controle, como nas telas do registro civil anexadas a processos do INSS). O `/api/v1/anonimizar-arquivo` informa essas páginas no campo `paginas_nao_tarjaveis` (`{"texto_ilegivel": [...], "imagem": [...]}`); o `/api/v1/pdf-tarjado` as cobre por inteiro com `-F "cobrir_paginas_nao_tarjaveis=true"` (texto, imagens e desenhos são removidos e a página recebe um aviso) e, sem a opção, lista as que ficaram sem tarja no cabeçalho `X-Paginas-Nao-Tarjadas`. Na Interface Web Nativa, o aviso aparece no painel **Revisão da Anonimização**, com a opção de cobrir já marcada.
+
+Limites: texto dentro de imagem (PDF digitalizado sem OCR) não é lido nem tarjado, só coberto com a página inteira; anotações e comentários do PDF não são tratados; em PDF que justifica o texto com o operador `Tw`, o texto restante pode se deslocar visualmente para baixo de uma tarja (o conteúdo removido continua correto).
 
 ##### 4. Revisão humana: `nomes_manuais` e `nao_tarjar`
 Os endpoints de texto, de arquivo e de PDF tarjado (e o microserviço `api_anonimizador.py`) aceitam dois campos opcionais:

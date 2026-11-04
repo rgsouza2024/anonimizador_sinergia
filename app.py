@@ -31,6 +31,8 @@ from core.app_services import (
 )
 from core.engine_setup import carregar_analyzer_engine, carregar_anonymizer_engine
 from core.pdf_tarjado import gerar_pdf_tarjado
+from core.pdf_texto import paginas_nao_tarjaveis
+import fitz  # PyMuPDF
 from core.pipeline import executar_pipeline_anonimizacao
 from core.resources import (
     LISTA_ESTADO_CIVIL,
@@ -180,6 +182,11 @@ async def anonimizar_endpoint(req: AnonimizarRequest):
         "tempo_processamento": round(time.time() - inicio, 3)
     }
 
+def _paginas_nao_tarjaveis(conteudo_pdf):
+    with fitz.open(stream=conteudo_pdf, filetype="pdf") as documento:
+        return paginas_nao_tarjaveis(documento)
+
+
 @fastapi_app.post("/api/v1/anonimizar-arquivo")
 async def anonimizar_arquivo_endpoint(
     file: UploadFile = File(...),
@@ -242,6 +249,7 @@ async def anonimizar_arquivo_endpoint(
         "texto_anonimizado": texto_anon,
         "entidades_detectadas": entidades,
         "metadados_pdf": info_metadado,
+        "paginas_nao_tarjaveis": _paginas_nao_tarjaveis(conteudo) if nome_lower.endswith(".pdf") else None,
         "tempo_processamento": round(time.time() - inicio, 3)
     }
 
@@ -258,8 +266,14 @@ async def pdf_tarjado_endpoint(
     file: UploadFile = File(...),
     nomes_manuais: List[str] = Form([]),
     nao_tarjar: List[str] = Form([]),
+    cobrir_paginas_nao_tarjaveis: bool = Form(False),
 ):
-    """Devolve o PDF com tarja preta sobre os dados retirados (o texto sob a tarja é removido)."""
+    """Devolve o PDF com tarja preta sobre os dados retirados (o texto sob a tarja é removido).
+
+    Páginas que não podem ser tarjadas trecho a trecho (imagem, texto ilegível) são cobertas por
+    inteiro se cobrir_paginas_nao_tarjaveis for verdadeiro; as que ficarem sem tarja vão no
+    cabeçalho X-Paginas-Nao-Tarjadas.
+    """
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="O PDF tarjado só pode ser gerado a partir de um arquivo PDF (.pdf).")
     conteudo = await file.read()
@@ -281,13 +295,20 @@ async def pdf_tarjado_endpoint(
         nomes_manuais=nomes_manuais,
         nao_tarjar=nao_tarjar,
     )
-    pdf_bytes = gerar_pdf_tarjado(conteudo, metricas.get("trechos_tarjados", []))
+    nao_tarjaveis = _paginas_nao_tarjaveis(conteudo)
+    paginas = sorted(set(nao_tarjaveis["texto_ilegivel"]) | set(nao_tarjaveis["imagem"]))
+    pdf_bytes = gerar_pdf_tarjado(
+        conteudo, metricas.get("trechos_tarjados", []), paginas if cobrir_paginas_nao_tarjaveis else ()
+    )
     nome_base = os.path.splitext(os.path.basename(file.filename))[0]
     nome_saida = quote(f"{nome_base}_tarjado.pdf")
     return Response(
         content=pdf_bytes,
         media_type="application/pdf",
-        headers={"Content-Disposition": f"attachment; filename*=UTF-8''{nome_saida}"},
+        headers={
+            "Content-Disposition": f"attachment; filename*=UTF-8''{nome_saida}",
+            "X-Paginas-Nao-Tarjadas": "" if cobrir_paginas_nao_tarjaveis else ",".join(map(str, paginas)),
+        },
     )
 
 # Rota de compatibilidade para clientes legados

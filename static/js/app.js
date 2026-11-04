@@ -66,6 +66,9 @@
     btnRevisaoNomes: document.getElementById('btn-revisao-nomes'),
     reviewLiberados: document.getElementById('review-liberados'),
     reviewLiberadosChips: document.getElementById('review-liberados-chips'),
+    reviewPaginas: document.getElementById('review-paginas'),
+    reviewPaginasTexto: document.getElementById('review-paginas-texto'),
+    reviewCobrirPaginas: document.getElementById('review-cobrir-paginas'),
     auditFilterChips: document.getElementById('audit-filter-chips'),
     auditTableBody: document.getElementById('audit-table-body'),
     toastContainer: document.getElementById('toast-container')
@@ -200,6 +203,7 @@
     dom.btnDownloadPdf.style.display = 'none'; // o resultado na tela é de outro arquivo
     state.naoTarjar = []; // a revisão anterior era de outro documento
     dom.reviewNomes.value = '';
+    dom.reviewCobrirPaginas.checked = true;
     dom.fileBadgeName.textContent = file.name;
     dom.fileBadgeSize.textContent = `${(file.size / 1024).toFixed(1)} KB`;
     dom.fileBadge.style.display = 'flex';
@@ -354,6 +358,9 @@
       const formData = new FormData();
       formData.append('file', arquivo);
       anexarRevisao(formData);
+      const paginas = paginasNaoTarjaveis();
+      const cobrir = dom.reviewCobrirPaginas.checked;
+      formData.append('cobrir_paginas_nao_tarjaveis', cobrir ? 'true' : 'false');
       const response = await fetch(`${API_BASE}/api/v1/pdf-tarjado`, { method: 'POST', body: formData });
 
       if (!response.ok) {
@@ -374,10 +381,22 @@
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-      mostrarToast(
-        'PDF tarjado gerado. O texto sob as tarjas foi removido do arquivo. ' +
-        'Texto dentro de imagens (logotipo, marca d\'água, página digitalizada) não é tarjado: confira o PDF.',
-        'success', 7000);
+      if (paginas.length && !cobrir) {
+        mostrarToast(
+          `PDF tarjado gerado, mas ${paginas.length} página(s) ficaram sem tarja por serem imagem ou texto ilegível ` +
+          `(${formatarPaginas(paginas)}). Confira o PDF antes de usá-lo.`,
+          'error', 9000);
+      } else if (paginas.length) {
+        mostrarToast(
+          `PDF tarjado gerado. O texto sob as tarjas foi removido do arquivo, e ${paginas.length} página(s) ` +
+          'que não podiam ser tarjadas foram cobertas por inteiro.',
+          'success', 7000);
+      } else {
+        mostrarToast(
+          'PDF tarjado gerado. O texto sob as tarjas foi removido do arquivo. ' +
+          'Texto dentro de imagens (logotipo, marca d\'água, página digitalizada) não é tarjado: confira o PDF.',
+          'success', 7000);
+      }
     } catch (err) {
       console.error(err);
       let msg = err.message || 'Erro inesperado.';
@@ -470,8 +489,41 @@
     renderizarRevisao();
   }
 
+  // Páginas de PDF que o motor não lê (imagem ou texto ilegível), informadas pelo backend
+  function paginasNaoTarjaveis() {
+    const info = (state.resultados && state.activeFile && state.resultados.paginas_nao_tarjaveis) || {};
+    return [...new Set([...(info.texto_ilegivel || []), ...(info.imagem || [])])].sort((a, b) => a - b);
+  }
+
+  // [16, 17, 19, 20, 21] -> "16–17, 19–21"
+  function formatarPaginas(paginas) {
+    const faixas = [];
+    paginas.forEach(p => {
+      const ultima = faixas[faixas.length - 1];
+      if (ultima && p === ultima[1] + 1) ultima[1] = p;
+      else faixas.push([p, p]);
+    });
+    return faixas.map(([a, b]) => (a === b ? `${a}` : `${a}–${b}`)).join(', ');
+  }
+
+  function renderizarAvisoPaginas() {
+    const info = (state.resultados && state.activeFile && state.resultados.paginas_nao_tarjaveis) || {};
+    const partes = [];
+    if ((info.texto_ilegivel || []).length) {
+      partes.push(`Texto ilegível para o anonimizador (a fonte não informa as letras): páginas ${formatarPaginas(info.texto_ilegivel)}.`);
+    }
+    if ((info.imagem || []).length) {
+      partes.push(`Imagem ou documento digitalizado: páginas ${formatarPaginas(info.imagem)}.`);
+    }
+    dom.reviewPaginasTexto.textContent = partes.length
+      ? `${partes.join(' ')} Nada nessas páginas foi lido nem tarjado.`
+      : '';
+    dom.reviewPaginas.style.display = partes.length ? 'flex' : 'none';
+  }
+
   function renderizarRevisao() {
     dom.reviewSection.style.display = 'block';
+    renderizarAvisoPaginas();
     dom.reviewLiberadosChips.innerHTML = '';
     state.naoTarjar.forEach((trecho, indice) => {
       const chip = document.createElement('button');

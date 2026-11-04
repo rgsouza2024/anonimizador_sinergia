@@ -125,6 +125,51 @@ def test_pdf_fatiado():
     print("[OK] PDF fatiado em recortes: texto remontado e tarjado no lugar certo.")
 
 
+def _pdf_com_paginas_nao_tarjaveis():
+    """Página 1 normal; 2 digitalizada (imagem com rodapé); 3 com texto ilegível (códigos de controle,
+    como as telas do registro civil gravadas com fonte sem tabela de caracteres)."""
+    documento = fitz.open()
+    normal = documento.new_page()
+    normal.insert_text((72, 72), "AUTOR: JOAO PEDRO KOWALCZYK", fontsize=11)
+    normal.insert_text((72, 90), "O autor requer o benefício.", fontsize=11)
+    digitalizada = documento.new_page()
+    imagem = fitz.Pixmap(fitz.csRGB, fitz.IRect(0, 0, 60, 80), False)
+    imagem.clear_with(200)
+    digitalizada.insert_image(fitz.Rect(40, 60, 560, 700), pixmap=imagem)
+    digitalizada.insert_text((40, 780), "Num. 2269495045 - Pág. 1", fontsize=8)
+    ilegivel = documento.new_page()
+    ilegivel.insert_text((72, 72), "".join(chr(i) for i in range(1, 31)) * 2, fontsize=11)
+    conteudo = documento.tobytes()
+    documento.close()
+    return conteudo
+
+
+def test_paginas_nao_tarjaveis():
+    conteudo = _pdf_com_paginas_nao_tarjaveis()
+    resposta = client.post("/api/v1/anonimizar-arquivo", files={"file": ("processo.pdf", conteudo, "application/pdf")})
+    assert resposta.status_code == 200, resposta.text
+    assert resposta.json()["paginas_nao_tarjaveis"] == {"texto_ilegivel": [3], "imagem": [2]}, resposta.json()
+
+    sem_cobrir = client.post("/api/v1/pdf-tarjado", files={"file": ("processo.pdf", conteudo, "application/pdf")})
+    assert sem_cobrir.headers["x-paginas-nao-tarjadas"] == "2,3"
+    with fitz.open(stream=sem_cobrir.content, filetype="pdf") as tarjado:
+        assert len(tarjado[1].get_images()) == 1, "Sem a opção, a página digitalizada deveria ficar como está"
+
+    coberto = client.post(
+        "/api/v1/pdf-tarjado",
+        files={"file": ("processo.pdf", conteudo, "application/pdf")},
+        data={"cobrir_paginas_nao_tarjaveis": "true"},
+    )
+    assert coberto.headers["x-paginas-nao-tarjadas"] == ""
+    with fitz.open(stream=coberto.content, filetype="pdf") as tarjado:
+        assert "requer o benefício" in tarjado[0].get_text() and "KOWALCZYK" not in tarjado[0].get_text()
+        for indice in (1, 2):
+            pagina = tarjado[indice]
+            assert not pagina.get_images(), "Imagem continua na página coberta"
+            assert pagina.get_text().startswith("Página coberta pelo anonimizador"), pagina.get_text()
+    print("[OK] Páginas de imagem e de texto ilegível: informadas e, a pedido, cobertas por inteiro.")
+
+
 def test_pdf_tarjado_recusa_outro_formato():
     resposta = client.post("/api/v1/pdf-tarjado", files={"file": ("peca.docx", b"x", "application/octet-stream")})
     assert resposta.status_code == 400
@@ -135,5 +180,6 @@ if __name__ == "__main__":
     test_pdf_tarjado()
     test_pdf_tarjado_com_revisao()
     test_pdf_fatiado()
+    test_paginas_nao_tarjaveis()
     test_pdf_tarjado_recusa_outro_formato()
     print("TODOS OS TESTES DO PDF TARJADO PASSARAM COM SUCESSO!")

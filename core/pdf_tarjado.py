@@ -77,13 +77,40 @@ def _tarjas(pagina, texto_pagina, trechos, caixas=None):
     return tarjas
 
 
-def gerar_pdf_tarjado(conteudo_pdf, trechos_tarjados):
-    """Devolve os bytes do PDF com tarja preta sobre cada trecho (inicio, fim) do texto extraido."""
+_AVISO_PAGINA_COBERTA = (
+    "Página coberta pelo anonimizador: o conteúdo desta página (imagem ou texto ilegível) "
+    "não pôde ser lido para tarjar."
+)
+
+
+def _cobrir_pagina(pagina):
+    """Remove texto, imagens e desenhos da pagina inteira e a pinta de preto, com um aviso."""
+    pagina.add_redact_annot(pagina.rect, fill=(0, 0, 0))
+    pagina.apply_redactions(
+        images=getattr(fitz, "PDF_REDACT_IMAGE_REMOVE", 2),
+        graphics=getattr(fitz, "PDF_REDACT_LINE_ART_REMOVE_IF_TOUCHED", 2),
+    )
+    margem = 0.1 * pagina.rect.width
+    caixa = fitz.Rect(margem, pagina.rect.height / 2 - 40, pagina.rect.width - margem, pagina.rect.height / 2 + 40)
+    pagina.insert_textbox(caixa, _AVISO_PAGINA_COBERTA, fontsize=12, color=(1, 1, 1), align=fitz.TEXT_ALIGN_CENTER)
+
+
+def gerar_pdf_tarjado(conteudo_pdf, trechos_tarjados, paginas_cobrir=()):
+    """Devolve os bytes do PDF com tarja preta sobre cada trecho (inicio, fim) do texto extraido.
+
+    paginas_cobrir: numeros (a partir de 1) das paginas cobertas por inteiro, por nao poderem ser
+    tarjadas trecho a trecho (ver paginas_nao_tarjaveis em core/pdf_texto.py).
+    """
+    paginas_cobrir = set(paginas_cobrir or ())
     with fitz.open(stream=conteudo_pdf, filetype="pdf") as documento:
         deslocamento = 0
-        for pagina in documento:
+        for numero, pagina in enumerate(documento, start=1):
             texto_pagina, caixas = texto_da_pagina(pagina)
             fim_pagina = deslocamento + len(texto_pagina)
+            if numero in paginas_cobrir:
+                _cobrir_pagina(pagina)
+                deslocamento = fim_pagina
+                continue
             trechos_pagina = [
                 (max(inicio, deslocamento) - deslocamento, min(fim, fim_pagina) - deslocamento)
                 for inicio, fim in trechos_tarjados

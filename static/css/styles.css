@@ -1121,6 +1121,39 @@ body::after {
   color: var(--color-text-muted);
 }
 
+.review-alerta {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px 12px;
+  border: 1px solid var(--hl-doc-border);
+  border-radius: var(--radius-md);
+  background-color: var(--hl-doc-bg);
+  color: var(--hl-doc-text);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.review-alerta-icone {
+  flex: none;
+  margin-top: 1px;
+}
+
+.review-alerta-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.review-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
 .btn-row-action {
   padding: 3px 9px;
   font-size: 0.76rem;

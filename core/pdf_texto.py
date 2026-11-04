@@ -89,3 +89,53 @@ def texto_da_pagina(pagina):
     if _pagina_fatiada(pedacos):
         return _remontar(pedacos)
     return pagina.get_text(), None
+
+
+# Paginas que o motor nao consegue tarjar:
+# - texto ilegivel: fonte sem tabela de caracteres; na tela o texto se le, mas a extracao devolve
+#   codigos de controle ("\x00\x01\x02"), e o motor nao acha nada nele;
+# - imagem: pagina digitalizada ou captura de tela, sem texto por cima da imagem.
+_MINIMO_CARACTERES_ILEGIVEIS = 20
+# Area de UMA imagem, em fracao da pagina: logotipo, brasao e marca d'agua do papel timbrado ficam em
+# ate 20%; documento digitalizado passa de 30%.
+_MINIMO_AREA_IMAGEM = 0.25
+# Na digitalizacao, so o rodape do PJe/INSS cai sobre a imagem (ate ~100 caracteres); na peca em papel
+# timbrado, o texto inteiro.
+_MAXIMO_CARACTERES_SOBRE_IMAGEM = 150
+
+
+def _trecho_ilegivel(texto):
+    return any(ord(c) < 32 and c not in "\t\n\r" for c in texto)
+
+
+def paginas_nao_tarjaveis(documento):
+    """{"texto_ilegivel": [...], "imagem": [...]}, com os numeros das paginas a partir de 1."""
+    ilegivel, imagem = [], []
+    for numero, pagina in enumerate(documento, start=1):
+        caracteres_ilegiveis, centros_legiveis = 0, []
+        for bloco in pagina.get_text("rawdict", flags=FLAGS_RAWDICT_SO_TEXTO)["blocks"]:
+            for linha in bloco.get("lines", []):
+                for span in linha["spans"]:
+                    if _trecho_ilegivel("".join(c["c"] for c in span["chars"])):
+                        caracteres_ilegiveis += sum(1 for c in span["chars"] if not c["c"].isspace())
+                    else:
+                        centros_legiveis += [
+                            fitz.Point((c["bbox"][0] + c["bbox"][2]) / 2, (c["bbox"][1] + c["bbox"][3]) / 2)
+                            for c in span["chars"]
+                            if not c["c"].isspace()
+                        ]
+        if caracteres_ilegiveis >= _MINIMO_CARACTERES_ILEGIVEIS:
+            ilegivel.append(numero)
+            continue
+        area_pagina = pagina.rect.get_area()
+        grandes = {
+            tuple(r)
+            for r in (fitz.Rect(info["bbox"]) & pagina.rect for info in pagina.get_image_info())
+            if r.get_area() >= _MINIMO_AREA_IMAGEM * area_pagina
+        }
+        if grandes:
+            grandes = [fitz.Rect(r) for r in grandes]
+            sobre_imagem = sum(1 for p in centros_legiveis if any(p in r for r in grandes))
+            if sobre_imagem < _MAXIMO_CARACTERES_SOBRE_IMAGEM:
+                imagem.append(numero)
+    return {"texto_ilegivel": ilegivel, "imagem": imagem}
