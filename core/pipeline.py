@@ -72,7 +72,7 @@ def executar_pipeline_anonimizacao(
     nao_tarjar=None,
     spans_nomes_manuais_fn=None,
     nomes_manuais=None,
-    spans_magistrados_fn=None,
+    spans_agentes_publicos_fn=None,
 ):
     metricas_pipeline = {}
     # Cada fase de nome troca trechos do texto; o rastreio guarda a posicao de cada troca no original.
@@ -80,12 +80,12 @@ def executar_pipeline_anonimizacao(
     # Revisao humana: "nao tarjar" vale mais que tudo; os nomes escritos a mao vem logo depois.
     if spans_nao_tarjar_fn and nao_tarjar:
         rastreado.proteger(spans_nao_tarjar_fn(texto_original, nao_tarjar))
-    # Magistrado citado na jurisprudencia fica visivel, salvo se a pessoa mandou tarjar o nome a mao.
-    if spans_magistrados_fn:
+    # Magistrado e membro da AGU ficam visiveis, salvo se a pessoa mandou tarjar o nome a mao.
+    if spans_agentes_publicos_fn:
         spans_manuais = spans_nomes_manuais_fn(texto_original, nomes_manuais) if spans_nomes_manuais_fn and nomes_manuais else []
         rastreado.proteger([
             (inicio, fim)
-            for inicio, fim in spans_magistrados_fn(texto_original)
+            for inicio, fim in spans_agentes_publicos_fn(texto_original)
             if not any(a < fim and inicio < b for a, b in spans_manuais)
         ])
     if spans_nomes_manuais_fn and nomes_manuais:

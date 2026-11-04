@@ -512,7 +512,7 @@ Na Interface Web Nativa, o painel **Revisão da Anonimização** traz a caixa "F
 
 No JSON, são listas (`"nomes_manuais": ["Schietti"]`); em `multipart/form-data`, campos repetidos (`-F "nomes_manuais=Schietti" -F "nao_tarjar=926.511.422-72"`).
 
-Nome de magistrado logo depois do rótulo ("Relator", "Rel.", "Min.", "Ministro", "Des. Fed.", "Desembargador Federal", "Juiz(a) Federal") não é tarjado: é agente público no exercício da função, citado na jurisprudência ou atuando no processo. Para tarjar mesmo assim, informe o nome em `nomes_manuais`.
+Nome de magistrado logo depois do rótulo ("Relator", "Rel.", "Min.", "Ministro", "Des. Fed.", "Desembargador Federal", "Juiz(a) Federal") não é tarjado: é agente público no exercício da função, citado na jurisprudência ou atuando no processo. O mesmo vale para membro da AGU com o cargo antes do nome ou na linha de baixo da assinatura ("Procurador(a) Federal", "Advogado(a) da União", "Procurador(a) da Fazenda Nacional", "Procurador(a) do Banco Central"); "procurador" sozinho é o advogado da parte e continua tarjado. Para tarjar mesmo assim, informe o nome em `nomes_manuais`.
 
 ##### 5. Rota de Compatibilidade Retroativa (`POST /anonimizar`)
 Mantida para garantir compatibilidade com sistemas legados que consumiam a versão inicial da API.

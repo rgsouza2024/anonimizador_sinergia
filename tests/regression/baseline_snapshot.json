@@ -2217,5 +2217,124 @@
         "text": "número"
       }
     ]
+  },
+  {
+    "id": "membro_da_agu_nao_e_tarjado",
+    "input": "Nesses termos, pede deferimento.\nKARINY CHISTINA DE OLIVEIRA\nProcuradora Federal\nContestação da Procuradora Federal Ana Maria Souza.\nMARCOS ANTONIO PEREIRA\nAdvogado da União\nProcurador Federal\nJOSE CARLOS KOWALSKI ajuizou a ação.\nA autora, por seu procurador JOAO PEDRO KOWALCZYK, requer. MARIA APARECIDA SOUZA\nProcuradora",
+    "output": "Nesses termos, pede deferimento.\nKARINY CHISTINA DE OLIVEIRA\nProcuradora Federal\nContestação da Procuradora Federal Ana Maria Souza.\nMARCOS ANTONIO PEREIRA\nAdvogado da União\nProcurador Federal\n<NOME> <NOME> KOWALSKI ajuizou a ação.\nA autora, por seu procurador <NOME> <NOME> <NOME>, requer. <NOME> <NOME> <NOME>\nProcuradora",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "termos"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "pede deferimento"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Federal"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Federal"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Contestação"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Federal"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Federal"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Advogado"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Advogado"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Procurador"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Procurador"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Federal"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Federal"
+      },
+      {
+        "entity": "NOME",
+        "text": "JOSE"
+      },
+      {
+        "entity": "NOME",
+        "text": "CARLOS"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "ação"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autora"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autora"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "procurador"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "procurador"
+      },
+      {
+        "entity": "NOME",
+        "text": "JOAO"
+      },
+      {
+        "entity": "NOME",
+        "text": "PEDRO"
+      },
+      {
+        "entity": "NOME",
+        "text": "KOWALCZYK"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requer"
+      },
+      {
+        "entity": "NOME",
+        "text": "MARIA"
+      },
+      {
+        "entity": "NOME",
+        "text": "APARECIDA"
+      },
+      {
+        "entity": "NOME",
+        "text": "SOUZA"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Procuradora"
+      }
+    ]
   }
 ]

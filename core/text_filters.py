@@ -723,6 +723,12 @@ _ROTULO_MAGISTRADO = (
     r"|Des\.(?:\s*Fed\.)?|Desembargador(?:a\b|\(a\)|\b)(?:\s+Federal\b)?"
     r"|Ju[íi]z(?:a|\(a\))?\s+Federal\b(?:\s+Convocad[oa]\b)?)"
 )
+# Membro da AGU no exercicio da funcao. "Procurador" sozinho fica de fora: "por seu procurador FULANO"
+# e o advogado particular da parte.
+_ROTULO_AGU = (
+    r"(?i:Procurador(?:a|\(a\))?\s+(?:Federal|da\s+Fazenda\s+Nacional|do\s+Banco\s+Central)\b"
+    r"|Advogad[oa](?:\(a\))?\s+da\s+Uni[ãa]o\b)"
+)
 _TOKEN_NOME_MAGISTRADO = r"(?:[A-ZÀ-Ý][A-Za-zÀ-ÖØ-öø-ÿ']+|[A-Z]\.)"
 _REGEX_MAGISTRADO = re.compile(
     rf"(?:{_ROTULO_MAGISTRADO}\s*:?\s*)+"
@@ -733,12 +739,21 @@ _FIM_NOME_MAGISTRADO = {
     "DE", "DA", "DO", "DAS", "DOS", "E", "DATA", "TURMA", "TRIBUNAL", "PLENO", "PLENARIO", "JUIZADO", "VARA",
     "SECAO", "SUBSECAO", "JULGAMENTO", "JULGADO", "PUBLICACAO", "DECISAO", "ORGAO", "NUM", "FEDERAL", "ESPECIAL",
 }
+# Membro da AGU: nome na mesma linha depois do cargo ("Procuradora Federal Fulana") ou assinatura com o
+# cargo na linha de baixo ("FULANA DE TAL / Procuradora Federal"). Nunca na linha seguinte ao cargo, que
+# pode ser o comeco de outro paragrafo.
+_NOME_NA_LINHA = (
+    rf"{_TOKEN_NOME_MAGISTRADO}(?:[ \t]+(?:(?:de|da|do|das|dos|e|DE|DA|DO|DAS|DOS|E)[ \t]+)?{_TOKEN_NOME_MAGISTRADO})"
+)
+_REGEX_CARGO_AGU_ANTES_DO_NOME = re.compile(rf"{_ROTULO_AGU}[ \t]*:?[ \t]*(?P<nome>{_NOME_NA_LINHA}{{0,7}})")
+_REGEX_NOME_ANTES_DO_CARGO_AGU = re.compile(rf"(?m)^[ \t]*(?P<nome>{_NOME_NA_LINHA}{{1,7}})[ \t]*\n[ \t]*{_ROTULO_AGU}")
 
 
-def spans_magistrados_citados(texto):
-    """Trechos com nome de magistrado logo depois do rotulo (relator, ministro, desembargador, juiz federal)."""
-    spans = []
-    for match in _REGEX_MAGISTRADO.finditer(texto or ""):
+def spans_agentes_publicos(texto):
+    """Nome de agente publico no exercicio da funcao, que nao e tarjado: magistrado logo depois do rotulo
+    (relator, ministro, desembargador, juiz federal) e membro da AGU antes ou depois do cargo."""
+    spans = [match.span("nome") for match in _REGEX_NOME_ANTES_DO_CARGO_AGU.finditer(texto or "")]
+    for match in list(_REGEX_MAGISTRADO.finditer(texto or "")) + list(_REGEX_CARGO_AGU_ANTES_DO_NOME.finditer(texto or "")):
         inicio = match.start("nome")
         fim = inicio
         for token in re.finditer(r"\S+", match.group("nome")):
