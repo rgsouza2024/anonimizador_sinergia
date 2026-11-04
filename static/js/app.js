@@ -14,7 +14,7 @@
     activeFile: null, // Objeto File (.pdf ou .docx) se carregado
     resultados: null, // { texto_anonimizado, texto_original, entidades_detectadas, tempo_processamento }
     highlightMode: true,
-    filtroEntidadeAtual: 'ALL',
+    filtroEntidadeAtual: 'TARJADOS',
     naoTarjar: [] // trechos que a pessoa mandou não tarjar ("Retirar tarja")
   };
 
@@ -60,8 +60,8 @@
     // Estatísticas & Auditoria (Sem Emojis)
     statsSection: document.getElementById('stats-section'),
     statTempo: document.getElementById('stat-tempo'),
-    statTotalEntidades: document.getElementById('stat-total-entidades'),
-    statTiposEntidades: document.getElementById('stat-tipos-entidades'),
+    statTarjados: document.getElementById('stat-tarjados'),
+    statMantidos: document.getElementById('stat-mantidos'),
     auditSection: document.getElementById('audit-section'),
     reviewSection: document.getElementById('review-section'),
     reviewNomes: document.getElementById('review-nomes'),
@@ -494,8 +494,10 @@
     const entidades = data.entidades_detectadas || [];
     const tempo = data.tempo_processamento || 0;
 
+    const totalTarjados = filtrarEntidades(entidades, 'TARJADOS').length;
     dom.statTempo.textContent = `${tempo.toFixed(2)}s`;
-    dom.statTotalEntidades.textContent = entidades.length;
+    dom.statTarjados.textContent = totalTarjados;
+    dom.statMantidos.textContent = entidades.length - totalTarjados;
 
     const contagemPorTipo = {};
     entidades.forEach(e => {
@@ -503,15 +505,21 @@
       contagemPorTipo[tipo] = (contagemPorTipo[tipo] || 0) + 1;
     });
 
-    const totalTipos = Object.keys(contagemPorTipo).length;
-    dom.statTiposEntidades.textContent = totalTipos;
     dom.statsSection.style.display = 'grid';
 
-    dom.auditFilterChips.innerHTML = `
-      <button class="filter-chip ${state.filtroEntidadeAtual === 'ALL' ? 'active' : ''}" data-filter="ALL">Todas (${entidades.length})</button>
-    `;
+    const grupos = [
+      ['TARJADOS', 'Tarjados', totalTarjados],
+      ['MANTIDOS', 'Mantidos', entidades.length - totalTarjados],
+      ['ALL', 'Todas', entidades.length]
+    ];
+    dom.auditFilterChips.innerHTML = grupos.map(([filtro, rotulo, qtd]) =>
+      `<button class="filter-chip ${state.filtroEntidadeAtual === filtro ? 'active' : ''}" data-filter="${filtro}">${rotulo} (${qtd})</button>`
+    ).join('');
 
-    Object.entries(contagemPorTipo).sort((a, b) => b[1] - a[1]).forEach(([tipo, qtd]) => {
+    // Tipos tarjados primeiro, depois os mantidos; em cada grupo, do mais frequente ao menos
+    Object.entries(contagemPorTipo).sort((a, b) =>
+      (TIPOS_TARJADOS.has(b[0]) - TIPOS_TARJADOS.has(a[0])) || (b[1] - a[1])
+    ).forEach(([tipo, qtd]) => {
       const chip = document.createElement('button');
       chip.className = `filter-chip ${state.filtroEntidadeAtual === tipo ? 'active' : ''}`;
       chip.dataset.filter = tipo;
@@ -581,12 +589,18 @@
     processarUniversal();
   }
 
+  // Filtros da auditoria: grupo (tarjados, mantidos, todas) ou um tipo de entidade
+  function filtrarEntidades(entidades, filtro) {
+    if (filtro === 'ALL') return entidades;
+    if (filtro === 'TARJADOS') return entidades.filter(e => TIPOS_TARJADOS.has(e.Entidade));
+    if (filtro === 'MANTIDOS') return entidades.filter(e => !TIPOS_TARJADOS.has(e.Entidade));
+    return entidades.filter(e => e.Entidade === filtro);
+  }
+
   function renderizarLinhasTabela(entidades, filtro) {
     dom.auditTableBody.innerHTML = '';
 
-    const filtradas = filtro === 'ALL' 
-      ? entidades 
-      : entidades.filter(e => e.Entidade === filtro);
+    const filtradas = filtrarEntidades(entidades, filtro);
 
     if (filtradas.length === 0) {
       dom.auditTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--color-text-muted); padding: 24px;">Nenhuma entidade encontrada para este filtro.</td></tr>';
@@ -611,6 +625,8 @@
         botao.textContent = 'Retirar tarja';
         botao.dataset.trecho = e['Texto Detectado'];
         tr.lastElementChild.appendChild(botao);
+      } else if (!TIPOS_TARJADOS.has(e.Entidade)) {
+        tr.lastElementChild.innerHTML = '<span class="audit-mantido" title="Reconhecido pelo motor e mantido visível no texto">Mantido</span>';
       }
       dom.auditTableBody.appendChild(tr);
     });

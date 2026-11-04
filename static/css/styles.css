@@ -1174,6 +1174,13 @@ body::after {
   white-space: nowrap;
 }
 
+/* Linha da auditoria que o motor reconheceu mas deixou visível */
+.audit-mantido {
+  font-size: 0.76rem;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
 /* ── 13. NOTIFICAÇÕES TOAST (SEM EMOJIS, APENAS ÍCONES VETORIAIS) ────────── */
 .toast-container {
   position: fixed;
