@@ -187,5 +187,9 @@
   {
     "id": "rg_com_espaco_no_meio",
     "input": "portador do RG nº 03.035.4 71-46 SSP/BA e da cédula de identidade 1234 567-8. Testemunha com RG 5544332 23-05-1990 compareceu; RG 7788990 em 2 vias."
+  },
+  {
+    "id": "cep_quebrado_entre_linhas",
+    "input": "residente em Campo Verde/MT, CEP 78840-\n000, vem requerer. Outro endereço: CEP: 40.110 - 909. Processo AC 5011021-\n34.2023.4.04.7112 e valor 12345 678."
   }
 ]

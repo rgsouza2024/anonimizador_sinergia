@@ -146,7 +146,7 @@ def carregar_analyzer_engine(
             supported_entity="CEP_NUMBER",
             name="CustomCepRecognizer",
             patterns=[
-                Pattern(name="cep_com_rotulo", regex=r"(?i)\bCEP\s*[:\-]?\s*\d{5}-?\d{3}\b", score=0.99),
+                Pattern(name="cep_com_rotulo", regex=r"(?i)\bCEP\s*[:\-]?\s*\d{2}\.?\d{3}(?:\s*-\s*|-?)\d{3}\b", score=0.99),
                 Pattern(name="cep_hifen", regex=r"\b\d{5}-\d{3}\b", score=0.93),
                 Pattern(name="cep_pontuado", regex=r"\b\d{2}\.\d{3}-\d{3}\b", score=0.93),
             ],

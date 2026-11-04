@@ -1600,5 +1600,64 @@
         "text": "RG 7788990"
       }
     ]
+  },
+  {
+    "id": "cep_quebrado_entre_linhas",
+    "input": "residente em Campo Verde/MT, CEP 78840-\n000, vem requerer. Outro endereço: CEP: 40.110 - 909. Processo AC 5011021-\n34.2023.4.04.7112 e valor 12345 678.",
+    "output": "residente em Campo Verde/MT, <CEP>, vem requerer. Outro endereço: <CEP>. Processo AC 5011021-\n34.2023.4.04.7112 e valor 12345 678.",
+    "entities": [
+      {
+        "entity": "LOCATION",
+        "text": "Campo Verde"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Campo"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "MT"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "MT"
+      },
+      {
+        "entity": "CEP_NUMBER",
+        "text": "CEP 78840-\n000"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CEP"
+      },
+      {
+        "entity": "CEP_NUMBER",
+        "text": "CEP: 40.110 - 909"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "CEP"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Processo"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "AC"
+      },
+      {
+        "entity": "DATE_TIME",
+        "text": "4.04.7112"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "valor"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "valor"
+      }
+    ]
   }
 ]
