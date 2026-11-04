@@ -30,10 +30,10 @@ def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None, info_
         if identificado:
             sufixo_metadado = (
                 f" Metadados (nomes PF): identificado ({total_nomes} nome(s)); "
-                f"ocorrencias forcadas: {ocorrencias_forcadas}."
+                f"ocorrências forçadas: {ocorrencias_forcadas}."
             )
         else:
-            sufixo_metadado = " Metadados (nomes PF): nao identificado."
+            sufixo_metadado = " Metadados (nomes PF): não identificado."
     if df_resultados is None or df_resultados.empty:
         return f"**Resumo ({origem}):** nenhuma entidade detectada.{sufixo_metadado}{sufixo_tempo}"
     total_entidades = len(df_resultados)
@@ -42,7 +42,7 @@ def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None, info_
     top_formatado = ", ".join([f"{entidade} ({qtde})" for entidade, qtde in top_tipos.items()])
     return (
         f"**Resumo ({origem}):** {total_entidades} entidades detectadas em "
-        f"{tipos_unicos} tipos. Principais ocorrencias: {top_formatado}.{sufixo_metadado}{sufixo_tempo}"
+        f"{tipos_unicos} tipos. Principais ocorrências: {top_formatado}.{sufixo_metadado}{sufixo_tempo}"
     )
 
 
@@ -63,7 +63,7 @@ def extrair_texto_de_pdf(caminho_arquivo_pdf):
             if documento_pdf.page_count > LIMITE_PDF_PAGINAS:
                 return (
                     None,
-                    f"O PDF excede o limite de {LIMITE_PDF_PAGINAS} paginas.",
+                    f"O PDF excede o limite de {LIMITE_PDF_PAGINAS} páginas.",
                     set(),
                 )
             nomes_pf_metadados = extrair_nomes_pf_metadados_pdf(documento_pdf.metadata or {})
@@ -73,5 +73,5 @@ def extrair_texto_de_pdf(caminho_arquivo_pdf):
         print(f"Erro ao extrair texto do PDF: {e}")
         return None, f"Erro ao extrair texto do PDF: {e}", set()
     if not texto_completo.strip():
-        return None, "O PDF carregado nao contem texto extraivel.", nomes_pf_metadados
+        return None, "O PDF carregado não contém texto extraível.", nomes_pf_metadados
     return texto_completo, None, nomes_pf_metadados
