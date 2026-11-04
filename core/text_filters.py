@@ -910,6 +910,12 @@ def extrair_nomes_pf_metadados_pdf(metadados_pdf):
                 nomes.add(candidato)
 
         for segmento in re.split(r"[;\n|]", valor_campo):
+            # "REU: FULANO" -> "FULANO". Advogado fica de fora, como no padrao por papel acima.
+            rotulo = re.match(r"\s*([A-Za-zÀ-ÖØ-öø-ÿ ]+?)\s*:\s*", segmento)
+            if rotulo:
+                if re.fullmatch(r"(?i)advogad[oa]s?|procurador(?:a|es)?", rotulo.group(1).strip()):
+                    continue
+                segmento = segmento[rotulo.end():]
             candidato = _limpar_candidato_nome_metadado(segmento)
             if _candidato_metadado_e_pessoa(candidato):
                 nomes.add(candidato)
