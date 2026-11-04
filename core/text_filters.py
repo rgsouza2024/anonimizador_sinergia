@@ -312,7 +312,8 @@ def extrair_nomes_parte_alvo(texto_original, papeis=PAPEIS_ALVO_NOME_PARTE):
 
     padrao_linha_rotulo = re.compile(rf"(?im)^\s*({papeis_regex})\s*:\s*(.+?)\s*$")
     for match in padrao_linha_rotulo.finditer(texto_original):
-        nome_limpo = _limpar_nome_extraido(match.group(2))
+        # "AUTOR: NOME, brasileiro, ..." -> o nome termina na primeira virgula.
+        nome_limpo = _limpar_nome_extraido(match.group(2).split(",")[0])
         if _nome_parte_passa_filtros(nome_limpo):
             nomes_encontrados.add(nome_limpo)
 

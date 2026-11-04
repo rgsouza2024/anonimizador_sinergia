@@ -191,5 +191,9 @@
   {
     "id": "cep_quebrado_entre_linhas",
     "input": "residente em Campo Verde/MT, CEP 78840-\n000, vem requerer. Outro endereço: CEP: 40.110 - 909. Processo AC 5011021-\n34.2023.4.04.7112 e valor 12345 678."
+  },
+  {
+    "id": "autor_com_qualificacao_na_mesma_linha",
+    "input": "AUTOR: JOAO PEDRO KOWALCZYK, brasileiro, solteiro, lavrador, residente em Campo Verde/MT, requer o benefício. O autor JOAO PEDRO KOWALCZYK é segurado.\nPACIENTE: MARCOS ANTONIO ZIELINSKI, preso preventivamente, impetra habeas corpus."
   }
 ]

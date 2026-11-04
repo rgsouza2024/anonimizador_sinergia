@@ -1659,5 +1659,80 @@
         "text": "valor"
       }
     ]
+  },
+  {
+    "id": "autor_com_qualificacao_na_mesma_linha",
+    "input": "AUTOR: JOAO PEDRO KOWALCZYK, brasileiro, solteiro, lavrador, residente em Campo Verde/MT, requer o benefício. O autor JOAO PEDRO KOWALCZYK é segurado.\nPACIENTE: MARCOS ANTONIO ZIELINSKI, preso preventivamente, impetra habeas corpus.",
+    "output": "AUTOR: <NOME_PARTE_AUTORA>, brasileiro, solteiro, lavrador, residente em Campo Verde/MT, requer o benefício. O autor <NOME_PARTE_AUTORA> é segurado.\nPACIENTE: <NOME>, preso preventivamente, impetra habeas corpus.",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "JOAO PEDRO KOWALCZYK"
+      },
+      {
+        "entity": "ESTADO_CIVIL",
+        "text": "solteiro"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Campo Verde"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Campo"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "MT"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "MT"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requer"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "benefício"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autor"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autor"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "JOAO PEDRO KOWALCZYK"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "segurado"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "PACIENTE"
+      },
+      {
+        "entity": "NOME",
+        "text": "MARCOS ANTONIO ZIELINSKI"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "habeas corpus"
+      }
+    ]
   }
 ]
