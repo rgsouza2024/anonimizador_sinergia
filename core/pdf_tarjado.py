@@ -23,18 +23,27 @@ _SEM_TRACOS = getattr(fitz, "PDF_REDACT_LINE_ART_NONE", 0)
 def _caracteres_da_pagina(pagina):
     """Texto da pagina reconstruido caractere a caractere, com (x0, x1, linha de base, tamanho) de cada um.
 
-    Quebra de linha recebe None.
+    Caractere de linha que nao corre da esquerda para a direita (texto girado, como no extrato do CNIS
+    impresso de lado) recebe ja o par (retangulo de remocao, retangulo pintado). Quebra de linha recebe None.
     """
     texto, caixas = [], []
     for bloco in pagina.get_text("rawdict", flags=FLAGS_RAWDICT_SO_TEXTO)["blocks"]:
         if bloco.get("type") != 0:
             continue
         for linha in bloco["lines"]:
+            direcao = linha["dir"]
+            horizontal = abs(direcao[1]) < 1e-3 and direcao[0] > 0
             for span in linha["spans"]:
                 for caractere in span["chars"]:
                     texto.append(caractere["c"])
-                    x0, _, x1, _ = caractere["bbox"]
-                    caixas.append((x0, x1, caractere["origin"][1], span["size"]))
+                    if horizontal:
+                        x0, _, x1, _ = caractere["bbox"]
+                        caixas.append((x0, x1, caractere["origin"][1], span["size"]))
+                    else:
+                        caixas.append(tuple(
+                            _faixa_girada(caractere, span["size"], direcao, faixa)
+                            for faixa in (_FAIXA_REMOCAO, _FAIXA_TARJA)
+                        ))
             texto.append("\n")
             caixas.append(None)
     return "".join(texto), caixas
@@ -43,6 +52,29 @@ def _caracteres_da_pagina(pagina):
 def _faixa(x0, x1, base, tamanho, faixa):
     acima, abaixo = faixa
     return fitz.Rect(x0, base - acima * tamanho, x1, base + abaixo * tamanho)
+
+
+def _faixa_girada(caractere, tamanho, direcao, faixa):
+    """A mesma faixa de _faixa para um caractere de linha com outra direcao.
+
+    Ao longo da linha, cobre a caixa do caractere; na perpendicular, vai de 'abaixo' a 'acima' da linha
+    de base, no sentido em que a letra "sobe" (a esquerda da direcao da linha).
+    """
+    acima, abaixo = faixa
+    dx, dy = direcao
+    sobe = (dy, -dx)
+    ox, oy = caractere["origin"]
+    x0, y0, x1, y1 = caractere["bbox"]
+    ao_longo = [(x - ox) * dx + (y - oy) * dy for x in (x0, x1) for y in (y0, y1)]
+    pontos = [
+        fitz.Point(ox + dx * a + sobe[0] * t, oy + dy * a + sobe[1] * t)
+        for a in (min(ao_longo), max(ao_longo))
+        for t in (-abaixo * tamanho, acima * tamanho)
+    ]
+    retangulo = fitz.Rect(pontos[0], pontos[0])
+    for ponto in pontos[1:]:
+        retangulo |= ponto
+    return retangulo
 
 
 def _tarjas(pagina, texto_pagina, trechos, caixas=None):
@@ -57,11 +89,17 @@ def _tarjas(pagina, texto_pagina, trechos, caixas=None):
     if texto_reconstruido == texto_pagina:
         for inicio, fim in trechos:
             atual = None  # [x0, x1, base, tamanho] da tarja em montagem nesta linha
+            girada = None  # (remocao, pintada) da tarja em montagem numa linha de texto girado
             for caixa in caixas[inicio:fim] + [None]:
                 if caixa is None:  # quebra de linha (ou fim do trecho): fecha a tarja desta linha
                     if atual is not None:
                         tarjas.append((_faixa(*atual, _FAIXA_REMOCAO), _faixa(*atual, _FAIXA_TARJA)))
-                    atual = None
+                    if girada is not None:
+                        tarjas.append(girada)
+                    atual = girada = None
+                    continue
+                if len(caixa) == 2:
+                    girada = caixa if girada is None else (girada[0] | caixa[0], girada[1] | caixa[1])
                     continue
                 x0, x1, base, tamanho = caixa
                 if atual is None:

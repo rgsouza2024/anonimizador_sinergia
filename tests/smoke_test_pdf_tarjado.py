@@ -170,6 +170,25 @@ def test_paginas_nao_tarjaveis():
     print("[OK] Páginas de imagem e de texto ilegível: informadas e, a pedido, cobertas por inteiro.")
 
 
+def test_pdf_tarjado_texto_girado():
+    # Extrato do CNIS impresso de lado: as linhas correm de baixo para cima numa página em pé.
+    documento = fitz.open()
+    pagina = documento.new_page()
+    pagina.insert_text((72, 72), "Extrato previdenciário anexado aos autos.", fontsize=11)
+    for x, linha in ((120, "CPF: 529.982.247-25"), (140, "Nome: JOAO PEDRO KOWALCZYK")):
+        pagina.insert_text((x, 700), linha, fontsize=10, rotate=90)
+    conteudo = documento.tobytes()
+
+    resposta = client.post("/api/v1/pdf-tarjado", files={"file": ("cnis.pdf", conteudo, "application/pdf")})
+    assert resposta.status_code == 200, resposta.text
+    with fitz.open(stream=resposta.content, filetype="pdf") as tarjado:
+        texto = tarjado[0].get_text()
+    assert "Extrato previdenciário anexado aos autos." in texto, texto
+    for dado in ("529.982", "247-25", "JOAO PEDRO", "KOWALCZYK"):
+        assert dado not in texto, f"{dado} continua no PDF tarjado: {texto!r}"
+    print("[OK] Texto girado: a tarja segue a direção da linha.")
+
+
 def test_pdf_tarjado_recusa_outro_formato():
     resposta = client.post("/api/v1/pdf-tarjado", files={"file": ("peca.docx", b"x", "application/octet-stream")})
     assert resposta.status_code == 400
@@ -181,5 +200,6 @@ if __name__ == "__main__":
     test_pdf_tarjado_com_revisao()
     test_pdf_fatiado()
     test_paginas_nao_tarjaveis()
+    test_pdf_tarjado_texto_girado()
     test_pdf_tarjado_recusa_outro_formato()
     print("TODOS OS TESTES DO PDF TARJADO PASSARAM COM SUCESSO!")
