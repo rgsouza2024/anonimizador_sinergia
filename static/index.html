@@ -26,12 +26,12 @@
         </div>
       </div>
       <div class="header-actions">
-        <div class="status-pill" title="Motores de NLP (Presidio + spaCy) operando em memória local protegida">
+        <div class="status-pill status-verificando" id="status-motor" role="status" title="Verificando se o servidor e os motores de NLP estão disponíveis">
           <div class="status-dot-wrapper">
             <div class="status-dot-pulse"></div>
             <div class="status-dot"></div>
           </div>
-          <span>Motor NLP Online</span>
+          <span id="status-motor-texto">Verificando motor...</span>
         </div>
         <button id="btn-theme-toggle" class="btn-theme-toggle" title="Alternar Modo Claro / Escuro" aria-label="Alternar tema">
           <!-- Sol (Light Mode) -->

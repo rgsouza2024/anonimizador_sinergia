@@ -298,6 +298,13 @@ body::after {
   animation: pulseBeacon 2s infinite ease-out;
 }
 
+/* Indicador ainda verificando ou com o motor fora do ar: sem o pulso verde */
+.status-verificando .status-dot { background: var(--jf-cinza); }
+.status-offline .status-dot { background: var(--color-error); }
+.status-offline { color: var(--color-error); border-color: var(--color-error-border); }
+.status-verificando .status-dot-pulse,
+.status-offline .status-dot-pulse { display: none; }
+
 @keyframes pulseBeacon {
   0% { transform: scale(0.5); opacity: 1; }
   100% { transform: scale(1.6); opacity: 0; }

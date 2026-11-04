@@ -7,7 +7,7 @@ import time
 import gradio as gr
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request, File, Form, UploadFile, HTTPException
-from fastapi.responses import RedirectResponse, FileResponse, Response
+from fastapi.responses import RedirectResponse, FileResponse, JSONResponse, Response
 from urllib.parse import quote
 from fastapi.staticfiles import StaticFiles
 from typing import List, Optional
@@ -315,6 +315,22 @@ async def pdf_tarjado_endpoint(
 @fastapi_app.post("/anonimizar")
 async def handle_compatibility_request(req: AnonimizarRequest):
     return await anonimizar_endpoint(req)
+
+
+@fastapi_app.get("/health")
+async def health():
+    """Estado dos motores, consultado pelo indicador de status da interface (503 se algum falhou)."""
+    analyzer_ok = analyzer_engine is not None
+    anonymizer_ok = anonymizer_engine is not None
+    motores_ok = analyzer_ok and anonymizer_ok
+    return JSONResponse(
+        status_code=200 if motores_ok else 503,
+        content={
+            "status": "ok" if motores_ok else "erro",
+            "analyzer_carregado": analyzer_ok,
+            "anonymizer_carregado": anonymizer_ok,
+        },
+    )
 
 # ── fim REST API ──────────────────────────────────────────────────────────────
 

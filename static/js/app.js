@@ -31,6 +31,8 @@
     iconMoon: document.getElementById('icon-moon'),
     privacyToggle: document.getElementById('privacy-toggle'),
     privacyCard: document.getElementById('privacy-card'),
+    statusMotor: document.getElementById('status-motor'),
+    statusMotorTexto: document.getElementById('status-motor-texto'),
 
     // Entrada Universal
     panelInput: document.getElementById('panel-input'),
@@ -236,6 +238,28 @@
     ? 'http://127.0.0.1:7860'
     : '';
 
+  // Indicador de status do cabeçalho: reflete o /health do servidor
+  const STATUS_MOTOR = {
+    verificando: ['Verificando motor...', 'Verificando se o servidor e os motores de NLP estão disponíveis'],
+    online: ['Motor NLP Online', 'Motores de NLP (Presidio + spaCy) operando em memória local protegida'],
+    offline: ['Motor indisponível', 'O servidor não respondeu ou os motores de NLP não carregaram. Nova verificação a cada 30 segundos.']
+  };
+
+  function definirStatusMotor(estado) {
+    dom.statusMotor.className = `status-pill status-${estado}`;
+    dom.statusMotorTexto.textContent = STATUS_MOTOR[estado][0];
+    dom.statusMotor.title = STATUS_MOTOR[estado][1];
+  }
+
+  async function verificarMotor() {
+    try {
+      const response = await fetch(`${API_BASE}/health`, { cache: 'no-store' });
+      definirStatusMotor(response.ok ? 'online' : 'offline');
+    } catch (err) {
+      definirStatusMotor('offline');
+    }
+  }
+
   // Revisão humana: nomes escritos à mão e trechos liberados, enviados em toda anonimização
   function parametrosRevisao() {
     return {
@@ -316,6 +340,7 @@
         data.sucesso = true;
       }
 
+      definirStatusMotor('online');
       state.resultados = data;
       renderizarResultados(data);
       renderizarAuditoriaEEstatisticas(data);
@@ -329,7 +354,8 @@
       console.error(err);
       let msg = err.message || 'Erro inesperado.';
       if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
-        msg = 'Não foi possível conectar ao servidor backend (http://127.0.0.1:7860). Certifique-se de que o backend Python está em execução.';
+        definirStatusMotor('offline');
+        msg ='Não foi possível conectar ao servidor backend (http://127.0.0.1:7860). Certifique-se de que o backend Python está em execução.';
       }
       mostrarToast(msg, 'error', 4500);
     } finally {
@@ -409,7 +435,8 @@
       console.error(err);
       let msg = err.message || 'Erro inesperado.';
       if (msg.includes('Failed to fetch') || msg.includes('NetworkError') || msg.includes('Load failed')) {
-        msg = 'Não foi possível conectar ao servidor backend (http://127.0.0.1:7860). Certifique-se de que o backend Python está em execução.';
+        definirStatusMotor('offline');
+        msg ='Não foi possível conectar ao servidor backend (http://127.0.0.1:7860). Certifique-se de que o backend Python está em execução.';
       }
       mostrarToast(msg, 'error', 4500);
     } finally {
@@ -734,6 +761,10 @@
 
     // Rolagem Sincronizada
     inicializarRolagemSincronizada();
+
+    // Status do motor: ao abrir e a cada 30 segundos
+    verificarMotor();
+    setInterval(verificarMotor, 30000);
   }
 
   document.addEventListener('DOMContentLoaded', inicializarEventos);
