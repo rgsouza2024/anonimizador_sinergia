@@ -52,7 +52,7 @@ Anonimizar conteúdo jurídico em múltiplos formatos (texto livre, PDF com text
 
 - **Entrada Omnimodal:**
   - **Texto direto** (digitação ou colagem na interface)
-  - **PDF textual** (extração por PyMuPDF). Página gravada em recortes verticais, em que cada linha vem em pedaços fora de ordem, é detectada e tem o texto remontado linha a linha pela posição dos caracteres (`core/pdf_texto.py`); o PDF tarjado usa o mesmo texto.
+  - **PDF textual** (extração por PyMuPDF). Página gravada em recortes verticais, em que cada linha vem em pedaços fora de ordem, é detectada e tem o texto remontado linha a linha pela posição dos caracteres (`core/pdf_texto.py`); o PDF tarjado usa o mesmo texto. Texto girado (linhas que correm de baixo para cima, como no extrato do CNIS impresso de lado) é tarjado na direção da linha.
   - **Documentos Word (.docx)** (extração de parágrafos e tabelas via `python-docx`)
 - **Interfaces de Usuário:**
   - **Interface Web Nativa (Padrão Oficial):** SPA moderna servida na raiz (`/`), com realce visual de entidades (*highlighting*), alternância de tema (Claro/Escuro) e download de documento.
@@ -61,6 +61,7 @@ Anonimizar conteúdo jurídico em múltiplos formatos (texto livre, PDF com text
   - `POST /api/v1/anonimizar`: Endpoint JSON para anonimização de textos livres e metadados.
   - `POST /api/v1/anonimizar-arquivo`: Endpoint universal para upload de arquivos PDF e DOCX via `multipart/form-data`.
   - `POST /api/v1/pdf-tarjado`: Devolve o próprio PDF com tarja preta sobre os dados retirados.
+  - `GET /health`: Estado dos motores de NLP (200 quando carregados, 503 se algum falhou).
   - `POST /anonimizar`: Rota de compatibilidade retroativa para clientes legados.
 - **Saídas estruturadas:**
   - Texto anonimizado com substituições parametrizadas (`<CPF/CIN>`, `<ENDERECO>`, `<NOME>`, etc.).
@@ -83,6 +84,7 @@ A aplicação oferece dois pontos de entrada independentes para atender a difere
      - `POST /api/v1/anonimizar` (texto livre via JSON)
      - `POST /api/v1/anonimizar-arquivo` (PDF e Word `.docx` via upload multipart)
      - `POST /api/v1/pdf-tarjado` (PDF original com tarja preta sobre os dados retirados)
+     - `GET /health` (estado dos motores, consultado pelo indicador de status da interface)
      - `POST /anonimizar` (compatibilidade retroativa)
 
 2. **Microserviço REST Isolado (`api_anonimizador.py` - Porta 8000):**
@@ -464,8 +466,11 @@ docker compose --profile full up -d --build app-completo
 - SPA moderna em HTML5/CSS3/JavaScript servida diretamente pelo FastAPI.
 - Alternância instantânea de tema Claro/Escuro (*Dark/Light Mode*).
 - Realce colorido de cada tipo de entidade detectada sobre o texto.
-- Tabela interativa com estatísticas e filtros por tipo de dado sensível.
+- Tabela interativa com estatísticas e filtros por tipo de dado sensível. Os indicadores e os filtros separam os **dados tarjados** dos termos **mantidos no texto** (cargos, órgãos, locais, estado civil), e a tabela abre nos tarjados.
 - Botão de cópia e download imediato do documento sanitizado.
+- Indicador de status no cabeçalho ("Motor NLP Online", "Motor indisponível"), que consulta `GET /health` ao abrir, a cada 30 segundos e quando uma requisição falha.
+- Com arquivo anexado, a caixa da esquerda mostra o texto extraído em modo somente leitura: o que se anonimiza é o arquivo. Ao remover o arquivo, o texto fica editável e passa a ser anonimizado como texto.
+- Números no formato brasileiro (tempo, tamanho do arquivo, confiança e contagens).
 
 ##### 2. Upload de Arquivos PDF e Word DOCX (`POST /api/v1/anonimizar-arquivo`)
 Endpoint universal que aceita documentos PDF e Word via `multipart/form-data`:
@@ -498,7 +503,7 @@ Recebe o mesmo PDF (`multipart/form-data`) e devolve o arquivo com tarja preta s
 curl -X POST "http://localhost:7860/api/v1/pdf-tarjado" -F "file=@peticao_inicial.pdf" -o peticao_inicial_tarjado.pdf
 ```
 
-Páginas que o motor não consegue ler são identificadas por `core/pdf_texto.py`: página digitalizada ou captura de tela (uma imagem com mais de 25% da página e quase nenhum texto sobre ela) e página de **texto ilegível** (fonte sem tabela de caracteres: na tela o texto se lê, mas a extração devolve códigos de controle, como nas telas do registro civil anexadas a processos do INSS). O `/api/v1/anonimizar-arquivo` informa essas páginas no campo `paginas_nao_tarjaveis` (`{"texto_ilegivel": [...], "imagem": [...]}`); o `/api/v1/pdf-tarjado` as cobre por inteiro com `-F "cobrir_paginas_nao_tarjaveis=true"` (texto, imagens e desenhos são removidos e a página recebe um aviso) e, sem a opção, lista as que ficaram sem tarja no cabeçalho `X-Paginas-Nao-Tarjadas`. Na Interface Web Nativa, o aviso aparece no painel **Revisão da Anonimização**, com a opção de cobrir já marcada.
+Páginas que o motor não consegue ler são identificadas por `core/pdf_texto.py`: página digitalizada ou captura de tela (uma imagem com mais de 25% da página e quase nenhum texto sobre ela) e página de **texto ilegível** (fonte sem tabela de caracteres: na tela o texto se lê, mas a extração devolve códigos de controle, como nas telas do registro civil anexadas a processos do INSS). O `/api/v1/anonimizar-arquivo` informa essas páginas no campo `paginas_nao_tarjaveis` (`{"texto_ilegivel": [...], "imagem": [...]}`); o `/api/v1/pdf-tarjado` as cobre por inteiro com `-F "cobrir_paginas_nao_tarjaveis=true"` (texto, imagens e desenhos são removidos e a página, pintada de preto, recebe o aviso "Página ocultada para proteger dados pessoais", com o motivo — imagem ou fonte que o anonimizador não consegue ler — e a orientação de consultar o documento original) e, sem a opção, lista as que ficaram sem tarja no cabeçalho `X-Paginas-Nao-Tarjadas`. Na Interface Web Nativa, o aviso aparece no painel **Revisão da Anonimização**, com a opção de cobrir já marcada.
 
 Limites: texto dentro de imagem (PDF digitalizado sem OCR) não é lido nem tarjado, só coberto com a página inteira; anotações e comentários do PDF não são tratados; em PDF que justifica o texto com o operador `Tw`, o texto restante pode se deslocar visualmente para baixo de uma tarja (o conteúdo removido continua correto).
 
@@ -532,7 +537,7 @@ Mantida para garantir compatibilidade com sistemas legados que consumiam a vers�
 | **API Texto JSON** | ✔️ Sim (`/api/v1/anonimizar`) | ✔️ Sim (`/api/v1/anonimizar`) |
 | **Upload PDF / DOCX** | ❌ Não | ✔️ Sim (`/api/v1/anonimizar-arquivo`) |
 | **PDF tarjado** | ❌ Não | ✔️ Sim (`/api/v1/pdf-tarjado`) |
-| **Healthcheck** | ✔️ Sim (`/health`) | Embutido no FastAPI |
+| **Healthcheck** | ✔️ Sim (`/health`) | ✔️ Sim (`/health`) |
 | **Consumo de Memória** | Mais enxuto (~700 MB a 1 GB) | Completo (~1 GB a 1.4 GB) |
 | **Público Alvo** | Sistemas externos, integrações, microsserviços | Usuários finais, servidores, analistas |
 
@@ -549,6 +554,7 @@ Mantida para garantir compatibilidade com sistemas legados que consumiam a vers�
   - Web UI SPA: `http://localhost:7860/`
   - Gradio UI: `http://localhost:7860/ui/`
   - Swagger: `http://localhost:7860/docs`
+  - Health: `http://localhost:7860/health`
 
 #### Hugging Face Spaces (quando publicado)
 - **Web UI Nativa:** `https://[seu-space].hf.space/`
@@ -556,6 +562,7 @@ Mantida para garantir compatibilidade com sistemas legados que consumiam a vers�
 - **API Texto:** `POST https://[seu-space].hf.space/api/v1/anonimizar`
 - **API Arquivo (PDF/DOCX):** `POST https://[seu-space].hf.space/api/v1/anonimizar-arquivo`
 - **API PDF tarjado:** `POST https://[seu-space].hf.space/api/v1/pdf-tarjado`
+- **Health:** `GET https://[seu-space].hf.space/health`
 
 ## 9. Testes e Validação
 
