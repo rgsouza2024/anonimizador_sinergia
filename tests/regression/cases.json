@@ -207,5 +207,9 @@
   {
     "id": "cabecalho_de_tabela_nao_vira_empresa",
     "input": "Grupo Familiar:\nNOME\nCPF\nESTADO CIVIL\nPARENTESCO\nJOSE SILVA DUARTE\n542.253.022-53\nSolteiro\nIrmão(ã)\nRéu: INSTITUTO NACIONAL DO SEGURO SOCIAL"
+  },
+  {
+    "id": "rotulos_de_formulario_nao_viram_nome",
+    "input": "Fato gerador/ Data de Nascimento\n10/11/2023\nSexo\nFeminino\nMARIA APARECIDA KOWALSKA\n(  ) Titular      (X) Componente\nGrupo familiar\nMÃE\nNOME DO NASCIDO\nJOAO PEDRO KOWALCZYK\n19/03/2024 ATÉ OS DIAS ATUAIS\nPena - reclusão, de um a cinco anos.\nJunta a certidão de nascimento, sob pena de preclusão, há dias. A testemunha Ana Nascimento compareceu. ADVOCACIA AGUIAR - contato.aguiar@gmail.com"
   }
 ]

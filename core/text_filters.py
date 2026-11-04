@@ -186,10 +186,16 @@ _PLACEHOLDERS_NOME = ("<NOME>", PLACEHOLDER_NOME_PARTE_INTERNO)
 
 
 def _remover_comum_isolada_caixa_alta(texto, spans):
-    """Palavra comum em linha toda em maiusculas, e nome de estado ("Jequié-Bahia"), so sao tarjados
-    se colados a outro nome ("Maria Bahia")."""
+    """Palavra comum em linha toda em maiusculas, nome de estado ("Jequié-Bahia") e nome da lista que
+    o proprio documento usa como palavra comum ("Data de Nascimento", ao lado de "certidão de
+    nascimento") so sao tarjados se colados a outro nome ("Maria Bahia", "Ana Nascimento")."""
     inicios = {inicio for inicio, _ in spans}
     fins = {fim for _, fim in spans}
+    # E-mail e endereco web tem nome em minuscula ("fulano.aguiar@gmail.com") e nao contam.
+    texto_sem_enderecos = re.sub(r"\S*(?:@|://|www\.)\S*", " ", texto)
+    usadas_em_minuscula = {
+        _normalizar_token_nome(m.group(0)) for m in _REGEX_PALAVRA.finditer(texto_sem_enderecos) if m.group(0)[0].islower()
+    }
 
     def tem_nome_vizinho(inicio, fim):
         depois = _REGEX_VIZINHO_DEPOIS.match(texto, fim, min(len(texto), fim + 12))
@@ -218,7 +224,8 @@ def _remover_comum_isolada_caixa_alta(texto, spans):
             and linha_toda_em_maiusculas(inicio, fim)
         )
         estado = _normalizar_token_nome(palavra) in _ESTADOS_UMA_PALAVRA_NORMALIZADOS
-        if (comum_em_caixa_alta or estado) and not tem_nome_vizinho(inicio, fim):
+        comum_no_documento = _normalizar_token_nome(palavra) in usadas_em_minuscula
+        if (comum_em_caixa_alta or estado or comum_no_documento) and not tem_nome_vizinho(inicio, fim):
             continue
         resultado.append((inicio, fim))
     return resultado
@@ -360,7 +367,8 @@ def extrair_nomes_pessoais_contextuais(texto_original):
         return nomes_encontrados
 
     conectores_nome = r"(?:DE|DA|DO|DAS|DOS|E|de|da|do|das|dos|e)"
-    bloco_nome = rf"[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+(?:\s+{conectores_nome})?(?:\s+[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+){{1,7}}"
+    # O nome fica numa linha so: em formulario, a linha seguinte e outro rotulo ("M\u00C3E / NOME DO NASCIDO").
+    bloco_nome = rf"[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+(?:[^\S\n]+{conectores_nome})?(?:[^\S\n]+[A-Z\u00C0-\u00DD][A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u00FF]+){{1,7}}"
 
     padroes = [
         re.compile(rf"(?im)^\s*(?P<nome>{bloco_nome})\s*,\s*(?:brasileir[oa]|solteir[oa]|casad[oa]|desempregad[oa]|portador[oa])\b"),
@@ -606,6 +614,11 @@ def _estender_nome_inteiro(texto, spans, spans_protegidos):
                     k += direcao
                     continue
                 if p["classe"] != "maiuscula":
+                    break
+                # Na ponta, a palavra da outra linha e rotulo de formulario ("Sexo / Feminino / FULANA"),
+                # nao continuacao do nome.
+                vizinho = sequencia[k - direcao]
+                if "\n" in texto[min(p["fim"], vizinho["fim"]):max(p["inicio"], vizinho["inicio"])]:
                     break
                 if toda_em_caixa_alta:
                     depois = texto[p["fim"]:p["fim"] + 3]
