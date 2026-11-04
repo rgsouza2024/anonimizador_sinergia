@@ -191,6 +191,7 @@ Pipeline principal em `core/pipeline.py`:
 - `LEGAL_OR_COMMON_TERM`: `keep`
 - `CNH`: `replace` -> `***********`
 - `SIAPE`: `replace` -> `***` (só os 7 dígitos, e só com o rótulo `SIAPE`, `matrícula` ou `mat.` antes; o rótulo é mantido)
+- `NIT`: `mask` parcial -> `NIT 165********` (NIT, PIS, PASEP ou NIS de 11 dígitos, com ou sem pontuação, só com o rótulo antes; o rótulo e os 3 primeiros dígitos ficam). O número do benefício (NB) continua visível.
 - `RG_NUMBER`: `replace` -> `<NUMERO RG>`
 - `TERMO_COMUM`: `keep`
 
@@ -210,6 +211,7 @@ Entidades custom registradas:
 - `TERMO_COMUM`
 - `CNH`
 - `SIAPE`
+- `NIT`
 - `RG_NUMBER`
 - `ID_DOCUMENTO`
 

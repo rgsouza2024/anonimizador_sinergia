@@ -211,5 +211,9 @@
   {
     "id": "rotulos_de_formulario_nao_viram_nome",
     "input": "Fato gerador/ Data de Nascimento\n10/11/2023\nSexo\nFeminino\nMARIA APARECIDA KOWALSKA\n(  ) Titular      (X) Componente\nGrupo familiar\nMÃE\nNOME DO NASCIDO\nJOAO PEDRO KOWALCZYK\n19/03/2024 ATÉ OS DIAS ATUAIS\nPena - reclusão, de um a cinco anos.\nJunta a certidão de nascimento, sob pena de preclusão, há dias. A testemunha Ana Nascimento compareceu. ADVOCACIA AGUIAR - contato.aguiar@gmail.com"
+  },
+  {
+    "id": "nit_pis_nis_mascara_parcial",
+    "input": "NB 2442721567\nNIT\n16546134536\nNIS\n2.033.112.872-6\nPIS/PASEP nº 123.45678.90-1. Documento id 2269495045 e número 26070711445300000002184829279."
   }
 ]

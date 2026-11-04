@@ -20,7 +20,7 @@
 
   // Tipos de entidade que o motor troca ou mascara (os demais só são registrados na auditoria)
   const TIPOS_TARJADOS = new Set(['NOME', 'NOME_PARTE_AUTORA', 'CPF', 'OAB_NUMBER', 'CEP_NUMBER', 'ENDERECO_LOGRADOURO',
-    'EMAIL_ADDRESS', 'PHONE_NUMBER', 'PHONE_NUMBER_BR', 'CNH', 'SIAPE', 'RG_NUMBER']);
+    'EMAIL_ADDRESS', 'PHONE_NUMBER', 'PHONE_NUMBER_BR', 'CNH', 'SIAPE', 'NIT', 'RG_NUMBER']);
 
   // ── ELEMENTOS DO DOM ───────────────────────────────────────────────────────
   const dom = {

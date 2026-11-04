@@ -23,6 +23,8 @@ def obter_operadores_anonimizacao():
         "LEGAL_OR_COMMON_TERM": OperatorConfig("keep"),
         "CNH": OperatorConfig("replace", {"new_value": "***********"}),
         "SIAPE": OperatorConfig("replace", {"new_value": "***"}),
+        # O filtro já deixou só o que vem depois dos 3 primeiros dígitos: mascara tudo isso.
+        "NIT": OperatorConfig("mask", {"type": "mask", "masking_char": "*", "chars_to_mask": 20, "from_end": True}),
         "RG_NUMBER": OperatorConfig("replace", {"new_value": "<NUMERO RG>"}),
         "TERMO_COMUM": OperatorConfig("keep"),
     }

@@ -182,11 +182,11 @@
   {
     "id": "nit_nb_numero_longo",
     "input": "NIT 12732444032 NB 7107032446 e processo 1004207-64.2023.4.01.4200",
-    "output": "NIT 12732444032 NB 7107032446 e processo 1004207-64.2023.4.01.4200",
+    "output": "NIT 127******** NB 7107032446 e processo 1004207-64.2023.4.01.4200",
     "entities": [
       {
-        "entity": "ID_DOCUMENTO",
-        "text": "12732444032"
+        "entity": "NIT",
+        "text": "32444032"
       },
       {
         "entity": "TERMO_COMUM",
@@ -2172,6 +2172,49 @@
       {
         "entity": "EMAIL_ADDRESS",
         "text": "contato.aguiar@gmail.com"
+      }
+    ]
+  },
+  {
+    "id": "nit_pis_nis_mascara_parcial",
+    "input": "NB 2442721567\nNIT\n16546134536\nNIS\n2.033.112.872-6\nPIS/PASEP nº 123.45678.90-1. Documento id 2269495045 e número 26070711445300000002184829279.",
+    "output": "NB 2442721567\nNIT\n165********\nNIS\n2.03***********\nPIS/PASEP nº 123***********. Documento id 2269495045 e número 26070711445300000002184829279.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "NB"
+      },
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "2442721567"
+      },
+      {
+        "entity": "NIT",
+        "text": "46134536"
+      },
+      {
+        "entity": "NIT",
+        "text": "3.112.872-6"
+      },
+      {
+        "entity": "NIT",
+        "text": ".45678.90-1"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Documento"
+      },
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "id 2269495045"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "id"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "número"
       }
     ]
   }

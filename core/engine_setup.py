@@ -225,6 +225,22 @@ def carregar_analyzer_engine(
     )
     analyzer.registry.add_recognizer(
         PatternRecognizer(
+            supported_entity="NIT",
+            name="NitPisRecognizer",
+            # NIT/PIS/PASEP/NIS (11 digitos, com ou sem pontuacao) so com o rotulo antes; numero solto
+            # de 11 digitos e frequente no PJe. filtrar_resultados_analise deixa os 3 primeiros digitos.
+            patterns=[
+                Pattern(
+                    name="nit_com_rotulo",
+                    regex=r"\b(?:NIT|PIS|PASEP|NIS)(?:\s*/\s*(?:PIS|PASEP|NIT))*\s*(?:n[ºo°.]?\s*)?[:\-]?\s*\d(?:[.\-]?\d){10}(?![\d.\-]*\d)",
+                    score=0.95,
+                ),
+            ],
+            supported_language="pt",
+        )
+    )
+    analyzer.registry.add_recognizer(
+        PatternRecognizer(
             supported_entity="SIAPE",
             name="SIAPERecognizer",
             # Exige o rótulo; filtrar_resultados_analise recorta a detecção para os 7 dígitos.

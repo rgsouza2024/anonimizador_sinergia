@@ -818,6 +818,10 @@ def filtrar_resultados_analise(resultados_analise, texto_analise):
         if resultado.entity_type == "SIAPE":
             # A detecção inclui o rótulo ("matrícula SIAPE nº"); só o número é tarjado.
             resultado.start = resultado.end - 7
+        if resultado.entity_type == "NIT":
+            # Máscara parcial: o rótulo e os 3 primeiros dígitos ficam ("NIT 165********").
+            terceiro_digito = [m.end() for m in re.finditer(r"\d", texto_analise[resultado.start:resultado.end])][2]
+            resultado.start += terceiro_digito
         trecho_detectado = texto_analise[resultado.start:resultado.end]
         if resultado.entity_type in {"CPF", "CIN"}:
             cpf_valido = cpf_tem_digitos_validos(trecho_detectado)
@@ -830,6 +834,13 @@ def filtrar_resultados_analise(resultados_analise, texto_analise):
                 if not trecho_tem_contexto_oab(texto_analise, resultado.start, resultado.end):
                     continue
         resultados_filtrados.append(resultado)
+    # Número longo solto (ID_DOCUMENTO, mantido) não vale contra o NIT com rótulo, que é mascarado.
+    spans_nit = [(r.start, r.end) for r in resultados_filtrados if r.entity_type == "NIT"]
+    if spans_nit:
+        resultados_filtrados = [
+            r for r in resultados_filtrados
+            if not (r.entity_type == "ID_DOCUMENTO" and any(r.start < fim and inicio < r.end for inicio, fim in spans_nit))
+        ]
     return resultados_filtrados
 
 
