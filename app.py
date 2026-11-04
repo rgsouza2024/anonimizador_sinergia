@@ -298,7 +298,7 @@ async def pdf_tarjado_endpoint(
     nao_tarjaveis = _paginas_nao_tarjaveis(conteudo)
     paginas = sorted(set(nao_tarjaveis["texto_ilegivel"]) | set(nao_tarjaveis["imagem"]))
     pdf_bytes = gerar_pdf_tarjado(
-        conteudo, metricas.get("trechos_tarjados", []), paginas if cobrir_paginas_nao_tarjaveis else ()
+        conteudo, metricas.get("trechos_tarjados", []), nao_tarjaveis if cobrir_paginas_nao_tarjaveis else None
     )
     nome_base = os.path.splitext(os.path.basename(file.filename))[0]
     nome_saida = quote(f"{nome_base}_tarjado.pdf")

@@ -163,10 +163,12 @@ def test_paginas_nao_tarjaveis():
     assert coberto.headers["x-paginas-nao-tarjadas"] == ""
     with fitz.open(stream=coberto.content, filetype="pdf") as tarjado:
         assert "requer o benefício" in tarjado[0].get_text() and "KOWALCZYK" not in tarjado[0].get_text()
-        for indice in (1, 2):
+        for indice, motivo in ((1, "é uma imagem (foto ou documento digitalizado)"), (2, "usa uma fonte que o anonimizador não consegue ler")):
             pagina = tarjado[indice]
+            texto = " ".join(pagina.get_text().split())
             assert not pagina.get_images(), "Imagem continua na página coberta"
-            assert pagina.get_text().startswith("Página coberta pelo anonimizador"), pagina.get_text()
+            assert texto.startswith("Página ocultada para proteger dados pessoais."), texto
+            assert motivo in texto and texto.endswith("Consulte o documento original, se necessário."), texto
     print("[OK] Páginas de imagem e de texto ilegível: informadas e, a pedido, cobertas por inteiro.")
 
 

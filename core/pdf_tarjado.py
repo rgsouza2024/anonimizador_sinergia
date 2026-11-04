@@ -115,13 +115,22 @@ def _tarjas(pagina, texto_pagina, trechos, caixas=None):
     return tarjas
 
 
-_AVISO_PAGINA_COBERTA = (
-    "Página coberta pelo anonimizador: o conteúdo desta página (imagem ou texto ilegível) "
-    "não pôde ser lido para tarjar."
-)
+# Aviso escrito na pagina coberta: o que foi feito, por que, e o que fazer.
+_AVISO_TITULO = "Página ocultada para proteger dados pessoais."
+_AVISO_MOTIVO = {
+    "imagem": (
+        "Esta página é uma imagem (foto ou documento digitalizado), e o anonimizador não consegue "
+        "tarjar só os dados que estão dentro dela."
+    ),
+    "texto_ilegivel": (
+        "O texto desta página usa uma fonte que o anonimizador não consegue ler, por isso ele não "
+        "consegue tarjar só os dados pessoais."
+    ),
+}
+_AVISO_CONSULTA = "Consulte o documento original, se necessário."
 
 
-def _cobrir_pagina(pagina):
+def _cobrir_pagina(pagina, motivo):
     """Remove texto, imagens e desenhos da pagina inteira e a pinta de preto, com um aviso."""
     pagina.add_redact_annot(pagina.rect, fill=(0, 0, 0))
     pagina.apply_redactions(
@@ -129,24 +138,28 @@ def _cobrir_pagina(pagina):
         graphics=getattr(fitz, "PDF_REDACT_LINE_ART_REMOVE_IF_TOUCHED", 2),
     )
     margem = 0.1 * pagina.rect.width
-    caixa = fitz.Rect(margem, pagina.rect.height / 2 - 40, pagina.rect.width - margem, pagina.rect.height / 2 + 40)
-    pagina.insert_textbox(caixa, _AVISO_PAGINA_COBERTA, fontsize=12, color=(1, 1, 1), align=fitz.TEXT_ALIGN_CENTER)
+    caixa = fitz.Rect(margem, pagina.rect.height / 2 - 80, pagina.rect.width - margem, pagina.rect.height / 2 + 80)
+    aviso = f"{_AVISO_TITULO}\n\n{_AVISO_MOTIVO[motivo]} {_AVISO_CONSULTA}"
+    pagina.insert_textbox(caixa, aviso, fontsize=12, color=(1, 1, 1), align=fitz.TEXT_ALIGN_CENTER)
 
 
-def gerar_pdf_tarjado(conteudo_pdf, trechos_tarjados, paginas_cobrir=()):
+def gerar_pdf_tarjado(conteudo_pdf, trechos_tarjados, paginas_cobrir=None):
     """Devolve os bytes do PDF com tarja preta sobre cada trecho (inicio, fim) do texto extraido.
 
-    paginas_cobrir: numeros (a partir de 1) das paginas cobertas por inteiro, por nao poderem ser
-    tarjadas trecho a trecho (ver paginas_nao_tarjaveis em core/pdf_texto.py).
+    paginas_cobrir: paginas cobertas por inteiro, por nao poderem ser tarjadas trecho a trecho, no
+    formato de paginas_nao_tarjaveis (core/pdf_texto.py): {"texto_ilegivel": [...], "imagem": [...]},
+    com numeros a partir de 1. O motivo escolhe o texto do aviso.
     """
-    paginas_cobrir = set(paginas_cobrir or ())
+    motivo_por_pagina = {
+        numero: motivo for motivo, numeros in (paginas_cobrir or {}).items() for numero in numeros
+    }
     with fitz.open(stream=conteudo_pdf, filetype="pdf") as documento:
         deslocamento = 0
         for numero, pagina in enumerate(documento, start=1):
             texto_pagina, caixas = texto_da_pagina(pagina)
             fim_pagina = deslocamento + len(texto_pagina)
-            if numero in paginas_cobrir:
-                _cobrir_pagina(pagina)
+            if numero in motivo_por_pagina:
+                _cobrir_pagina(pagina, motivo_por_pagina[numero])
                 deslocamento = fim_pagina
                 continue
             trechos_pagina = [
