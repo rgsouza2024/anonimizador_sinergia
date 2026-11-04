@@ -219,5 +219,9 @@
   {
     "id": "membro_da_agu_nao_e_tarjado",
     "input": "Nesses termos, pede deferimento.\nKARINY CHISTINA DE OLIVEIRA\nProcuradora Federal\nContestação da Procuradora Federal Ana Maria Souza.\nMARCOS ANTONIO PEREIRA\nAdvogado da União\nProcurador Federal\nJOSE CARLOS KOWALSKI ajuizou a ação.\nA autora, por seu procurador JOAO PEDRO KOWALCZYK, requer. MARIA APARECIDA SOUZA\nProcuradora"
+  },
+  {
+    "id": "autor_sem_virgula_antes_do_verbo",
+    "input": "AUTOR: JOAO PEDRO KOWALCZYK requer o benefício.\nPACIENTE: Marcos Antonio Zielinski impetra habeas corpus.\nREQUERENTE: Maria das Dores Kowalska"
   }
 ]

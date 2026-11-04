@@ -2336,5 +2336,56 @@
         "text": "Procuradora"
       }
     ]
+  },
+  {
+    "id": "autor_sem_virgula_antes_do_verbo",
+    "input": "AUTOR: JOAO PEDRO KOWALCZYK requer o benefício.\nPACIENTE: Marcos Antonio Zielinski impetra habeas corpus.\nREQUERENTE: Maria das Dores Kowalska",
+    "output": "AUTOR: <NOME_PARTE_AUTORA> requer o benefício.\nPACIENTE: <NOME> impetra habeas corpus.\nREQUERENTE: <NOME_PARTE_AUTORA>",
+    "entities": [
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "AUTOR"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "JOAO PEDRO KOWALCZYK"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requer"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "benefício"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "PACIENTE"
+      },
+      {
+        "entity": "NOME",
+        "text": "Marcos Antonio Zielinski"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "habeas corpus"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "REQUERENTE"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "REQUERENTE"
+      },
+      {
+        "entity": "NOME_PARTE_AUTORA",
+        "text": "Maria das Dores Kowalska"
+      }
+    ]
   }
 ]

@@ -319,8 +319,9 @@ def extrair_nomes_parte_alvo(texto_original, papeis=PAPEIS_ALVO_NOME_PARTE):
 
     padrao_linha_rotulo = re.compile(rf"(?im)^\s*({papeis_regex})\s*:\s*(.+?)\s*$")
     for match in padrao_linha_rotulo.finditer(texto_original):
-        # "AUTOR: NOME, brasileiro, ..." -> o nome termina na primeira virgula.
-        nome_limpo = _limpar_nome_extraido(match.group(2).split(",")[0])
+        # "AUTOR: NOME, brasileiro, ..." e "AUTOR: NOME requer ..." -> o nome termina na primeira virgula
+        # ou na primeira palavra minuscula que nao e conector.
+        nome_limpo = _limpar_nome_extraido(_cortar_na_primeira_minuscula(match.group(2).split(",")[0]))
         if _nome_parte_passa_filtros(nome_limpo):
             nomes_encontrados.add(nome_limpo)
 
