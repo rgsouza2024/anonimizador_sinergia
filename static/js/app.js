@@ -205,9 +205,14 @@
     dom.reviewNomes.value = '';
     dom.reviewCobrirPaginas.checked = true;
     dom.fileBadgeName.textContent = file.name;
-    dom.fileBadgeSize.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+    dom.fileBadgeSize.textContent = `${(file.size / 1024).toFixed(1)} KB · texto somente leitura`;
     dom.fileBadge.style.display = 'flex';
-    dom.inputTexto.placeholder = `Arquivo "${file.name}" anexado e pronto para anonimização. Você também pode digitar observações adicionais ou acionar o botão abaixo.`;
+    // Com arquivo anexado, o que se anonimiza é o arquivo: a caixa só mostra o texto extraído dele
+    dom.inputTexto.value = '';
+    dom.charCounter.textContent = '0 caracteres';
+    dom.inputTexto.readOnly = true;
+    dom.inputTexto.title = 'Texto extraído do arquivo. Para editá-lo, remova o arquivo.';
+    dom.inputTexto.placeholder = `O texto de "${file.name}" aparecerá aqui depois de anonimizar. Para editar o texto, remova o arquivo.`;
     dom.btnAnonimizar.disabled = false;
     mostrarToast(`Arquivo "${file.name}" carregado.`, 'success');
   }
@@ -217,8 +222,13 @@
     dom.btnDownloadPdf.style.display = 'none';
     dom.fileInputUniversal.value = '';
     dom.fileBadge.style.display = 'none';
+    dom.inputTexto.readOnly = false;
+    dom.inputTexto.title = '';
     dom.inputTexto.placeholder = 'Cole o texto da peça jurídica aqui, ou arraste e solte arquivos PDF e Word (.docx)...';
     dom.btnAnonimizar.disabled = dom.inputTexto.value.trim().length === 0;
+    if (dom.inputTexto.value.trim()) {
+      mostrarToast('Arquivo removido. O texto extraído agora pode ser editado e anonimizado como texto.', 'success');
+    }
   }
 
   // Determina URL base da API (suporta porta 7860 mesmo se aberto por Live Server 5501 ou file://)
@@ -279,11 +289,9 @@
           throw new Error(data.erro || data.detail || `Erro no processamento (${response.status})`);
         }
 
-        // Se o textarea estava vazio, preenche com o texto extraído
-        if (!dom.inputTexto.value.trim() && data.texto_extraido) {
-          dom.inputTexto.value = data.texto_extraido;
-          dom.charCounter.textContent = `${data.texto_extraido.length.toLocaleString('pt-BR')} caracteres`;
-        }
+        // A caixa mostra o texto extraído do arquivo atual (somente leitura)
+        dom.inputTexto.value = data.texto_extraido || '';
+        dom.charCounter.textContent = `${dom.inputTexto.value.length.toLocaleString('pt-BR')} caracteres`;
 
       } else {
         // Envio via endpoint de texto puro
