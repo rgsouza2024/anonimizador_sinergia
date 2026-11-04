@@ -17,7 +17,7 @@ def dataframe_entidades_vazio(colunas_entidades_detectadas):
 def gerar_resumo_processamento(df_resultados, origem, tempo_segundos=None, info_metadado_pdf=None):
     sufixo_tempo = ""
     if tempo_segundos is not None:
-        sufixo_tempo = f" Tempo total: {tempo_segundos:.2f}s."
+        sufixo_tempo = f" Tempo total: {tempo_segundos:.2f} s.".replace(".", ",", 1)
     sufixo_metadado = ""
     if str(origem).upper() == "PDF":
         identificado = False

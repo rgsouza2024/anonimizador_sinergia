@@ -157,6 +157,11 @@
     mostrarToast('Download do documento iniciado.', 'success');
   }
 
+  // Números no formato brasileiro: formatarNumero(1234.5, 1) -> "1.234,5"
+  function formatarNumero(valor, casas = 0) {
+    return Number(valor).toLocaleString('pt-BR', { minimumFractionDigits: casas, maximumFractionDigits: casas });
+  }
+
   // ── 3. FORMATAÇÃO E DESTAQUES DE ENTIDADES ─────────────────────────────────
   function classificarTagEntidade(token) {
     const u = (token || '').toUpperCase();
@@ -207,7 +212,7 @@
     dom.reviewNomes.value = '';
     dom.reviewCobrirPaginas.checked = true;
     dom.fileBadgeName.textContent = file.name;
-    dom.fileBadgeSize.textContent = `${(file.size / 1024).toFixed(1)} KB · texto somente leitura`;
+    dom.fileBadgeSize.textContent = `${formatarNumero(file.size / 1024, 1)} KB · texto somente leitura`;
     dom.fileBadge.style.display = 'flex';
     // Com arquivo anexado, o que se anonimiza é o arquivo: a caixa só mostra o texto extraído dele
     dom.inputTexto.value = '';
@@ -495,9 +500,9 @@
     const tempo = data.tempo_processamento || 0;
 
     const totalTarjados = filtrarEntidades(entidades, 'TARJADOS').length;
-    dom.statTempo.textContent = `${tempo.toFixed(2)}s`;
-    dom.statTarjados.textContent = totalTarjados;
-    dom.statMantidos.textContent = entidades.length - totalTarjados;
+    dom.statTempo.textContent = `${formatarNumero(tempo, 2)} s`;
+    dom.statTarjados.textContent = formatarNumero(totalTarjados);
+    dom.statMantidos.textContent = formatarNumero(entidades.length - totalTarjados);
 
     const contagemPorTipo = {};
     entidades.forEach(e => {
@@ -513,7 +518,7 @@
       ['ALL', 'Todas', entidades.length]
     ];
     dom.auditFilterChips.innerHTML = grupos.map(([filtro, rotulo, qtd]) =>
-      `<button class="filter-chip ${state.filtroEntidadeAtual === filtro ? 'active' : ''}" data-filter="${filtro}">${rotulo} (${qtd})</button>`
+      `<button class="filter-chip ${state.filtroEntidadeAtual === filtro ? 'active' : ''}" data-filter="${filtro}">${rotulo} (${formatarNumero(qtd)})</button>`
     ).join('');
 
     // Tipos tarjados primeiro, depois os mantidos; em cada grupo, do mais frequente ao menos
@@ -523,7 +528,7 @@
       const chip = document.createElement('button');
       chip.className = `filter-chip ${state.filtroEntidadeAtual === tipo ? 'active' : ''}`;
       chip.dataset.filter = tipo;
-      chip.textContent = `${tipo} (${qtd})`;
+      chip.textContent = `${tipo} (${formatarNumero(qtd)})`;
       dom.auditFilterChips.appendChild(chip);
     });
 
@@ -615,7 +620,7 @@
         <td><strong>${escaparHtml(e['Texto Detectado'] || '-')}</strong></td>
         <td>${e['Início'] !== undefined ? e['Início'] : '-'}</td>
         <td>${e['Fim'] !== undefined ? e['Fim'] : '-'}</td>
-        <td>${e['Score'] || '1.00'}</td>
+        <td>${formatarNumero(e['Score'] || 1, 2)}</td>
         <td></td>
       `;
       if (TIPOS_TARJADOS.has(e.Entidade) && e['Texto Detectado']) {
