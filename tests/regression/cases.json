@@ -195,5 +195,13 @@
   {
     "id": "autor_com_qualificacao_na_mesma_linha",
     "input": "AUTOR: JOAO PEDRO KOWALCZYK, brasileiro, solteiro, lavrador, residente em Campo Verde/MT, requer o benefício. O autor JOAO PEDRO KOWALCZYK é segurado.\nPACIENTE: MARCOS ANTONIO ZIELINSKI, preso preventivamente, impetra habeas corpus."
+  },
+  {
+    "id": "magistrado_citado_nao_e_tarjado",
+    "input": "EXCELENTÍSSIMO SENHOR JUIZ FEDERAL DO JUIZADO ESPECIAL FEDERAL. MARIA APARECIDA KOWALSKA, brasileira, casada, requer o benefício. (STF, RE 567985, Relator(a): Min. MARCO AURÉLIO, Relator(a) p/ Acórdão: Min. GILMAR MENDES, Tribunal Pleno). (AC 1016601-69.2023.4.01.9999, Rel. Des. Fed. Urbano Leal Berquó Neto, Nona Turma). Relator: JUIZ FEDERAL DERIVALDO DE FIGUEIREDO BEZERRA FILHO, Data de Julgamento: 05/05/2010. Conforme o Relatório Médico, a autora MARIA APARECIDA KOWALSKA está incapaz, nos termos do Ministro do Estado do Trabalho."
+  },
+  {
+    "id": "nome_inteiro_sobrenome_raro_no_meio_testemunha",
+    "input": "A testemunha Rogerio Schietti Cruz depôs. Depois, a testemunha Schietti saiu."
   }
 ]

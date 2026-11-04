@@ -759,7 +759,7 @@
   {
     "id": "nome_inteiro_sobrenome_raro_no_meio",
     "input": "Rel. Min. Rogerio Schietti Cruz votou. Depois, o Ministro Schietti divergiu.",
-    "output": "Rel. Min. <NOME> <NOME> <NOME> votou. Depois, o Ministro <NOME> divergiu.",
+    "output": "Rel. Min. Rogerio Schietti Cruz votou. Depois, o Ministro Schietti divergiu.",
     "entities": [
       {
         "entity": "LOCATION",
@@ -780,22 +780,6 @@
       {
         "entity": "TERMO_COMUM",
         "text": "Ministro"
-      },
-      {
-        "entity": "NOME",
-        "text": "Rogerio"
-      },
-      {
-        "entity": "NOME",
-        "text": "Schietti"
-      },
-      {
-        "entity": "NOME",
-        "text": "Schietti"
-      },
-      {
-        "entity": "NOME",
-        "text": "Cruz"
       }
     ]
   },
@@ -1732,6 +1716,280 @@
       {
         "entity": "TERMO_COMUM",
         "text": "habeas corpus"
+      }
+    ]
+  },
+  {
+    "id": "magistrado_citado_nao_e_tarjado",
+    "input": "EXCELENTÍSSIMO SENHOR JUIZ FEDERAL DO JUIZADO ESPECIAL FEDERAL. MARIA APARECIDA KOWALSKA, brasileira, casada, requer o benefício. (STF, RE 567985, Relator(a): Min. MARCO AURÉLIO, Relator(a) p/ Acórdão: Min. GILMAR MENDES, Tribunal Pleno). (AC 1016601-69.2023.4.01.9999, Rel. Des. Fed. Urbano Leal Berquó Neto, Nona Turma). Relator: JUIZ FEDERAL DERIVALDO DE FIGUEIREDO BEZERRA FILHO, Data de Julgamento: 05/05/2010. Conforme o Relatório Médico, a autora MARIA APARECIDA KOWALSKA está incapaz, nos termos do Ministro do Estado do Trabalho.",
+    "output": "EXCELENTÍSSIMO SENHOR JUIZ FEDERAL DO JUIZADO ESPECIAL FEDERAL. <NOME>, brasileira, casada, requer o benefício. (STF, RE 567985, Relator(a): Min. MARCO AURÉLIO, Relator(a) p/ Acórdão: Min. GILMAR MENDES, Tribunal Pleno). (AC 1016601-69.2023.4.01.9999, Rel. Des. Fed. Urbano Leal Berquó Neto, Nona Turma). Relator: JUIZ FEDERAL DERIVALDO DE FIGUEIREDO BEZERRA FILHO, Data de Julgamento: 05/05/2010. Conforme o Relatório Médico, a autora <NOME> está incapaz, nos termos do Ministro do Estado do Trabalho.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "EXCELENTÍSSIMO SENHOR"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "EXCELENTÍSSIMO"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "EXCELENTÍSSIMO"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "SENHOR"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "SENHOR"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "JUIZ FEDERAL"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "JUIZ"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "JUIZ"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "JUIZADO ESPECIAL FEDERAL"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "JUIZADO ESPECIAL FEDERAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "JUIZADO"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "ESPECIAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "NOME",
+        "text": "MARIA APARECIDA KOWALSKA"
+      },
+      {
+        "entity": "ESTADO_CIVIL",
+        "text": "casada"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "requer"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "benefício"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "STF"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "STF"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Relator"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Relator"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Min."
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Relator"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Relator"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Acórdão"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Acórdão"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Min."
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Min"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Tribunal"
+      },
+      {
+        "entity": "SAFE_LOCATION",
+        "text": "AC"
+      },
+      {
+        "entity": "ID_DOCUMENTO",
+        "text": "1016601-69.2023.4.01.9999"
+      },
+      {
+        "entity": "DATE_TIME",
+        "text": "4.01.9999"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Rel"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Des"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Fed"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Turma"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "Turma"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Relator"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Relator"
+      },
+      {
+        "entity": "LEGAL_HEADER",
+        "text": "JUIZ FEDERAL"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "JUIZ"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "JUIZ"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "ORGANIZACAO_CONHECIDA",
+        "text": "FEDERAL"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Data"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Julgamento"
+      },
+      {
+        "entity": "DATE_TIME",
+        "text": "05/05/2010"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Conforme"
+      },
+      {
+        "entity": "LOCATION",
+        "text": "Relatório Médico"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Relatório"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Médico"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "autora"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "autora"
+      },
+      {
+        "entity": "NOME",
+        "text": "MARIA APARECIDA KOWALSKA"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "termos"
+      },
+      {
+        "entity": "LEGAL_TITLE",
+        "text": "Ministro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Ministro"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Estado"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "Trabalho"
+      }
+    ]
+  },
+  {
+    "id": "nome_inteiro_sobrenome_raro_no_meio_testemunha",
+    "input": "A testemunha Rogerio Schietti Cruz depôs. Depois, a testemunha Schietti saiu.",
+    "output": "A testemunha <NOME> depôs. Depois, a testemunha <NOME> saiu.",
+    "entities": [
+      {
+        "entity": "TERMO_COMUM",
+        "text": "testemunha"
+      },
+      {
+        "entity": "NOME",
+        "text": "Rogerio Schietti Cruz"
+      },
+      {
+        "entity": "TERMO_COMUM",
+        "text": "testemunha"
+      },
+      {
+        "entity": "NOME",
+        "text": "Schietti"
       }
     ]
   }

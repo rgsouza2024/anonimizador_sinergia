@@ -23,6 +23,7 @@ from core.text_filters import (
     extrair_nomes_pessoais_contextuais,
     filtrar_resultados_analise,
     normalizar_placeholders_nome_parte,
+    spans_magistrados_citados,
     spans_nao_tarjar,
     spans_nomes_manuais,
 )
@@ -75,4 +76,5 @@ def executar_anonimizacao(
         nao_tarjar=nao_tarjar or [],
         spans_nomes_manuais_fn=spans_nomes_manuais,
         nomes_manuais=nomes_manuais or [],
+        spans_magistrados_fn=spans_magistrados_citados,
     )

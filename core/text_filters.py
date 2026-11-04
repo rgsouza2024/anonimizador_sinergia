@@ -701,6 +701,44 @@ def spans_nao_tarjar(texto, trechos_nao_tarjar):
     return _mesclar_spans(spans)
 
 
+# Nome de magistrado citado ("Relator: Min. FULANO", "Rel. Des. Fed. Fulano", "JUIZ FEDERAL FULANO"):
+# agente publico no exercicio da funcao, nao e tarjado. O rotulo nao distingue maiuscula; o nome sim.
+_ROTULO_MAGISTRADO = (
+    r"(?i:Relator(?:a\b|\(a\)|\b)(?:\s+(?:p/|para\s+o|do)\s+ac[óo]rd[ãa]o)?"
+    r"|Rel\.(?:\s+(?:p/|para\s+o|do)\s+ac[óo]rd[ãa]o)?"
+    r"|Min\.|Ministr[oa](?:\(a\)|\b)"
+    r"|Des\.(?:\s*Fed\.)?|Desembargador(?:a\b|\(a\)|\b)(?:\s+Federal\b)?"
+    r"|Ju[íi]z(?:a|\(a\))?\s+Federal\b(?:\s+Convocad[oa]\b)?)"
+)
+_TOKEN_NOME_MAGISTRADO = r"(?:[A-ZÀ-Ý][A-Za-zÀ-ÖØ-öø-ÿ']+|[A-Z]\.)"
+_REGEX_MAGISTRADO = re.compile(
+    rf"(?:{_ROTULO_MAGISTRADO}\s*:?\s*)+"
+    rf"(?P<nome>{_TOKEN_NOME_MAGISTRADO}(?:\s+(?:(?:de|da|do|das|dos|e|DE|DA|DO|DAS|DOS|E)\s+)?{_TOKEN_NOME_MAGISTRADO}){{0,7}})"
+)
+# Palavras que encerram o nome (orgao, data do julgamento) ou mostram que nao era nome ("JUIZ FEDERAL DO JUIZADO").
+_FIM_NOME_MAGISTRADO = {
+    "DE", "DA", "DO", "DAS", "DOS", "E", "DATA", "TURMA", "TRIBUNAL", "PLENO", "PLENARIO", "JUIZADO", "VARA",
+    "SECAO", "SUBSECAO", "JULGAMENTO", "JULGADO", "PUBLICACAO", "DECISAO", "ORGAO", "NUM", "FEDERAL", "ESPECIAL",
+}
+
+
+def spans_magistrados_citados(texto):
+    """Trechos com nome de magistrado logo depois do rotulo (relator, ministro, desembargador, juiz federal)."""
+    spans = []
+    for match in _REGEX_MAGISTRADO.finditer(texto or ""):
+        inicio = match.start("nome")
+        fim = inicio
+        for token in re.finditer(r"\S+", match.group("nome")):
+            if _normalizar_token_nome(token.group()) in _FIM_NOME_MAGISTRADO:
+                if token.group().upper() in ("DE", "DA", "DO", "DAS", "DOS", "E") and fim > inicio:
+                    continue  # conectivo no meio do nome: so conta se vier outro nome depois
+                break
+            fim = match.start("nome") + token.end()
+        if fim > inicio:
+            spans.append((inicio, fim))
+    return _mesclar_spans(spans)
+
+
 def normalizar_placeholders_nome_parte(texto):
     if not texto:
         return texto
